@@ -12,8 +12,8 @@ import org.joml.Vector3f;
  */
 public final class KatanaChoreography {
     private static final float DEG = (float)Math.PI / 180;
-    public static final float DRAW_DISTANCE = 13.28F;
-    public static final float SUPPORT_GRIP = 35F;
+    public static final float DRAW_DISTANCE = 13.28F * 320 * BladeRig.MODEL_SCALE;
+    public static final float SUPPORT_GRIP = 18F;
     public static final float GRASP_END = .24F, DRAW_CLEAR = .64F;
     public static final float INSERT_START = .55F, INSERT_END = .86F;
     public record Frame(Matrix4f blade, Matrix4f sheath, float support, float mainContact,
@@ -91,7 +91,7 @@ public final class KatanaChoreography {
     // A directed cutting arc after clearance prevents slerp taking a backwards shortcut
     // from a side-facing saya to a completed horizontal cut (>180 degrees apart).
     private static final Key[] DRAW_CUT = {
-        k(0,-7.529466F,5,-4.657428F,175,0,180,-8,0,0,0,8),
+        k(0,8.5F-DRAW_DISTANCE,3.5F,-3.5F,180,0,180,-8,0,0,0,8),
         k(.35F,-5,4.5F,-6,218,0,135,-4,-30,3,0,10),
         k(.68F,-2,4.5F,-5.5F,285,-3,90,8,10,6,0,12),
         k(1,-1.5F,6,-4.5F,348,-14,75,12,16,3,0,10)};
@@ -124,14 +124,14 @@ public final class KatanaChoreography {
         // The mouth sits outside the left waist; the length follows the flank backwards.
         // +X of the OBJ points towards its pommel, -X towards the closed saya tip.
         // The built-in OBJ's cutting edge is +Y. Carry and draw it edge-up (-Y).
-        var dock = transform(4.7F,6F,-3.5F,106,-8,180);
+        var dock = transform(4.7F,5.5F,-4.7F,106,-8,180);
         return new Frame(dock,new Matrix4f(dock),0,0,0,0,0,0,0,0);
     }
     private static Frame ready() {
         return sample(OVERHEAD,1);
     }
     private static Frame clear() {
-        Matrix4f saya = transform(5.7F,5,-3.5F,175,0,180);
+        Matrix4f saya = transform(8.5F,3.5F,-3.5F,180,0,180);
         return new Frame(new Matrix4f(saya).translate(DRAW_DISTANCE/16,0,0),saya,0,1,1,1,-8,0,0,8,0);
     }
     private static Frame aligned(float pull) {
@@ -227,9 +227,9 @@ public final class KatanaChoreography {
         return new Frame(idle().blade,idle().sheath,0,release,release,release,0,-68*release,0,0,0);
     }
     private static Frame guided(float pull,float lift) {
-        Frame axis=clear();
+        Frame axis=aligned(pull);
         // With the edge-up bind, +Y points upwards; keep the guide above the saya.
-        return new Frame(new Matrix4f(axis.sheath).translate(DRAW_DISTANCE/16*pull,.7F/16*lift,0),axis.sheath,0,1,1,1,
+        return new Frame(new Matrix4f(axis.blade).translate(0,.7F/16*lift,0),axis.sheath,0,1,1,1,
                 axis.hip,axis.chest,axis.lean,axis.step,axis.bank);
     }
     public static boolean judgementRelease(String name) {

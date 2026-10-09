@@ -12,7 +12,7 @@ import net.minecraft.world.entity.player.PlayerModelType;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
-/** First person observes the world avatar. No view-specific joints, IK goals or scale. */
+/** Both views share joints and attachments; first person frames the whole rig together. */
 public final class BladeAvatarPose {
     public record Frame(AvatarRenderState state,PlayerModel model,Matrix4f modelToEntity) {}
 
@@ -46,6 +46,29 @@ public final class BladeAvatarPose {
         var position=camera.position();var state=frame.state();
         return new Matrix4f().rotation(new Quaternionf(camera.rotation()).conjugate())
                 .translate((float)(state.x-position.x),(float)(state.y-position.y),(float)(state.z-position.z))
+                .mul(frame.modelToEntity());
+    }
+    /** One rigid presentation transform for skin, hands, blade and saya. A bounded
+     * observation pitch keeps the waist-held hilt in view and the shoulders behind
+     * the lens. It does not change animation time, IK, size or gameplay aim. */
+    public static Matrix4f firstPersonSpace(Frame frame, float partialTick) {
+        var mc=Minecraft.getInstance();
+        var player=mc.player;
+        var camera=mc.gameRenderer.getMainCamera();
+        var state=frame.state();
+        float radians=(float)Math.PI/180;
+        float yaw=player.getViewYRot(partialTick)*radians;
+        float pitch=player.getViewXRot(partialTick);
+        var nativeView=new Quaternionf().rotationYXZ((float)Math.PI-yaw,-pitch*radians,0);
+        float bodyYaw=state.bodyRot*radians;
+        var framedView=new Quaternionf().rotationYXZ((float)Math.PI-bodyYaw,-(55+pitch*.04F)*radians,0);
+        var position=camera.position();
+        float forward=.20F*state.scale;
+        return new Matrix4f().rotation(new Quaternionf(camera.rotation()).conjugate()).rotate(nativeView)
+                .translate(0,-.08F*state.scale,-.45F*state.scale)
+                .rotate(framedView.conjugate())
+                .translate((float)(state.x-position.x)+ (float)Math.sin(bodyYaw)*forward,
+                        (float)(state.y-position.y), (float)(state.z-position.z)-(float)Math.cos(bodyYaw)*forward)
                 .mul(frame.modelToEntity());
     }
     private BladeAvatarPose() {}

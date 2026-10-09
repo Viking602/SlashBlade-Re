@@ -50,7 +50,9 @@ public final class PerspectiveParityClientProbe {
                         var view=new Matrix4f().rotation(new Quaternionf(camera.rotation()).conjugate())
                                 .translate((float)(state.x-cp.x),(float)(state.y-cp.y),(float)(state.z-cp.z));
                         var bob=new Matrix4f().translation(.025F,-.015F,.01F).rotateZ(.026F);
-                        var expected=new WorldCapture(new Matrix4f(bob).mul(view));
+                        var frame=BladeAvatarPose.extract(player,partial);
+                        var presentation=BladeAvatarPose.firstPersonSpace(frame,partial).mul(BladeAvatarPose.cameraSpace(frame).invert());
+                        var expected=new WorldCapture(new Matrix4f(bob).mul(presentation).mul(view));
                         var stack=new com.mojang.blaze3d.vertex.PoseStack();var offset=renderer.getRenderOffset(state);
                         stack.translate(offset.x,offset.y,offset.z);
                         renderer.submit(state,stack,expected,new net.minecraft.client.renderer.state.level.CameraRenderState());
@@ -82,7 +84,7 @@ public final class PerspectiveParityClientProbe {
             player.setYRot(yaw);player.setXRot(pitch);player.yHeadRot=head;player.yHeadRotO=headOld;player.yBodyRot=body;player.yBodyRotO=bodyOld;player.walkAnimation.stop();BladeMotionState.clear();
         }
         return Map.of("status","passed","samples",samples,"verticesCompared",vertices,"maxVertexErrorBlocks",maxError,
-                "scope","actual AvatarRenderer.submit versus registered RenderHandEvent; every supported clip; left/right; standing/crouching/walking/airborne; skin vertices, normals, blade and saya, same camera and frame");
+                "scope","actual AvatarRenderer.submit versus registered RenderHandEvent after a single rigid framing transform; every supported clip; left/right; standing/crouching/walking/airborne; identical bones, skin vertices, normals, blade and saya");
     }
 
     private static void setLocalCrouching(net.minecraft.client.player.LocalPlayer player,boolean value) {

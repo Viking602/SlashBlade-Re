@@ -57,7 +57,7 @@ public final class BladeRigClientProbe {
                     .getTranslation(new Vector3f());
             var contact = i==1 && f.support()==1
                     ? new Matrix4f(sockets[0]).transformPosition(new Vector3f(KatanaChoreography.SUPPORT_GRIP*BladeRig.MODEL_SCALE,0,0))
-                    : new Matrix4f(socket).transformPosition(new Vector3f(i == 0 ? 0 : BladeRig.SHEATH_GRIP_X * BladeRig.MODEL_SCALE, 0, 0));
+                    : new Matrix4f(socket).transformPosition(new Vector3f((i == 0 ? BladeRig.PRIMARY_GRIP_X : BladeRig.SHEATH_GRIP_X) * BladeRig.MODEL_SCALE, 0, 0));
             double error = wrist.distance(contact);
             maxGripError = Math.max(maxGripError, error);
             require(error < .0001, "weapon grip left the final hand: " + error + " index="+i+" main="+state.mainArm+" score="+f);

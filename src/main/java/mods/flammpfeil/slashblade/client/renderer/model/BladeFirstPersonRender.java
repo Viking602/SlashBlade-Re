@@ -50,9 +50,9 @@ public class BladeFirstPersonRender {
             if (meshes == null) return;
             var input = event.getPoseStack();
             input.pushPose();
-            // The hand pass starts with inverse view. Put the actual world avatar
-            // back through the camera; only the observation point changes.
-            input.mulPose(BladeAvatarPose.cameraSpace(avatar));
+            // Frame the complete shared rig once. Per-part offsets would separate
+            // the palm, grip and saya during transitions.
+            input.mulPose(BladeAvatarPose.firstPersonSpace(avatar,event.getPartialTick()));
             if (!mc.player.isInvisible()) {
                 var arms = new GeometryBuffer();
                 var skin = net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(state.skin.body().texturePath());

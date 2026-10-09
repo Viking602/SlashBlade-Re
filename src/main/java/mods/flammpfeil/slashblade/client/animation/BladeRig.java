@@ -22,10 +22,13 @@ import org.joml.Vector3f;
 
 /** Weapon meshes stay in bind space until the final, already constrained hands are known. */
 public final class BladeRig {
-    // Fit the katana to the fixed eight-pixel shoulder/wrist reach. The previous
-    // oversized blade required an extreme torso twist to clear its own saya.
-    public static final float MODEL_SCALE = 1F / 320;
-    public static final float SHEATH_GRIP_X = -45;
+    // One model scale in both perspectives. Grips sit just behind the tsuba and
+    // around the koiguchi, leaving enough reach for the longer katana to clear.
+    public static final float MODEL_SCALE = 1F / 176;
+    public static final float PRIMARY_GRIP_X = -20;
+    public static final float SHEATH_GRIP_X = -40;
+    private static final net.minecraft.util.context.ContextKey<Matrix4f[]> SOLVED_TARGETS =
+            new net.minecraft.util.context.ContextKey<>(mods.flammpfeil.slashblade.SlashBlade.id("weapon_targets"));
     private static PlayerModel firstPersonStandard, firstPersonSlim;
     public record Meshes(GeometryBuffer blade, GeometryBuffer sheath, boolean noScabbard) {}
 
@@ -75,19 +78,19 @@ public final class BladeRig {
         Quaternionf nativeSpine=PlayerBladeAnimation.vanillaRotation(model.body).mul(spine.conjugate());
         return new Matrix4f().translation(hip).rotate(nativeSpine).translate(0,-12F/16,0).mul(local);
     }
-    private static Matrix4f palmToBlade(Matrix4f palm, HumanoidRenderState state) {
-        if (state.mainArm == HumanoidArm.LEFT) palm.rotateY((float)Math.PI);
+    private static Matrix4f palmToBlade(Matrix4f palm, HumanoidRenderState state, int index) {
+        if ((index==0 ? state.mainArm : state.mainArm.getOpposite()) == HumanoidArm.RIGHT) palm.rotateY((float)Math.PI);
         return palm;
     }
-    private static Matrix4f wristGoal(Matrix4f weapon, float offset, HumanoidRenderState state) {
+    private static Matrix4f wristGoal(Matrix4f weapon, float offset, HumanoidRenderState state, int index) {
         Matrix4f goal = new Matrix4f(weapon).translate(offset*MODEL_SCALE,0,0);
-        if (state.mainArm == HumanoidArm.LEFT) goal.rotateY((float)Math.PI);
+        if ((index==0 ? state.mainArm : state.mainArm.getOpposite()) == HumanoidArm.RIGHT) goal.rotateY((float)Math.PI);
         return goal;
     }
     private static Matrix4f localSocket(HumanoidModel<?> model, HumanoidRenderState state, int index) {
         HumanoidArm side = index == 0 ? state.mainArm : state.mainArm.getOpposite();
-        Matrix4f result = palmToBlade(ArticulatedRig.localHand(arm(model,state,index),center(side,slim(state))),state);
-        if (index == 1) result.translate(-SHEATH_GRIP_X*MODEL_SCALE,0,0);
+        Matrix4f result = palmToBlade(ArticulatedRig.localHand(arm(model,state,index),center(side,slim(state))),state,index);
+        result.translate(-(index == 1 ? SHEATH_GRIP_X : PRIMARY_GRIP_X)*MODEL_SCALE,0,0);
         return result;
     }
     public static void constrain(HumanoidModel<?> model, HumanoidRenderState state) {
@@ -95,28 +98,51 @@ public final class BladeRig {
         if (f.active()<=0) return;
         Matrix4f blade=authored(model,state,f.blade()), saya=authored(model,state,f.sheath());
         boolean bare=Boolean.TRUE.equals(state.getRenderData(PlayerBladeAnimation.NO_SCABBARD));
+        // During draw/noto, solve the two contacts as a coupled pair. Clamping
+        // each wrist independently separates the longer blade from its mouth.
+        if (!bare && f.support()==0 && f.mainContact()>=1 && f.offContact()>=1) {
+            var shift=new Vector3f();
+            for(int pass=0;pass<96;pass++) {
+                float correction=0;
+                for(int index=0;index<2;index++) {
+                    var part=arm(model,state,index);
+                    var side=index==0 ? state.mainArm : state.mainArm.getOpposite();
+                    var wrist=wristGoal(index==0 ? blade : saya,index==0 ? PRIMARY_GRIP_X : SHEATH_GRIP_X,state,index);
+                    var rotation=wrist.getUnnormalizedRotation(new Quaternionf()).normalize();
+                    var delta=wrist.getTranslation(new Vector3f()).add(shift)
+                            .sub(rotation.transform(new Vector3f(center(side,slim(state))/16,0,0)))
+                            .sub(new Vector3f(part.x,part.y,part.z).div(16));
+                    float distance=delta.length();correction=Math.max(correction,distance-.56F);
+                    if(distance>.56F) shift.fma((.56F-distance)/distance,delta);
+                }
+                if(correction<.000001F) break;
+            }
+            blade.setTranslation(blade.getTranslation(new Vector3f()).add(shift));
+            saya.setTranslation(saya.getTranslation(new Vector3f()).add(shift));
+        }
         Vector3f initial=blade.getTranslation(new Vector3f());
         // Project the common two-hand hilt into the intersection of both reach spheres.
         // The second hand must not silently miss the hilt when the primary wrist is clamped.
-        if (f.support() > 0) for (int pass=0;pass<32;pass++) {
+        if (f.support() > 0) for (int pass=0;pass<192;pass++) {
           float correction=0;
           for (int index=0;index<2;index++) {
             ModelPart part=arm(model,state,index);
             HumanoidArm side=index==0 ? state.mainArm : state.mainArm.getOpposite();
-            Matrix4f wrist=wristGoal(blade,index==0 ? 0 : KatanaChoreography.SUPPORT_GRIP,state);
+            Matrix4f wrist=wristGoal(blade,index==0 ? PRIMARY_GRIP_X : KatanaChoreography.SUPPORT_GRIP,state,index);
             var q=wrist.getUnnormalizedRotation(new Quaternionf()).normalize();
             Vector3f goal=wrist.getTranslation(new Vector3f()).sub(q.transform(new Vector3f(center(side,slim(state))/16,0,0)));
             Vector3f shoulder=new Vector3f(part.x,part.y,part.z).div(16);
             Vector3f reach=goal.sub(shoulder,new Vector3f());
             float distance=reach.length();
-            correction=Math.max(correction,distance-.485F);
-            if(distance>.485F) blade.setTranslation(blade.getTranslation(new Vector3f()).fma((.485F-distance)/distance,reach));
+            correction=Math.max(correction,distance-.55F);
+            if(distance>.55F) blade.setTranslation(blade.getTranslation(new Vector3f()).fma((.55F-distance)/distance,reach));
           }
           if(correction<.000001F) break;
         }
         blade.setTranslation(initial.lerp(blade.getTranslation(new Vector3f()),f.support()));
-        Matrix4f right=wristGoal(blade,0,state);
-        Matrix4f left=rigidBlend(wristGoal(saya,SHEATH_GRIP_X,state),wristGoal(blade,KatanaChoreography.SUPPORT_GRIP,state),f.support());
+        state.setRenderData(SOLVED_TARGETS,new Matrix4f[]{new Matrix4f(blade),new Matrix4f(saya)});
+        Matrix4f right=wristGoal(blade,PRIMARY_GRIP_X,state,0);
+        Matrix4f left=rigidBlend(wristGoal(saya,SHEATH_GRIP_X,state,1),wristGoal(blade,KatanaChoreography.SUPPORT_GRIP,state,1),f.support());
         // An arced regrip travels in front of the jacket rather than through the abdomen.
         float regrip=(float)Math.sin(Math.PI*f.support());
         Vector3f arc=PlayerBladeAnimation.partMatrix(model.body).transformDirection(new Vector3f(0,-.07F*regrip,-.10F*regrip));
@@ -135,8 +161,9 @@ public final class BladeRig {
     public static Matrix4f[] attachments(HumanoidModel<?> model, AvatarRenderState state, boolean noScabbard) {
         var f=score(state);
         Matrix4f root=PlayerBladeAnimation.partMatrix(model.root());
-        Matrix4f blade=f.mainContact()>=1 || noScabbard ? localSocket(model,state,0) : authored(model,state,f.blade());
-        Matrix4f saya=f.offContact()>=1 && f.support()==0 ? localSocket(model,state,1) : authored(model,state,f.sheath());
+        var targets=f.active()>0 ? state.getRenderData(SOLVED_TARGETS) : null;
+        Matrix4f blade=f.mainContact()>=1 || noScabbard ? localSocket(model,state,0) : targets==null ? authored(model,state,f.blade()) : new Matrix4f(targets[0]);
+        Matrix4f saya=f.offContact()>=1 && f.support()==0 ? localSocket(model,state,1) : targets==null ? authored(model,state,f.sheath()) : new Matrix4f(targets[1]);
         return new Matrix4f[]{new Matrix4f(root).mul(blade),new Matrix4f(root).mul(saya)};
     }
     public static Matrix4f rigidBlend(Matrix4f a, Matrix4f b, float alpha) {

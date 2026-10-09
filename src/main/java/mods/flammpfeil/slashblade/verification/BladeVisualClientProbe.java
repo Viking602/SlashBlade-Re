@@ -48,9 +48,22 @@ public final class BladeVisualClientProbe {
             ,new Scene("sequence-draw-sheath-oblique", CameraType.THIRD_PERSON_FRONT, Extra.STANDBY_EX, 0, 0)
             ,new Scene("sequence-interrupted-draw", CameraType.THIRD_PERSON_FRONT, Extra.STANDBY_EX, 0, 0)
     };
-    private static final Scene[] scenes=Boolean.getBoolean("slashblade.perspectiveComparison")
+    private static final Scene[] scenes=Boolean.getBoolean("slashblade.firstPersonFraming") ? framingScenes()
+            : Boolean.getBoolean("slashblade.perspectiveComparison")
             ? new Scene[]{new Scene("sequence-third",CameraType.THIRD_PERSON_FRONT,Extra.STANDBY_EX,0,20),
                           new Scene("sequence-first",CameraType.FIRST_PERSON,Extra.STANDBY_EX,0,20)} : allScenes;
+    private static Scene[] framingScenes() {
+        var result=new java.util.ArrayList<Scene>();
+        for(int pitch:new int[]{0,45,65,80,89,-65}) {
+            result.add(new Scene("framing-"+pitch+"-idle",CameraType.FIRST_PERSON,Extra.STANDBY_EX,0,pitch));
+            result.add(new Scene("framing-"+pitch+"-draw",CameraType.FIRST_PERSON,Extra.EX_COMBO_A1,3,pitch));
+            result.add(new Scene("framing-"+pitch+"-cut",CameraType.FIRST_PERSON,Extra.EX_COMBO_A3,5,pitch));
+            result.add(new Scene("framing-"+pitch+"-sa",CameraType.FIRST_PERSON,Extra.EX_JUDGEMENT_CUT_SLASH,5,pitch));
+        }
+        result.add(new Scene("framing-third-idle",CameraType.THIRD_PERSON_FRONT,Extra.STANDBY_EX,0,0));
+        result.add(new Scene("framing-third-cut",CameraType.THIRD_PERSON_FRONT,Extra.EX_COMBO_A3,5,0));
+        return result.toArray(Scene[]::new);
+    }
     private static boolean started, pending;
     private static int sceneIndex, frames, sequenceFrame;
     private static BladeMotionState.Sample scriptedSample;
@@ -128,7 +141,7 @@ public final class BladeVisualClientProbe {
         });
         NeoForge.EVENT_BUS.addListener((RenderFrameEvent.Post event) -> {
             var mc = Minecraft.getInstance();
-            if (!started || pending || sceneIndex >= scenes.length || mc.screen != null || frames < 30) return;
+            if (!started || pending || sceneIndex >= scenes.length || mc.screen != null || frames < (Boolean.getBoolean("slashblade.firstPersonFraming") ? 3 : 30)) return;
             pending = true;
             Scene scene = scenes[sceneIndex];
             boolean sequence = scene.name().startsWith("sequence");
@@ -147,7 +160,8 @@ public final class BladeVisualClientProbe {
                     frames = sequence ? 29 : 0; pending = false;
                     if (sceneIndex == scenes.length) {
                         started=false; scriptedSample=null; mc.setCameraEntity(mc.player);
-                        CombatShowcaseClientProbe.start();
+                        if(Boolean.getBoolean("slashblade.firstPersonFraming")) mc.stop();
+                        else CombatShowcaseClientProbe.start();
                     }
                 });
             });
@@ -155,8 +169,8 @@ public final class BladeVisualClientProbe {
     }
 
     public static void start() {
-        if(Boolean.getBoolean("slashblade.combatShowcase") ||
-                (Boolean.getBoolean("slashblade.combatFirstPerson") && !Boolean.getBoolean("slashblade.perspectiveComparison"))) {
+        if(!Boolean.getBoolean("slashblade.firstPersonFraming") && (Boolean.getBoolean("slashblade.combatShowcase") ||
+                Boolean.getBoolean("slashblade.combatFirstPerson") && !Boolean.getBoolean("slashblade.perspectiveComparison"))) {
             CombatShowcaseClientProbe.start();
             return;
         }

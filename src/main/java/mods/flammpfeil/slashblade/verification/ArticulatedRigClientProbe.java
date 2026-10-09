@@ -66,11 +66,11 @@ public final class ArticulatedRigClientProbe {
                     Vector3f shoulder = base.getTranslation(new Vector3f());
                     Vector3f elbow = base.transformPosition(new Vector3f(0, .25F, 0));
                     Vector3f wrist = new Matrix4f(base).mul(binding.hand()).getTranslation(new Vector3f());
-                    float lengthError = Math.max(Math.abs(shoulder.distance(elbow) - .25F), Math.abs(elbow.distance(wrist) - .25F));
+                    float lengthError = Math.max(Math.abs(shoulder.distance(elbow) - .25F), Math.abs(elbow.distance(wrist) - .3125F));
                     maxLengthError = Math.max(maxLengthError, lengthError);
                     require(lengthError < .00001F, "IK stretched an arm");
                     Matrix4f whole = PlayerBladeAnimation.partMatrix(model.root()).mul(base);
-                    Vector3f surface = whole.transformPosition(LimbSkinning.deform(arm, new Vector3f(center/16, .5F, 0)));
+                    Vector3f surface = whole.transformPosition(LimbSkinning.deform(arm, new Vector3f(center/16, 9F/16, 0)));
                     Vector3f socket = BladeRig.hand(model, side, slim).getTranslation(new Vector3f());
                     float surfaceError = surface.distance(socket);
                     maxSurfaceGripError = Math.max(maxSurfaceGripError, surfaceError);
@@ -80,7 +80,7 @@ public final class ArticulatedRigClientProbe {
                     if (contact >= 1) {
                         Vector3f grip = index==1 && score.support()==1
                                 ? new Matrix4f(weapons[0]).transformPosition(new Vector3f(KatanaChoreography.SUPPORT_GRIP*BladeRig.MODEL_SCALE,0,0))
-                                : new Matrix4f(weapons[index]).transformPosition(new Vector3f(index == 0 ? 0 : BladeRig.SHEATH_GRIP_X*BladeRig.MODEL_SCALE, 0, 0));
+                                : new Matrix4f(weapons[index]).transformPosition(new Vector3f((index == 0 ? BladeRig.PRIMARY_GRIP_X : BladeRig.SHEATH_GRIP_X)*BladeRig.MODEL_SCALE, 0, 0));
                         require(grip.distance(surface) < .0001F, "held weapon detached during draw/sheath");
                     }
                 }
@@ -121,7 +121,6 @@ public final class ArticulatedRigClientProbe {
             state.setRenderData(PlayerBladeAnimation.POSE, null); model.setupAnim(state);
             require(LimbSkinning.get(model.rightArm) == null && LimbSkinning.get(model.leftSleeve) == null, "skinning leaked into an ordinary item pose");
             for (boolean crouch : new boolean[]{false, true}) {
-                if (view) continue; // Viewmodel has deliberately different resting shoulders.
                 state.isCrouching = crouch;
                 state.setRenderData(PlayerBladeAnimation.POSE, null); model.setupAnim(state);
                 var parts = new ModelPart[]{model.body, model.head, model.leftArm, model.rightArm, model.leftLeg, model.rightLeg};

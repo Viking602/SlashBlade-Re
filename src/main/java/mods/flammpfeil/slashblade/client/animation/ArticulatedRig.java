@@ -19,7 +19,7 @@ public final class ArticulatedRig {
             Vector3f direction = authored.transform(new Vector3f(0, 1, 0));
             float bend = (.48F + .52F * (1 - direction.y) * .5F) * weight;
             PlayerBladeAnimation.setRotation(arm, new Quaternionf(authored).rotateX(bend * .5F));
-            LimbSkinning.bind(arm, 4, 8, new Quaternionf().rotationX(-bend), new Quaternionf().rotationX(bend * .5F));
+            LimbSkinning.bind(arm, 4, 9, new Quaternionf().rotationX(-bend), new Quaternionf().rotationX(bend * .5F));
         }
         for (var leg : new ModelPart[]{model.leftLeg, model.rightLeg}) {
             Quaternionf authored = PlayerBladeAnimation.vanillaRotation(leg);
@@ -45,10 +45,10 @@ public final class ArticulatedRig {
         Vector3f direction = goal.sub(shoulder, new Vector3f());
         float distance = direction.length();
         if (distance < 1E-6F) direction.set(0, 1, 0); else direction.div(distance);
-        distance = Math.clamp(distance, .085F, .5F);
+        distance = Math.clamp(distance, .085F, .5625F);
         // At full extension, float round-off otherwise creates a visible sqrt(epsilon)
         // elbow angle when a native straight arm first enters the solver.
-        if (distance > .499999F) distance = .5F;
+        if (distance > .562499F) distance = .5625F;
         Quaternionf reference = PlayerBladeAnimation.vanillaRotation(arm);
         Vector3f pole = elbowPole == null ? reference.transform(new Vector3f(0, 0, 1)) : new Vector3f(elbowPole);
         pole.fma(-pole.dot(direction), direction);
@@ -57,16 +57,18 @@ public final class ArticulatedRig {
             pole.fma(-pole.dot(direction), direction);
         }
         pole.normalize();
-        float half = distance * .5F;
-        float height = (float)Math.sqrt(Math.max(0, .25F*.25F - half*half));
-        Vector3f upperDirection = new Vector3f(direction).mul(half).fma(height, pole).normalize();
-        Vector3f lowerDirection = new Vector3f(direction).mul(half).fma(-height, pole).normalize();
+        // The palm is centred in pixel 9 of the existing 12-pixel arm, not on
+        // its wrist boundary. Solve the unequal 4/5-pixel segments without stretch.
+        float upperAlong=(distance*distance+.25F*.25F-.3125F*.3125F)/(2*distance);
+        float height = (float)Math.sqrt(Math.max(0, .25F*.25F-upperAlong*upperAlong));
+        Vector3f upperDirection = new Vector3f(direction).mul(upperAlong).fma(height, pole).normalize();
+        Vector3f lowerDirection = new Vector3f(direction).mul(distance-upperAlong).fma(-height, pole).normalize();
         // Carry the hand's roll through the forearm and upper arm. Leaving all roll
         // at the wrist creates a candy-wrapper deformation during a cross-body grasp.
         Quaternionf lower = new Quaternionf().rotationTo(wrist.transform(new Vector3f(0, 1, 0)), lowerDirection).mul(wrist).normalize();
         Quaternionf upper = new Quaternionf().rotationTo(lowerDirection, upperDirection).mul(lower).normalize();
         PlayerBladeAnimation.setRotation(arm, upper);
-        LimbSkinning.bind(arm, 4, 8, new Quaternionf(upper).invert().mul(lower), new Quaternionf(lower).invert().mul(wrist));
+        LimbSkinning.bind(arm, 4, 9, new Quaternionf(upper).invert().mul(lower), new Quaternionf(lower).invert().mul(wrist));
     }
     private ArticulatedRig() {}
 }

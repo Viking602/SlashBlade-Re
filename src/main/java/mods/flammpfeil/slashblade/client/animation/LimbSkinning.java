@@ -82,7 +82,7 @@ public final class LimbSkinning {
     }
     public static Matrix4f hand(ModelPart part, float center) {
         var binding = bindings.get(part);
-        return binding == null ? new Matrix4f().translation(center / 16, 8F / 16, 0)
+        return binding == null ? new Matrix4f().translation(center / 16, 9F / 16, 0)
                 : new Matrix4f(binding.hand).translate(center / 16, 0, 0);
     }
     /** Called inside ModelPart.compile, so vanilla visibility, tint, armor trims and glint survive. */

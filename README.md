@@ -10,7 +10,7 @@ Chain your cuts. Time your Slash Arts. Feel the motion carry through your hands,
 
 **[Get started ↓](#get-started)** · [Controls](#make-your-first-cut) · [Build from source](#build-from-source) · [Report an issue](https://github.com/Viking602/SlashBlade-Re/issues)
 
-> **Development preview · `0.1.2-26.1.2-port.20`**<br>
+> **Development preview · `0.1.2-26.1.2-port.21`**<br>
 > This repository provides source code. Build the preview below; a packaged release is not published here yet.
 
 ![Continuous combat against a training Husk: normal combos, Slash Arts and Super SA](media/combat-preview.gif)
@@ -28,7 +28,7 @@ The blade clears its sheath before the cut. Recovery flows into alignment and sh
 Hips lead. Shoulders turn. Elbows and wrists bend. Hands, hilt, and sheath share a coordinated rig, with original choreography inspired by iaido and the pace of Devil May Cry.
 
 **Change your view. Keep your motion.**<br>
-First and third person use the same character pose and weapon attachments. The first-person camera follows the animated head with limited rotation, while your gameplay aim stays under your control.
+First and third person share the larger katana, character pose, and weapon attachments. First person frames the hands, blade, and saya together: the sheathed hilt stays in view at rest, and looking down no longer brings your shoulders across the screen. The camera follows the animated head with limited rotation, while your gameplay aim stays under your control.
 
 **SlashBlade, carried forward.**<br>
 Ground and air combos, Slash Arts, Just SA, and Super SA join the familiar blades, crafting progression, soul materials, and summoned swords. English and Simplified Chinese are built in.
@@ -62,9 +62,11 @@ Super SA requires an eligible enchanted blade with at least **1,000 kills**, ful
 
 ## Built. Played. Compared.
 
-The `port.20` verification run passed **91 required GameTests** and an isolated client check with **73 installed mods**. First- and third-person rendering were compared across **1,704 samples** covering standing, crouching, walking, airborne poses, and both dominant hands.
+The `port.21` verification run passed **91 required GameTests** and isolated client checks with **73 installed mods**. First- and third-person bones, skin, blade, and saya were compared across **1,704 samples**, allowing for the single transform that frames the whole rig in first person.
 
-These checks cover the built-in blades and default animation set. Custom model proportions, other animation mods, and long multiplayer sessions still need separate testing. Real character proportions also mean a low-held sheath or a raised blade can leave the first-person frame.
+Another **3,864 first-person checks** covered both standard and slim skins, both dominant hands, seven look angles from straight up to straight down, and three head-turn angles. The hilt remained visible at rest; arm coverage stayed below 28% in the sampled views. The sheathing check found no blade/saya collisions across **12,864 samples**.
+
+These checks cover the built-in blades and default animation set. Custom model proportions, other animation mods, and long multiplayer sessions still need separate testing. A blade can leave the frame briefly during a wide swing.
 
 ## Build from source
 
@@ -87,7 +89,7 @@ cd SlashBlade-Re
 sh ./gradlew build
 ```
 
-Output: `build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.20.jar`.
+Output: `build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.21.jar`.
 
 To run the server-side regression suite, use the same wrapper with `runGameTestServer` in a disposable checkout. The task writes to a sibling `test-gametest` directory.
 

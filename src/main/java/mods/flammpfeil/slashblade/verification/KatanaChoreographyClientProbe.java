@@ -33,7 +33,9 @@ public final class KatanaChoreographyClientProbe {
                     float distance=previous.transformPosition(new Vector3f(-291*BladeRig.MODEL_SCALE,0,0)).distance(
                             new Matrix4f(f.blade()).transformPosition(new Vector3f(-291*BladeRig.MODEL_SCALE,0,0)));
                     maxStep=Math.max(maxStep,distance);
-                    require(distance<.05F,"cut has an internal discontinuity: "+combo.getName()+" step="+i+" distance="+distance);
+                    // The same angular step travels farther at the tip of a longer
+                    // sword. Normalize by length instead of forbidding larger models.
+                    require(distance/(320*BladeRig.MODEL_SCALE)<.05F,"cut has an internal discontinuity: "+combo.getName()+" step="+i+" distance="+distance);
                 }
                 previous=new Matrix4f(f.blade());
                 if(f.support()==1) require(f.sheath().equals(KatanaChoreography.idle().sheath(),.00001F),"two-hand cut waves the saya with the support hand");
@@ -150,13 +152,11 @@ public final class KatanaChoreographyClientProbe {
             state.setRenderData(PlayerBladeAnimation.VIEWMODEL,view);
             model.setupAnim(state);
             Vector3f hip=new Vector3f(model.leftLeg.x+model.rightLeg.x,model.leftLeg.y+model.rightLeg.y,model.leftLeg.z+model.rightLeg.z).div(32);
-            if(view) hip.y+=1;
             Matrix4f local=new Matrix4f(dock);
-            if(view) local.m31(local.m31()-6F/16);
             if(main==HumanoidArm.LEFT) local=new Matrix4f().scaling(-1,1,1).mul(local).scale(1,1,-1);
             Matrix4f expected=new Matrix4f().translation(hip).rotate(PlayerBladeAnimation.vanillaRotation(model.body)).translate(0,-12F/16,0).mul(local);
             for(int step=0;step<=100;step++) {
-                var combo=Extra.EX_COMBO_A3;
+                var combo=Extra.EX_COMBO_A4;
                 var pose=PlayerBladeAnimation.sample(new BladeAnimationTimeline(combo,combo.getStartFrame()+(combo.getEndFrame()-combo.getStartFrame())*step/100F));
                 if(pose.score().support()!=1) continue;
                 state.setRenderData(PlayerBladeAnimation.POSE,pose); model.setupAnim(state);
@@ -166,6 +166,7 @@ public final class KatanaChoreographyClientProbe {
                 samples++;
             }
         }
+        require(samples>0,"pelvis anchor regression did not exercise a two-handed cut");
         return Map.of("pelvisAnchorCases",samples,"minimumLateralPositionBlocks",minSide,"maximumPelvisAnchorErrorBlocks",maxError);
     }
     private static void require(boolean valid,String message) { if(!valid) throw new IllegalStateException(message); }
