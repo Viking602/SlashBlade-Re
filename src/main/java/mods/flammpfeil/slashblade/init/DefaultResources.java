@@ -4,6 +4,7 @@ import mods.flammpfeil.slashblade.SlashBlade;
 import net.minecraft.resources.Identifier;
 
 public interface DefaultResources{
+    Identifier testLocation=SlashBlade.id("combostate/piercing.vmd");
     Identifier BaseMotionLocation = Identifier.fromNamespaceAndPath(SlashBlade.modid, "combostate/old_motion.vmd");
     Identifier ExMotionLocation = Identifier.fromNamespaceAndPath(SlashBlade.modid, "combostate/motion.vmd");
 }

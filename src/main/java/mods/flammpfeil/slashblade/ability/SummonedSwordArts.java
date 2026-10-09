@@ -110,8 +110,8 @@ public class SummonedSwordArts {
                             //summon
                             SBData.get(entity.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
 
-                                if (state.getProudSoulCount()<20) return;
-                            state.setProudSoulCount(state.getProudSoulCount()-20);
+                                if (state.getProudSoulCount()<mods.flammpfeil.slashblade.SlashBladeConfig.SUMMON_SWORD_ART_COST.get()) return;
+                            state.setProudSoulCount(state.getProudSoulCount()-mods.flammpfeil.slashblade.SlashBladeConfig.SUMMON_SWORD_ART_COST.get());
 
 
                                 AdvancementHelper.grantCriterion(entity, ADVANCEMENT_SPIRAL_SWORDS);
@@ -176,8 +176,8 @@ public class SummonedSwordArts {
 
                             if(target == null) return;
 
-                            if (state.getProudSoulCount()<20) return;
-                            state.setProudSoulCount(state.getProudSoulCount()-20);
+                            if (state.getProudSoulCount()<mods.flammpfeil.slashblade.SlashBladeConfig.SUMMON_SWORD_ART_COST.get()) return;
+                            state.setProudSoulCount(state.getProudSoulCount()-mods.flammpfeil.slashblade.SlashBladeConfig.SUMMON_SWORD_ART_COST.get());
 
                             AdvancementHelper.grantCriterion(entity, ADVANCEMENT_STORM_SWORDS);
 
@@ -234,8 +234,8 @@ public class SummonedSwordArts {
 
                             Level worldIn = entity.level();
 
-                            if (state.getProudSoulCount()<20) return;
-                            state.setProudSoulCount(state.getProudSoulCount()-20);
+                            if (state.getProudSoulCount()<mods.flammpfeil.slashblade.SlashBladeConfig.SUMMON_SWORD_ART_COST.get()) return;
+                            state.setProudSoulCount(state.getProudSoulCount()-mods.flammpfeil.slashblade.SlashBladeConfig.SUMMON_SWORD_ART_COST.get());
 
                             AdvancementHelper.grantCriterion(entity, ADVANCEMENT_BLISTERING_SWORDS);
 
@@ -293,8 +293,8 @@ public class SummonedSwordArts {
                             Level worldIn = entity.level();
                             Entity target = state.getTargetEntity(worldIn);
 
-                            if (state.getProudSoulCount()<20) return;
-                            state.setProudSoulCount(state.getProudSoulCount()-20);
+                            if (state.getProudSoulCount()<mods.flammpfeil.slashblade.SlashBladeConfig.SUMMON_SWORD_ART_COST.get()) return;
+                            state.setProudSoulCount(state.getProudSoulCount()-mods.flammpfeil.slashblade.SlashBladeConfig.SUMMON_SWORD_ART_COST.get());
 
                             AdvancementHelper.grantCriterion(entity, ADVANCEMENT_HEAVY_RAIN_SWORDS);
 
@@ -366,8 +366,8 @@ public class SummonedSwordArts {
             });
 
             SBData.get(sender.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state)->{
-                if(state.getProudSoulCount()<2) return;
-                state.setProudSoulCount(state.getProudSoulCount()-2);
+                if(state.getProudSoulCount()<mods.flammpfeil.slashblade.SlashBladeConfig.SUMMON_SWORD_COST.get()) return;
+                state.setProudSoulCount(state.getProudSoulCount()-mods.flammpfeil.slashblade.SlashBladeConfig.SUMMON_SWORD_COST.get());
 
                 AdvancementHelper.grantCriterion(sender, ADVANCEMENT_SUMMONEDSWORDS);
 

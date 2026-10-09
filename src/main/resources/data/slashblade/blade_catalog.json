@@ -22,7 +22,9 @@
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
-          "TargetEntity": -1
+          "TargetEntity": -1,
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 40
       }
@@ -51,7 +53,9 @@
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
-          "TargetEntity": -1
+          "TargetEntity": -1,
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 60
       }
@@ -80,7 +84,9 @@
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
-          "TargetEntity": -1
+          "TargetEntity": -1,
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 70
       }
@@ -109,7 +115,9 @@
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
-          "TargetEntity": -1
+          "TargetEntity": -1,
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 40
       }
@@ -138,7 +146,9 @@
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
-          "TargetEntity": -1
+          "TargetEntity": -1,
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 70
       }
@@ -162,14 +172,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:wave_edge",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 0,
-          "ModelName": "slashblade:model/named/agito.obj"
+          "ModelName": "slashblade:model/named/agito.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 60,
         "minecraft:custom_data": {
@@ -198,14 +210,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 0,
-          "ModelName": "slashblade:model/named/agito.obj"
+          "ModelName": "slashblade:model/named/agito.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 60,
         "minecraft:custom_data": {
@@ -234,14 +248,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:circle_slash",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 1,
-          "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
+          "ModelName": "slashblade:model/named/muramasa/muramasa.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 60,
         "minecraft:custom_data": {
@@ -270,14 +286,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:piercing",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 1,
-          "ModelName": "slashblade:model/named/sange/sange.obj"
+          "ModelName": "slashblade:model/named/sange/sange.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 70,
         "minecraft:enchantments": {
@@ -311,14 +329,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 1,
-          "ModelName": "slashblade:model/named/sange/sange.obj"
+          "ModelName": "slashblade:model/named/sange/sange.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 70,
         "minecraft:enchantments": {
@@ -354,14 +374,18 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:drive_vertical",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 3,
           "SummonedSwordColor": 3158064,
           "TargetEntity": -1,
           "isDefaultBewitched": 1,
-          "ModelName": "slashblade:model/named/dios/dios.obj"
+          "ModelName": "slashblade:model/named/dios/dios.obj",
+          "SpecialEffects": [
+            "slashblade:wither_edge"
+          ],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 70,
         "minecraft:enchantments": {
@@ -395,14 +419,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:drive_vertical",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 0,
-          "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
+          "ModelName": "slashblade:model/named/muramasa/muramasa.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 50,
         "minecraft:custom_data": {
@@ -431,14 +457,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:wave_edge",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 1,
-          "ModelName": "slashblade:model/named/agito.obj"
+          "ModelName": "slashblade:model/named/agito.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 60,
         "minecraft:custom_data": {
@@ -467,14 +495,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 0,
-          "ModelName": "slashblade:model/named/agito.obj"
+          "ModelName": "slashblade:model/named/agito.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 60,
         "minecraft:custom_data": {
@@ -503,14 +533,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:wave_edge",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 0,
-          "ModelName": "slashblade:model/named/agito.obj"
+          "ModelName": "slashblade:model/named/agito.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 60,
         "minecraft:custom_data": {
@@ -539,13 +571,15 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
-          "isDefaultBewitched": 0
+          "isDefaultBewitched": 0,
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 1561,
         "minecraft:custom_data": {
@@ -574,13 +608,15 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
-          "isDefaultBewitched": 0
+          "isDefaultBewitched": 0,
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 33,
         "minecraft:custom_data": {
@@ -609,13 +645,15 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
-          "isDefaultBewitched": 0
+          "isDefaultBewitched": 0,
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 250,
         "minecraft:custom_data": {
@@ -644,13 +682,15 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
-          "isDefaultBewitched": 0
+          "isDefaultBewitched": 0,
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 2031,
         "minecraft:custom_data": {
@@ -679,13 +719,15 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
-          "isDefaultBewitched": 0
+          "isDefaultBewitched": 0,
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 132,
         "minecraft:custom_data": {
@@ -714,13 +756,15 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
-          "isDefaultBewitched": 0
+          "isDefaultBewitched": 0,
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 60,
         "minecraft:custom_data": {
@@ -749,13 +793,15 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
-          "isDefaultBewitched": 0
+          "isDefaultBewitched": 0,
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 45,
         "minecraft:custom_data": {
@@ -784,14 +830,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 0,
-          "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
+          "ModelName": "slashblade:model/named/muramasa/muramasa.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 40,
         "minecraft:custom_data": {
@@ -820,14 +868,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 0,
-          "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
+          "ModelName": "slashblade:model/named/muramasa/muramasa.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 40,
         "minecraft:custom_data": {
@@ -856,14 +906,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:void_slash",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 1,
-          "ModelName": "slashblade:model/named/sange/sange.obj"
+          "ModelName": "slashblade:model/named/sange/sange.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 70,
         "minecraft:custom_data": {
@@ -892,13 +944,15 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:drive_vertical",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 4,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
-          "isDefaultBewitched": 1
+          "isDefaultBewitched": 1,
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 70,
         "minecraft:enchantments": {
@@ -931,14 +985,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 1,
-          "ModelName": "slashblade:model/named/yamato.obj"
+          "ModelName": "slashblade:model/named/yamato.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 40,
         "minecraft:enchantments": {
@@ -972,14 +1028,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 0,
-          "ModelName": "slashblade:model/named/yamato.obj"
+          "ModelName": "slashblade:model/named/yamato.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 40,
         "minecraft:custom_data": {
@@ -1008,14 +1066,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:sakura_end",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 0,
-          "ModelName": "slashblade:model/named/yasha/yasha.obj"
+          "ModelName": "slashblade:model/named/yasha/yasha.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 70,
         "minecraft:custom_data": {
@@ -1044,14 +1104,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:circle_slash",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 1,
-          "ModelName": "slashblade:model/named/yasha/yasha_true.obj"
+          "ModelName": "slashblade:model/named/yasha/yasha_true.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 70,
         "minecraft:custom_data": {
@@ -1080,14 +1142,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:drive_horizontal",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 1,
-          "ModelName": "slashblade:model/named/agito.obj"
+          "ModelName": "slashblade:model/named/agito.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 40,
         "minecraft:enchantments": {

@@ -144,14 +144,18 @@ public interface ISlashBladeState {
         if(key != null)
             result = SlashArts.NONE.valueOf(key);
 
-        if(result == SlashArts.NONE)
-            result = null;
+
 
         return result != null ? result : SlashArts.JUDGEMENT_CUT;
     }
 	void setSlashArtsKey(String slashArts);
 	String getSlashArtsKey();
 
+    java.util.Set<Identifier> getSpecialEffects();
+    void setSpecialEffects(java.util.Set<Identifier> effects);
+    default boolean hasSpecialEffect(Identifier id){return getSpecialEffects().contains(id);}
+    default void addSpecialEffect(Identifier id){var copy=new java.util.LinkedHashSet<>(getSpecialEffects());copy.add(id);setSpecialEffects(copy);}
+    default void removeSpecialEffect(Identifier id){var copy=new java.util.LinkedHashSet<>(getSpecialEffects());copy.remove(id);setSpecialEffects(copy);}
     boolean isDestructable();
 	void setDestructable(boolean destructable);
 
@@ -230,6 +234,11 @@ public interface ISlashBladeState {
         ComboState current = resolvCurrentComboState(user);
 
         ComboState next = current.getNext(user);
+        if(!isVirtual) {
+            var event=new mods.flammpfeil.slashblade.event.SlashBladeEvent.NextComboEvent(user.getMainHandItem(),this,user,Identifier.fromNamespaceAndPath("slashblade",next.getName()));
+            NeoForge.EVENT_BUS.post(event);
+            next=java.util.Optional.ofNullable(ComboState.NONE.valueOf(event.getNextCombo().getPath())).orElse(ComboState.NONE);
+        }
 
         if(next != ComboState.NONE && next == current)
             return ComboState.NONE;
@@ -250,6 +259,7 @@ public interface ISlashBladeState {
     }
 
     default ComboState doChargeAction(LivingEntity user, int elapsed){
+        if(isBroken() || isSealed() || !user.getMainHandItem().isEnchanted()) return ComboState.NONE;
         Map.Entry<Integer, ComboState> current = resolvCurrentComboStateTicks(user);
 
         if (elapsed <= 2)
@@ -280,6 +290,9 @@ public interface ISlashBladeState {
         }
 
         ComboState cs = this.getSlashArts().doArts(type, user);
+        var performed=new mods.flammpfeil.slashblade.event.SlashBladeEvent.PerformSlashArtEvent(user,elapsed,this,Identifier.fromNamespaceAndPath("slashblade",cs.getName()),type);
+        if(NeoForge.EVENT_BUS.post(performed).isCanceled())return ComboState.NONE;
+        cs=java.util.Optional.ofNullable(ComboState.NONE.valueOf(performed.getComboState().getPath())).orElse(ComboState.NONE);
         if(current.getValue() != cs && cs != ComboState.NONE){
             if(current.getValue().getPriority() > cs.getPriority()) {
                 if(type == SlashArts.ArtsType.Jackpot)
@@ -362,7 +375,7 @@ public interface ISlashBladeState {
     void setDamage(float damage);
 
     default <T extends LivingEntity> void damageBlade(ItemStack stack, int amount, T entityIn, Consumer<T> onBroken){
-        if(amount <= 0) return;
+        if(amount <= 0 || stack.has(net.minecraft.core.component.DataComponents.UNBREAKABLE)) return;
         // The original ItemStack.hurtAndBreak path skipped creative durability.
         // Blade damage now lives in our component, so retain that guard explicitly.
         if(entityIn instanceof Player player && player.getAbilities().instabuild) return;

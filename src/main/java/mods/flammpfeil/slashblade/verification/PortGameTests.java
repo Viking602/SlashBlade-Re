@@ -40,7 +40,7 @@ public final class PortGameTests {
         ResharpedProgressionGameTests.add(tests);
         tests.put("registrations", h -> {
             h.assertValueEqual(BuiltInRegistries.ITEM.keySet().stream().filter(id -> id.getNamespace().equals("slashblade")).count(), 19L, "items");
-            h.assertValueEqual(BuiltInRegistries.ENTITY_TYPE.keySet().stream().filter(id -> id.getNamespace().equals("slashblade")).count(), 10L, "entities");
+            h.assertValueEqual(BuiltInRegistries.ENTITY_TYPE.keySet().stream().filter(id -> id.getNamespace().equals("slashblade")).count(), 11L, "entities");
             h.assertValueEqual(state(blade()).getTargetEntityId(), -1, "fresh blade has no lock-on target");
         });
         tests.put("recipes_and_advancements", h -> {

@@ -77,7 +77,7 @@ public final class BladeRigClientProbe {
                 state.ageInTicks = 117.25F;
                 state.xRot = 35; state.yRot = 47;
                 for (var combo : ComboState.NONE.getRegistry().values()) {
-                    if (!DefaultResources.ExMotionLocation.equals(combo.getMotionLoc()) || combo == ComboState.NONE
+                    if (!(DefaultResources.ExMotionLocation.equals(combo.getMotionLoc()) || DefaultResources.testLocation.equals(combo.getMotionLoc())) || combo == ComboState.NONE
                             || combo == Extra.STANDBY_EX || combo == Extra.STANDBY_INAIR) continue;
                     for (int frame = 0; frame <= 16; frame++) {
                         float t = frame / 16F;

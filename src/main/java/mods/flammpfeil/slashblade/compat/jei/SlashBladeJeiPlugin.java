@@ -28,6 +28,9 @@ public final class SlashBladeJeiPlugin implements IModPlugin {
             var s=SBData.get(stack,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
             return List.of(s.getTranslationKey(),s.isBroken(),s.isSealed(),s.isNoScabbard());
         });
+        for(var item:List.of(SBItems.proudsoul_tiny,SBItems.proudsoul_sphere,SBItems.proudsoul_crystal))registration.registerSubtypeInterpreter(item,(stack,context)->{
+            var data=SBItemData.tag(stack);return List.of(data.getStringOr("SpecialAttackType",""),data.getStringOr("SpecialEffectType",""),stack.getEnchantments());
+        });
         // Material boxes are ordinary chests with a recipe component. Keep each box searchable.
         registration.registerSubtypeInterpreter(Items.CHEST, (stack, context) -> {
             var required=SBItemData.tag(stack).getCompoundOrEmpty("RequiredBlade");
@@ -36,8 +39,10 @@ public final class SlashBladeJeiPlugin implements IModPlugin {
     }
     @Override public void registerExtraIngredients(IExtraIngredientRegistration registration) {
         registration.addExtraItemStacks(BladeCatalog.items());
+        registration.addExtraItemStacks(ArtsItems.all());
     }
     @Override public void registerRecipes(IRecipeRegistration registration) {
+        registration.addItemStackInfo(ArtsItems.all(),Component.translatable("slashblade.jei.stand_arts"));
         var catalog=BladeCatalog.items();
         var factory=registration.getVanillaRecipeFactory();
         var anvils=new ArrayList<mezz.jei.api.recipe.vanilla.IJeiAnvilRecipe>();

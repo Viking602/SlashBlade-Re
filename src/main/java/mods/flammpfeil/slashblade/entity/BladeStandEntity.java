@@ -40,6 +40,10 @@ public class BladeStandEntity extends ItemFrame implements IEntityWithComplexSpa
         super(p_i50224_1_, p_i50224_2_);
     }
 
+    @Override public void tick() {
+        super.tick();
+        if(!level().isClientSide())mods.flammpfeil.slashblade.compat.SBData.get(getItem(),ItemSlashBlade.BLADESTATE).ifPresent(state->net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new mods.flammpfeil.slashblade.event.SlashBladeEvent.BladeStandTickEvent(getItem(),state,this)));
+    }
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket(net.minecraft.server.level.ServerEntity entity) {
         return super.getAddEntityPacket(entity);
@@ -160,6 +164,11 @@ public class BladeStandEntity extends ItemFrame implements IEntityWithComplexSpa
 
     @Override
     public boolean hurtServer(net.minecraft.server.level.ServerLevel level,net.minecraft.world.damagesource.DamageSource source,float amount) {
+        var held=getItem();
+        if(held.getItem() instanceof ItemSlashBlade){
+            var event=new mods.flammpfeil.slashblade.event.SlashBladeEvent.BladeStandAttackEvent(held,mods.flammpfeil.slashblade.compat.SBData.get(held,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new),this,source);
+            if(net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(event).isCanceled())return true;
+        }
         if(source.getEntity() instanceof net.minecraft.world.entity.boss.wither.WitherBoss && source.is(net.minecraft.tags.DamageTypeTags.IS_EXPLOSION)) {
             var blade=getItem();
             if(blade.getItem() instanceof ItemSlashBlade && mods.flammpfeil.slashblade.init.BladeCatalog.baseItemIdentity(blade).equals("slashblade:slashblade")
@@ -171,7 +180,7 @@ public class BladeStandEntity extends ItemFrame implements IEntityWithComplexSpa
     }
 
     protected ItemStack getFrameItemStack() {
-        return new ItemStack(currentType);
+        return new ItemStack(currentType!=null?currentType:mods.flammpfeil.slashblade.init.SBItems.bladestand_1);
     }
 
 }

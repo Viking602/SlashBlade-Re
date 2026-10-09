@@ -34,7 +34,9 @@ public class KillCounter {
         if(!(stack.getItem() instanceof ItemSlashBlade)) return;
 
         SBData.get(stack, ItemSlashBlade.BLADESTATE).ifPresent(state->{
-            state.setKillCount(state.getKillCount() + 1);
+            var gained=new SlashBladeEvent.AddKillCountEvent(stack,state,1);
+            NeoForge.EVENT_BUS.post(gained);
+            state.setKillCount(ResharpedProgression.addClamped(state.getKillCount(),Math.max(0,gained.getNewCount())));
         });
     }
 }

@@ -74,10 +74,10 @@ public final class PlayerBladeAnimation {
     }
     public static Pose sample(BladeAnimationTimeline timeline) {
         var combo = timeline.combo();
-        if (!ready || !DefaultResources.ExMotionLocation.equals(combo.getMotionLoc())
+        if (!ready || (!DefaultResources.ExMotionLocation.equals(combo.getMotionLoc()) && !DefaultResources.testLocation.equals(combo.getMotionLoc()))
                 || combo == Extra.STANDBY_EX || combo == Extra.STANDBY_INAIR) return null;
         String name=combo.getName();
-        boolean fullBody=name.startsWith("ex_aerial_") || name.startsWith("ex_rapid_slash")
+        boolean fullBody=name.startsWith("resharped_") || name.startsWith("ex_aerial_") || name.startsWith("ex_rapid_slash")
                 || name.startsWith("ex_rising_star") || name.startsWith("ex_judgement_cut")
                 || name.startsWith("ex_void_slash") || name.equals("ex_upperslash_jump") || name.equals("ex_super_sa");
         var frame=KatanaChoreography.sample(timeline);

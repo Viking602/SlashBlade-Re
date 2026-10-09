@@ -74,9 +74,16 @@ public final class SBData {
             mods.flammpfeil.slashblade.init.BladeCatalog.initializeBase(item.getItem(),state);
             seen = item.getOrDefault(BLADE_STATE.get(), CustomData.EMPTY);
             if (!seen.isEmpty()) new BladeStateCapabilityProvider(state).deserializeNBT(seen.copyTag());
+            if(!seen.copyTag().getBooleanOr("ResharpedArts",false)) {
+                var meta=SBItemData.tag(item);
+                if(meta.contains("resharped_slash_art")) state.setSlashArtsKey(meta.getStringOr("resharped_slash_art","slashblade:judgement_cut"));
+                var effects=new java.util.LinkedHashSet<net.minecraft.resources.Identifier>();
+                for(var element:meta.getListOrEmpty("resharped_special_effects")) element.asString().map(net.minecraft.resources.Identifier::tryParse).ifPresent(e->{if(e!=null)effects.add(e);});
+                state.setSpecialEffects(effects);
+            }
             state.setChangeListener(this::save);
             loading = false;
-            if (seen.isEmpty()) save();
+            save();
         }
         synchronized void save() {
             ItemStack item = stack.get();

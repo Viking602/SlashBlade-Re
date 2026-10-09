@@ -17,14 +17,16 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:drive_horizontal",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
           "isDefaultBewitched": 1,
-          "ModelName": "slashblade:model/named/agito.obj"
+          "ModelName": "slashblade:model/named/agito.obj",
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 40,
         "minecraft:enchantments": {

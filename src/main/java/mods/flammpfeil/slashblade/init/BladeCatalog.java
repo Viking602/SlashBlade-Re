@@ -31,6 +31,11 @@ public final class BladeCatalog {
         }
     }
     public static ItemStack blade(String id) {
+        var lookup=SBItemData.registries().lookup(mods.flammpfeil.slashblade.registry.slashblade.SlashBladeDefinition.REGISTRY_KEY);
+        if(lookup.isPresent()){
+            var key=net.minecraft.resources.Identifier.tryParse(id.contains(":")?id:"slashblade:"+id);
+            if(key!=null){var entry=lookup.get().get(net.minecraft.resources.ResourceKey.create(mods.flammpfeil.slashblade.registry.slashblade.SlashBladeDefinition.REGISTRY_KEY,key));if(entry.isPresent())return entry.get().value().getBlade();}
+        }
         for(var entry:DEFINITIONS) {
             var definition=entry.getAsJsonObject();
             if(definition.get("key").getAsString().equals(id))
@@ -41,6 +46,10 @@ public final class BladeCatalog {
     public static List<ItemStack> items() {
         var result=new ArrayList<ItemStack>();
         for(var entry:DEFINITIONS) result.add(blade(entry.getAsJsonObject().get("key").getAsString()));
+        SBItemData.registries().lookup(mods.flammpfeil.slashblade.registry.slashblade.SlashBladeDefinition.REGISTRY_KEY).ifPresent(registry->{
+            var existing=new HashSet<String>();for(var entry:DEFINITIONS)existing.add("slashblade:"+entry.getAsJsonObject().get("key").getAsString());
+            registry.listElements().filter(e->!existing.contains(e.key().identifier().toString())).sorted(java.util.Comparator.comparing(e->e.key().identifier().toString())).forEach(e->{var stack=e.value().getBlade();if(!stack.isEmpty())result.add(stack);});
+        });
         return result;
     }
     public static void displayItems(CreativeModeTab.Output output) {

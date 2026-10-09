@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class CombatShowcaseClientProbe {
     private static final boolean FIRST_PERSON=Boolean.getBoolean("slashblade.combatFirstPerson");
     private static final boolean SHOWCASE=Boolean.getBoolean("slashblade.combatShowcase");
-    private static final float SHOWCASE_HEALTH=400;
+    private static final float SHOWCASE_HEALTH=1000;
     private record Stage(String name,ComboState combo,int ticks,String action) {}
     private static final List<Stage> stages=new ArrayList<>();
     private static volatile boolean running,done;
@@ -159,6 +159,10 @@ public final class CombatShowcaseClientProbe {
         stages.add(new Stage("SA · 次元斩释放 / 收刀",null,100,"sa"));
         stages.add(new Stage("Just SA · 蓄力 10 ticks",null,10,"charge"));
         stages.add(new Stage("Just SA · 精准释放 / 收刀",null,85,"just"));
+        for(String art:List.of("sakura_end","void_slash","circle_slash","drive_vertical","drive_horizontal","wave_edge","piercing")) {
+            stages.add(new Stage("SA · "+art+" / charge",null,20,"charge:"+art));
+            stages.add(new Stage("SA · "+art+" / release / sheathe",null,100,"art:"+art));
+        }
         stages.add(new Stage("Super SA · 满耐久 / 千杀 / 蓄力",null,24,"super-charge"));
         stages.add(new Stage("Super SA · 定身 / 延迟斩击 / 收刀",null,110,"super"));
         add("演示结束",null,30);
@@ -167,7 +171,7 @@ public final class CombatShowcaseClientProbe {
             origin=actor.position(); actor.setYRot(0); actor.setXRot(FIRST_PERSON?(SHOWCASE?8:20):0);
             for(var slot:EquipmentSlot.values()) if(slot!=EquipmentSlot.MAINHAND) actor.setItemSlot(slot,ItemStack.EMPTY);
             var sword=new ItemStack(SBItems.slashblade); var s=state(sword);
-            s.setDefaultBewitched(true); s.setKillCount(1000); s.setBaseAttackModifier(6); s.setColorCode(0x66CCFF);
+            s.setProudSoulCount(10000); s.setDefaultBewitched(true); s.setKillCount(1000); s.setBaseAttackModifier(6); s.setColorCode(0x66CCFF);
             sword.enchant(actor.level().registryAccess().getOrThrow(Enchantments.SHARPNESS),1);
             actor.setItemInHand(InteractionHand.MAIN_HAND,sword);
             if(SHOWCASE) {
@@ -175,13 +179,14 @@ public final class CombatShowcaseClientProbe {
                 actor.level().getServer().setDifficulty(net.minecraft.world.Difficulty.NORMAL,true);
                 for(var mob:actor.level().getEntitiesOfClass(Mob.class,actor.getBoundingBox().inflate(64))) mob.discard();
             }
-            target=(SHOWCASE?EntityType.HUSK:EntityType.COW).create(actor.level(),EntitySpawnReason.COMMAND);
+            target=EntityType.HUSK.create(actor.level(),EntitySpawnReason.COMMAND);
             target.setNoAi(true); target.setNoGravity(true);
             // The normal targeting policy includes glowing passive entities as training targets.
             target.setGlowingTag(!SHOWCASE);
             float health=SHOWCASE?SHOWCASE_HEALTH:1000;
             target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(health); target.setHealth(health);
-            previousHealth=health;
+            previousHealth=target.getHealth();
+            if(previousHealth!=health)throw new IllegalStateException("Training health exceeds the entity attribute limit");
             target.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
             target.setYRot(180); target.yHeadRot=target.yHeadRotO=target.yBodyRot=target.yBodyRotO=180;
             target.setPos(origin.add(0,0,2.5)); actor.level().addFreshEntity(target); s.setTargetEntityId(target);
@@ -209,6 +214,14 @@ public final class CombatShowcaseClientProbe {
             events.add(Map.of("tick",shownTick,"stage",current.name,"action",current.action,"combo",current.combo==null?"":current.combo.getName()));
             SlashBlade.LOGGER.info("Combat showcase: tick={} {}",shownTick,current.name);
             if(current.combo!=null) { s.updateComboSeq(actor,current.combo); actor.swing(InteractionHand.MAIN_HAND); }
+            if(current.action.startsWith("charge:")) {
+                actor.teleportTo(origin.x,origin.y,origin.z);actor.setDeltaMovement(Vec3.ZERO);
+                s.setSlashArtsKey("slashblade:"+current.action.substring(7));
+                s.updateComboSeq(actor,ComboState.NONE);actor.startUsingItem(InteractionHand.MAIN_HAND);
+            } else if(current.action.startsWith("art:")) {
+                ((ItemSlashBlade)stack.getItem()).releaseUsing(stack,actor.level(),actor,72000-20);
+                actor.stopUsingItem();
+            }
             switch(current.action) {
                 case "charge" -> { s.updateComboSeq(actor,ComboState.NONE); actor.startUsingItem(InteractionHand.MAIN_HAND); }
                 case "sa", "just" -> {
@@ -217,7 +230,7 @@ public final class CombatShowcaseClientProbe {
                     actor.stopUsingItem();
                     SlashBlade.LOGGER.info("Combat showcase release: held={} combo={}",held,s.getComboSeq().getName());
                 }
-                case "super-charge" -> { s.setDamage(0); s.setKillCount(1000); style(true); }
+                case "super-charge" -> { actor.teleportTo(origin.x,origin.y,origin.z);actor.setDeltaMovement(Vec3.ZERO);s.setSlashArtsKey("slashblade:judgement_cut");s.setDamage(0); s.setKillCount(1000); style(true); }
                 case "super" -> {
                     style(false);
                     SlashBlade.LOGGER.info("Combat showcase Super SA release: combo={} damage={} kills={}",s.getComboSeq().getName(),s.getDamage(),s.getKillCount());
@@ -235,6 +248,9 @@ public final class CombatShowcaseClientProbe {
         InputCommandEvent.onInputChange(actor,input,old,input.getCommands().clone());
     }
     private static String englishTitle(Stage current) {
+        if(current.action.startsWith("charge:") || current.action.startsWith("art:"))
+            return current.action.substring(current.action.indexOf(':')+1).replace('_',' ').toUpperCase(Locale.ROOT)
+                    +(current.action.startsWith("charge:")?"  /  Charge":"  /  Release - recover - sheathe");
         return switch(current.action) {
             case "charge" -> stage+1<stages.size() && stages.get(stage+1).action.equals("just")
                     ? "JUST SA  /  Precision charge" : "STANDARD SA  /  Charge";
@@ -266,6 +282,13 @@ public final class CombatShowcaseClientProbe {
                 categoryDamage.merge(category,((Number)hit.get("damage")).floatValue(),Float::sum);
             }
             report.put("damageByCategory",categoryDamage);
+            var artDamage=new LinkedHashMap<String,Float>();
+            for(String art:List.of("sakura_end","void_slash","circle_slash","drive_vertical","drive_horizontal","wave_edge","piercing")) {
+                float amount=0;
+                for(var hit:hitEvents)if(((String)hit.get("stage")).startsWith("SA · "+art+" / release"))amount+=((Number)hit.get("damage")).floatValue();
+                artDamage.put(art,amount);if(amount<=0)passed=false;
+            }
+            report.put("damageByResharpedArt",artDamage);
             for(String category:List.of("normal","sa","just","super"))
                 if(categoryDamage.getOrDefault(category,0F)<=0) passed=false;
             if(Math.abs(SHOWCASE_HEALTH-shownHealth-damage)>.01F) passed=false;

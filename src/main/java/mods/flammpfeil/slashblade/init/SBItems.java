@@ -25,8 +25,21 @@ public final class SBItems {
         SoulItem(Properties properties, int enchantability) { super(properties.enchantable(enchantability)); }
         @Override public boolean isFoil(ItemStack stack) { return true; }
         @Override public void appendHoverText(ItemStack stack,Item.TooltipContext context,net.minecraft.world.item.component.TooltipDisplay display,java.util.function.Consumer<net.minecraft.network.chat.Component> tooltip,TooltipFlag flag) {
+            var data=mods.flammpfeil.slashblade.compat.SBItemData.tag(stack);
+            var art=net.minecraft.resources.Identifier.tryParse(data.getStringOr("SpecialAttackType",""));
+            if(art!=null && !art.getPath().isEmpty()){
+                var definition=mods.flammpfeil.slashblade.registry.SlashArtsRegistry.VALUES.getValue(art);
+                if(definition!=null)tooltip.accept(definition.getDescription());
+                tooltip.accept(net.minecraft.network.chat.Component.translatable("slashblade.tooltip.apply_art"));
+            }
+            var effect=net.minecraft.resources.Identifier.tryParse(data.getStringOr("SpecialEffectType",""));
+            if(effect!=null && !effect.getPath().isEmpty()){
+                var definition=mods.flammpfeil.slashblade.registry.SpecialEffectsRegistry.VALUES.getValue(effect);
+                if(definition!=null)tooltip.accept(net.minecraft.network.chat.Component.translatable("slashblade.tooltip.effect_level",definition.getDescription(),definition.getRequestLevel()));
+                tooltip.accept(net.minecraft.network.chat.Component.translatable("slashblade.tooltip.apply_effect"));
+            }
             int value=stack.get(net.minecraft.core.component.DataComponents.ENCHANTABLE).value();
-            tooltip.accept(net.minecraft.network.chat.Component.translatable("slashblade.tooltip.soul_material",Math.max(10,value),(int)Math.min(5000L,(long)value*10)));
+            tooltip.accept(net.minecraft.network.chat.Component.translatable("slashblade.tooltip.soul_material",(this==proudsoul_trapezohedron?mods.flammpfeil.slashblade.SlashBladeConfig.TRAPEZOHEDRON_MAX_REFINE.get():Math.max(10,value)),(int)Math.min(5000L,(long)value*10)));
             super.appendHoverText(stack,context,display,tooltip,flag);
         }
         @Override public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
@@ -83,14 +96,25 @@ public final class SBItems {
             proudsoul_trapezohedron, bladestand_1, bladestand_1w, bladestand_2, bladestand_2w, bladestand_s, bladestand_v})
             output.accept(item, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
         BladeCatalog.displayItems(output);
+        ArtsItems.all().forEach(output::accept);
     }
     public static void attributes(ItemAttributeModifierEvent event) {
         SBData.get(event.getItemStack(), ItemSlashBlade.BLADESTATE).ifPresent(state -> {
             event.removeAllModifiersFor(Attributes.ATTACK_DAMAGE);
-            event.addModifier(Attributes.ATTACK_DAMAGE, new AttributeModifier(SlashBlade.id("blade_damage"), state.getBaseAttackModifier(), AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND);
-            event.addModifier(Attributes.ATTACK_DAMAGE, new AttributeModifier(SlashBlade.id("rank_damage"), state.getAttackAmplifier(), AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND);
+            event.addModifier(Attributes.ATTACK_DAMAGE, new AttributeModifier(SlashBlade.id("blade_damage"), attackDamage(event.getItemStack(),state), AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND);
+
             event.addModifier(Attributes.ENTITY_INTERACTION_RANGE, new AttributeModifier(SlashBlade.id("blade_reach"), state.isBroken() ? ReachModifier.BrokendReach() : ReachModifier.BladeReach(), AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND);
         });
+    }
+    public static double displayDamage(mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState state) {
+        if(state.isBroken())return -.5;
+        double factor=state.getKillCount()>=1000?.1:.05;
+        return state.getBaseAttackModifier()*(2-1/(1+factor*state.getRefine()))-1;
+    }
+    private static double attackDamage(ItemStack blade,mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState state) {
+        var event=new mods.flammpfeil.slashblade.event.SlashBladeEvent.UpdateAttackEvent(blade,state,displayDamage(state));
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(event);
+        return event.getNewDamage();
     }
     private SBItems() {}
 }

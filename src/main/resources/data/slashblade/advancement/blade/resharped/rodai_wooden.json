@@ -17,13 +17,15 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:judgement_cut",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 2,
           "SummonedSwordColor": -13421569,
           "TargetEntity": -1,
-          "isDefaultBewitched": 0
+          "isDefaultBewitched": 0,
+          "SpecialEffects": [],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 60,
         "minecraft:custom_data": {

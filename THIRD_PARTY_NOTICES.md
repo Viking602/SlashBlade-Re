@@ -41,9 +41,11 @@ Epic Fight, Weapons of Miracles, and Devil May Cry are credited as design refere
 
 Reference and adaptation source: [0999312/SlashBlade_Resharped](https://github.com/0999312/SlashBlade_Resharped/tree/6e2a0a092fb794d7ea56fd83452869674f3ab1c7), version 1.9.65, commit `6e2a0a092fb794d7ea56fd83452869674f3ab1c7`.
 
-The built-in blade definitions, progression recipes, requirements, soul material conversions, growth economy, acquisition rules and JEI subtype strategy are adapted from this reference for Minecraft 26.1.2. The reference's defaults are used; its configurable settings, complete additional Slash Arts and special-effect implementations are not claimed as included.
+The built-in blade definitions, progression recipes, requirements, soul material conversions, growth economy, acquisition rules and JEI subtype strategy are adapted from this reference for Minecraft 26.1.2. The port also adapts the eight built-in Slash Arts, Wither Edge special effect, blade-stand art/effect/enchantment operations, server configuration, damage and repair rules, entity-drop and named-blade registries, and related events. Optional integrations targeting Forge 1.20.1 are not included as binary-compatible bridges.
 
 The port adds these 18 model/texture resources from the reference under `assets/slashblade/model/`: `named/agito_false.png`, `named/agito_rust.png`, `named/dios/dios.obj`, `named/dios/koseki.png`, `named/orotiagito.png`, `named/agito_rust_true.png`, `named/agito_true.png`, `rodai_diamond.png`, `rodai_golden.png`, `rodai_iron.png`, `rodai_netherite.png`, `rodai_stone.png`, `rodai_wooden.png`, `named/sange/sange.png`, `named/tagayasan.png`, `named/yasha/yasha.obj`, `named/yasha/yasha.png`, and `named/yasha/yasha_true.obj`. Upstream reserves artwork rights to the respective authors; these resources are not relicensed under this repository's MIT grant. Existing artwork retains its prior notices.
+
+Additional port.26 resources from that same reference are `assets/slashblade/model/util/drive.obj`, `assets/slashblade/combostate/piercing.vmd`, and `assets/slashblade/combostate/piercing_pl.vmd`. Their original resource terms remain applicable.
 
 The Resharped code license follows, preserved verbatim:
 MIT License

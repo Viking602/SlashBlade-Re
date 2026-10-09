@@ -76,6 +76,15 @@ public class ItemSlashBlade extends Item {
 
 
 
+    @Override public boolean supportsEnchantment(ItemStack stack,net.minecraft.core.Holder<net.minecraft.world.item.enchantment.Enchantment> enchantment) {
+        return extraEnchantment(enchantment) || new ItemStack(net.minecraft.world.item.Items.IRON_SWORD).supportsEnchantment(enchantment) || super.supportsEnchantment(stack,enchantment);
+    }
+    @Override public boolean isPrimaryItemFor(ItemStack stack,net.minecraft.core.Holder<net.minecraft.world.item.enchantment.Enchantment> enchantment) {
+        return extraEnchantment(enchantment) || new ItemStack(net.minecraft.world.item.Items.IRON_SWORD).isPrimaryItemFor(enchantment) || super.isPrimaryItemFor(stack,enchantment);
+    }
+    private static boolean extraEnchantment(net.minecraft.core.Holder<net.minecraft.world.item.enchantment.Enchantment> enchantment) {
+        return enchantment.is(net.minecraft.world.item.enchantment.Enchantments.SOUL_SPEED) || enchantment.is(net.minecraft.world.item.enchantment.Enchantments.POWER) || enchantment.is(net.minecraft.world.item.enchantment.Enchantments.FEATHER_FALLING) || enchantment.is(net.minecraft.world.item.enchantment.Enchantments.FIRE_PROTECTION) || enchantment.is(net.minecraft.world.item.enchantment.Enchantments.THORNS);
+    }
     public Rarity getRarity(ItemStack stack) {
         return SBData.get(stack, BLADESTATE).map(ISlashBladeState::getRarity).orElse(Rarity.COMMON);
     }
@@ -123,10 +132,11 @@ public class ItemSlashBlade extends Item {
             user.onEquippedItemBroken(stack.getItem(), user.getUsedItemHand() == InteractionHand.OFF_HAND ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND);
 
             var state = SBData.get(stack,BLADESTATE).orElseThrow(IllegalStateException::new);
+            if(net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new mods.flammpfeil.slashblade.event.SlashBladeEvent.BreakEvent(stack,state)).isCanceled())return;
             if (stack.isEnchanted() && user.level() instanceof ServerLevel level) {
                 var pool=level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).listElements()
-                    .filter(e -> e.value().isSupportedItem(stack)).toList();
-                int count=Math.max(1,Math.min(10,state.getProudSoulCount()/100));
+                    .filter(e -> stack.supportsEnchantment(e) && !mods.flammpfeil.slashblade.SlashBladeConfig.NON_DROPPABLE_ENCHANTMENT.get().contains(e.key().identifier().toString())).toList();
+                int count=Math.max(1,Math.min(mods.flammpfeil.slashblade.SlashBladeConfig.MAX_ENCHANTED_PROUDSOUL_DROP.get(),state.getProudSoulCount()/100));
                 for (int i=0;i<count && !pool.isEmpty();i++) {
                     var tiny=new ItemStack(SBItems.proudsoul_tiny);
                     tiny.enchant(pool.get(user.getRandom().nextInt(pool.size())),1);
@@ -135,7 +145,7 @@ public class ItemSlashBlade extends Item {
                     state.setProudSoulCount(state.getProudSoulCount()-100);
                 }
             }
-            int count=Math.max(1,Math.min(10,state.getProudSoulCount()/100));
+            int count=Math.max(1,Math.min(mods.flammpfeil.slashblade.SlashBladeConfig.MAX_PROUDSOUL_DROP.get(),state.getProudSoulCount()/100));
             ItemStack soul = new ItemStack(SBItems.proudsoul_tiny,count);
             state.setProudSoulCount(state.getProudSoulCount()-count*100);
 
@@ -194,6 +204,7 @@ public class ItemSlashBlade extends Item {
         ItemStack stack = attacker.getMainHandItem();
 
         SBData.get(stack, BLADESTATE).ifPresent((state)->{
+            if(net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new mods.flammpfeil.slashblade.event.SlashBladeEvent.HitEvent(stack,state,target,attacker)).isCanceled())return;
             state.resolvCurrentComboState(attacker).hitEffect(target, attacker);
 
             state.damageBlade(stack, 1, attacker, this.getOnBroken(stack));
@@ -226,7 +237,7 @@ public class ItemSlashBlade extends Item {
                 //sa.tickAction(entityLiving);
                 if (sa != ComboState.NONE){
                     boolean creative=entityLiving instanceof Player player && player.getAbilities().instabuild;
-                    if(!creative && state.getProudSoulCount()>=20) state.setProudSoulCount(state.getProudSoulCount()-20);
+                    if(!creative && state.getProudSoulCount()>=state.getSlashArts().getProudSoulCost()) state.setProudSoulCount(state.getProudSoulCount()-state.getSlashArts().getProudSoulCost());
                     else if(!creative) state.damageBlade(stack, 1, entityLiving, this.getOnBroken(stack));
                     entityLiving.swing(InteractionHand.MAIN_HAND);
                 }
@@ -238,6 +249,7 @@ public class ItemSlashBlade extends Item {
     @Override
     public void onUseTick(Level level, LivingEntity player, ItemStack stack, int count) {
         SBData.get(stack, BLADESTATE).ifPresent((state)->{
+            if(net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new mods.flammpfeil.slashblade.event.SlashBladeEvent.ChargeActionEvent(player,player.getTicksUsingItem(),state)).isCanceled())return;
             state.getComboSeq().holdAction(player);
 
             if(!player.level().isClientSide()){
@@ -259,25 +271,14 @@ public class ItemSlashBlade extends Item {
     }
 
     public void tickInventory(ItemStack stack, Level worldIn, Entity entityIn, boolean isSelected) {
+        var updateState=SBData.get(stack,BLADESTATE).orElseThrow(IllegalStateException::new);
+        if(net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new mods.flammpfeil.slashblade.event.SlashBladeEvent.UpdateEvent(stack,updateState,worldIn,entityIn,-1,isSelected)).isCanceled())return;
 
 
         if(!isSelected) {
-            SBData.get(stack, BLADESTATE).ifPresent((state)->{
-                if(entityIn instanceof Player
-                && ((Player) entityIn).hasEffect(MobEffects.HUNGER)
-                && 0 < ((Player) entityIn).getFoodData().getFoodLevel()) {
-
-                    int level = 1 + Math.abs(((LivingEntity) entityIn).getEffect(MobEffects.HUNGER).getAmplifier());
-                    float amout = 0.0004f * level;
-
-                    ((Player) entityIn).causeFoodExhaustion(0.005F * level);
-
-                    state.setDamage(state.getDamage() - amout);
-                }
-            });
-
+            if(entityIn instanceof Player player) repairUnequipped(stack,player);
             return;
-        };
+        }
 
         if(stack == null)
             return;
@@ -296,10 +297,29 @@ public class ItemSlashBlade extends Item {
                     state.setDamage(0.99f);
                 */
 
-                state.resolvCurrentComboState((LivingEntity)entityIn).tickAction((LivingEntity)entityIn);
+                var living=(LivingEntity)entityIn;
+                var resolved=state.resolvCurrentComboState(living);
+                // Timed SA follow-ups must execute their entry hit exactly once, too.
+                resolved=mods.flammpfeil.slashblade.slasharts.ResharpedCombos.enterTimedSegment(living,state,resolved);
+                resolved.tickAction(living);
                 state.sendChanges(entityIn);
             }
         });
+    }
+
+    public static void repairUnequipped(ItemStack stack,Player player) {
+        if(!mods.flammpfeil.slashblade.SlashBladeConfig.SELF_REPAIR_ENABLE.get())return;
+        var state=SBData.get(stack,BLADESTATE).orElseThrow(IllegalStateException::new);
+        boolean hunger=mods.flammpfeil.slashblade.SlashBladeConfig.HUNGER_CAN_REPAIR.get() && player.hasEffect(MobEffects.HUNGER);
+        if((!hunger && !SwordType.from(stack).contains(SwordType.Bewitched)) || state.getDamage()<=0 || player.getFoodData().getFoodLevel()<=0)return;
+        int amount=hunger?1+player.getEffect(MobEffects.HUNGER).getAmplifier():1;
+        int cost=(int)Math.min(Integer.MAX_VALUE,(long)amount*mods.flammpfeil.slashblade.SlashBladeConfig.BEWITCHED_EXP_COST.get());
+        if(mods.flammpfeil.slashblade.SlashBladeConfig.SELF_REPAIR_COST_EXP.get()) {
+            if(player.experienceLevel<cost)return;
+            player.giveExperiencePoints(-cost);
+        }
+        player.causeFoodExhaustion(amount*mods.flammpfeil.slashblade.SlashBladeConfig.BEWITCHED_HUNGER_EXHAUSTION.get().floatValue());
+        state.setDamage(state.getDamage()-amount/(float)state.getMaxDamage());
     }
 
     public CompoundTag getShareTag(ItemStack stack) { return mods.flammpfeil.slashblade.compat.SBItemData.tag(stack); }
@@ -372,9 +392,11 @@ public class ItemSlashBlade extends Item {
             tooltip.accept(Component.translatable("slashblade.tooltip.proud_soul",state.getProudSoulCount()));
             if (state.isBroken()) tooltip.accept(Component.translatable("slashblade.tooltip.broken"));
             if (state.isSealed()) tooltip.accept(Component.translatable("slashblade.tooltip.sealed"));
-            var source=SBItemData.tag(stack);
-            if(source.contains("resharped_definition") && (!source.getStringOr("resharped_slash_art","slashblade:judgement_cut").equals("slashblade:judgement_cut") || !source.getListOrEmpty("resharped_special_effects").isEmpty()))
-                tooltip.accept(Component.translatable("slashblade.tooltip.source_art").withStyle(ChatFormatting.DARK_GRAY));
+            tooltip.accept(Component.translatable("slashblade.tooltip.slash_art",Component.translatable("slash_art.slashblade."+state.getSlashArts().getName())).withStyle(ChatFormatting.AQUA));
+            for(var id:state.getSpecialEffects()) {
+                var effect=mods.flammpfeil.slashblade.registry.SpecialEffectsRegistry.REGISTRY.get().getValue(id);
+                if(effect!=null)tooltip.accept(Component.translatable(effect.getDescriptionId()).withStyle(ChatFormatting.LIGHT_PURPLE));
+            }
             if (state.getKillCount() > 0) tooltip.accept(Component.translatable("slashblade.tooltip.killcount", state.getKillCount()));
             if (state.getRefine() > 0) tooltip.accept(Component.translatable("slashblade.tooltip.refine", state.getRefine()).withStyle((ChatFormatting)refineColor.get(state.getRefine())));
         });

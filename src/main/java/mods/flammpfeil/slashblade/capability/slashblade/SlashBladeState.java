@@ -87,6 +87,9 @@ public class SlashBladeState implements ISlashBladeState{
 
     //performance setting
     protected RangeAttack rangeAttackType; //RangeAttackType
+    private java.util.Set<Identifier> specialEffects=java.util.Set.of();
+    @Override public java.util.Set<Identifier> getSpecialEffects(){return specialEffects;}
+    @Override public void setSpecialEffects(java.util.Set<Identifier> effects){specialEffects=java.util.Set.copyOf(effects);changeListener.run();}
     protected String slashArtsKey; //SpecialAttackType
     protected boolean isDestructable; //isDestructable
     protected boolean isDefaultBewitched; //isDefaultBewitched

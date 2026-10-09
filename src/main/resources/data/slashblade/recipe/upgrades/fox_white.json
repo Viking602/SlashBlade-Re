@@ -36,13 +36,15 @@
             "ProudSoul": 0,
             "killCount": 0,
             "RepairCounter": 0,
-            "SpecialAttackType": "judgement_cut",
+            "SpecialAttackType": "slashblade:judgement_cut",
             "ComboRoot": "standby",
             "ComboRootAir": "standby_inair",
             "StandbyRenderType": 2,
             "SummonedSwordColor": -13421569,
             "TargetEntity": -1,
-            "isDefaultBewitched": 0
+            "isDefaultBewitched": 0,
+            "SpecialEffects": [],
+            "ResharpedArts": true
           },
           "minecraft:max_damage": 45,
           "minecraft:custom_data": {
@@ -78,14 +80,16 @@
         "ProudSoul": 0,
         "killCount": 0,
         "RepairCounter": 0,
-        "SpecialAttackType": "judgement_cut",
+        "SpecialAttackType": "slashblade:judgement_cut",
         "ComboRoot": "standby",
         "ComboRootAir": "standby_inair",
         "StandbyRenderType": 2,
         "SummonedSwordColor": -13421569,
         "TargetEntity": -1,
         "isDefaultBewitched": 1,
-        "ModelName": "slashblade:model/named/sange/sange.obj"
+        "ModelName": "slashblade:model/named/sange/sange.obj",
+        "SpecialEffects": [],
+        "ResharpedArts": true
       },
       "minecraft:max_damage": 70,
       "minecraft:enchantments": {

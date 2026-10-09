@@ -103,7 +103,7 @@ public final class PlayerRenderClientProbe {
                         actor.setItemSlot(EquipmentSlot.MAINHAND, sword);
                         var blade = SBData.get(sword, ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
                         for (var combo : ComboState.NONE.getRegistry().values()) {
-                            if (!DefaultResources.ExMotionLocation.equals(combo.getMotionLoc()) || combo == ComboState.NONE
+                            if (!(DefaultResources.ExMotionLocation.equals(combo.getMotionLoc()) || DefaultResources.testLocation.equals(combo.getMotionLoc())) || combo == ComboState.NONE
                                     || combo == Extra.STANDBY_EX || combo == Extra.STANDBY_INAIR) continue;
                             blade.setComboSeq(combo);
                             blade.setLastActionTime(mc.level.getGameTime());

@@ -30,7 +30,16 @@ public class SlashBlade {
     public static CreativeModeTab SLASHBLADE;
     public static Identifier id(String path) { return Identifier.fromNamespaceAndPath(modid, path); }
 
-    public SlashBlade(IEventBus modBus) {
+    public SlashBlade(IEventBus modBus, net.neoforged.fml.ModContainer container) {
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, SlashBladeConfig.COMMON_CONFIG);
+        mods.flammpfeil.slashblade.registry.ModAttributes.ATTRIBUTES.register(modBus);
+        modBus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent e)->e.add(EntityType.PLAYER,mods.flammpfeil.slashblade.registry.ModAttributes.SLASHBLADE_DAMAGE));
+        mods.flammpfeil.slashblade.registry.SpecialEffectsRegistry.register(modBus);
+        mods.flammpfeil.slashblade.registry.SlashArtsRegistry.register(modBus);
+        modBus.addListener((net.neoforged.neoforge.registries.DataPackRegistryEvent.NewRegistry e)->{
+            e.dataPackRegistry(mods.flammpfeil.slashblade.registry.slashblade.SlashBladeDefinition.REGISTRY_KEY,mods.flammpfeil.slashblade.registry.slashblade.SlashBladeDefinition.CODEC,mods.flammpfeil.slashblade.registry.slashblade.SlashBladeDefinition.CODEC);
+            e.dataPackRegistry(mods.flammpfeil.slashblade.event.drop.EntityDropEntry.REGISTRY_KEY,mods.flammpfeil.slashblade.event.drop.EntityDropEntry.CODEC,mods.flammpfeil.slashblade.event.drop.EntityDropEntry.CODEC);
+        });
         SBData.register(modBus);
         mods.flammpfeil.slashblade.compat.SBRecipes.register(modBus);
         modBus.addListener(RegistryEvents::register);
@@ -44,6 +53,7 @@ public class SlashBlade {
     }
 
     private void setup(FMLCommonSetupEvent event) {
+        mods.flammpfeil.slashblade.slasharts.ResharpedCombos.bootstrap();
         NeoForge.EVENT_BUS.addListener(KnockBackHandler::onLivingKnockBack);
         FallHandler.getInstance().register();
         LockOnManager.getInstance().register();
@@ -52,8 +62,11 @@ public class SlashBlade {
         NeoForge.EVENT_BUS.register(new StunManager());
         AnvilCrafting.getInstance().register();
         RefineHandler.getInstance().register();
+        NeoForge.EVENT_BUS.register(mods.flammpfeil.slashblade.registry.specialeffects.WitherEdge.class);
+        NeoForge.EVENT_BUS.register(mods.flammpfeil.slashblade.event.bladestand.BladeStandActions.class);
         KillCounter.getInstance().register();
         NeoForge.EVENT_BUS.register(new mods.flammpfeil.slashblade.event.ResharpedProgression());
+        NeoForge.EVENT_BUS.register(mods.flammpfeil.slashblade.event.ResharpedEnchantmentHooks.class);
         RankPointHandler.getInstance().register();
         AllowFlightOverrwrite.getInstance().register();
         NeoForge.EVENT_BUS.addListener(TargetSelector::onInputChange);
@@ -87,6 +100,7 @@ public class SlashBlade {
         public static EntityType<EntityHeavyRainSwords> HeavyRainSwords;
         public static EntityType<EntityJudgementCut> JudgementCut;
         public static EntityType<EntitySlashEffect> SlashEffect;
+        public static EntityType<EntityDrive> Drive;
         public static EntityType<PlacePreviewEntity> PlacePreview;
         public static Identifier SWORD_SUMMONED;
 
@@ -108,6 +122,7 @@ public class SlashBlade {
                 helper.register(BlisteringSwordsLoc, BlisteringSwords = build(BlisteringSwordsLoc, EntityBlisteringSwords::new, .5F, .5F, 20));
                 helper.register(HeavyRainSwordsLoc, HeavyRainSwords = build(HeavyRainSwordsLoc, EntityHeavyRainSwords::new, .5F, .5F, 20));
                 helper.register(JudgementCutLoc, JudgementCut = build(JudgementCutLoc, EntityJudgementCut::new, .5F, .5F, 20));
+                helper.register(id("drive"), Drive=build(id("drive"),EntityDrive::new,3,3,1));
                 helper.register(SlashEffectLoc, SlashEffect = build(SlashEffectLoc, EntitySlashEffect::new, .5F, .5F, 20));
                 helper.register(PlacePreviewEntityLoc, PlacePreview = build(PlacePreviewEntityLoc, PlacePreviewEntity::new, .5F, .5F, 20));
             });

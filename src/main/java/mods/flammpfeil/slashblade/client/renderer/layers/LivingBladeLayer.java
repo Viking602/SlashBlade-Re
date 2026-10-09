@@ -38,7 +38,8 @@ public final class LivingBladeLayer<S extends LivingEntityRenderState, M extends
                 var sample = mods.flammpfeil.slashblade.client.animation.BladeMotionState.sample(entity, blade, partial);
                 mods.flammpfeil.slashblade.client.animation.PlayerBladeAnimation.extract(entity, avatar, sample);
                 if (mods.flammpfeil.slashblade.client.animation.PlayerBladeAnimation.available()
-                        && mods.flammpfeil.slashblade.init.DefaultResources.ExMotionLocation.equals(sample.current().combo().getMotionLoc())) {
+                        && (mods.flammpfeil.slashblade.init.DefaultResources.ExMotionLocation.equals(sample.current().combo().getMotionLoc())
+                        || mods.flammpfeil.slashblade.init.DefaultResources.testLocation.equals(sample.current().combo().getMotionLoc()))) {
                     var meshes = mods.flammpfeil.slashblade.client.animation.BladeRig.capture(entity.getMainHandItem(), blade, state.lightCoords);
                     state.setRenderData(RIG, meshes);
                     state.setRenderData(GEOMETRY, meshes.blade());

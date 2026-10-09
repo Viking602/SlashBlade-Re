@@ -21,6 +21,15 @@ import mods.flammpfeil.slashblade.compat.LazyOptional;
 import java.util.Optional;
 
 public class JudgementCut {
+    public static void doJudgementCutSuper(LivingEntity owner){
+        if(owner.level().isClientSide())return;
+        for(var target:owner.level().getEntitiesOfClass(LivingEntity.class,owner.getBoundingBox().inflate(48),e->e!=owner && mods.flammpfeil.slashblade.util.TargetSelector.canAttack(owner,e) && e.distanceToSqr(owner)<=1600)){
+            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOWNESS,40,10));
+            var cut=new EntityJudgementCut(SlashBlade.RegistryEvents.JudgementCut,owner.level());cut.setOwner(owner);cut.setPos(target.position());
+            SBData.get(owner.getMainHandItem(),ItemSlashBlade.BLADESTATE).ifPresent(s->cut.setColor(s.getColorCode()));owner.level().addFreshEntity(cut);
+        }
+    }
+
     static public EntityJudgementCut doJudgementCutJust(LivingEntity user){
         EntityJudgementCut sa = doJudgementCut(user);
         if (sa == null) return null;

@@ -48,7 +48,7 @@ public final class BladeMotionClientProbe {
         var initial = new BladeAnimationTimeline(Extra.EX_COMBO_A1, 6);
         var idle = new BladeAnimationTimeline(Extra.STANDBY_EX, 0);
         for (var combo : ComboState.NONE.getRegistry().values()) {
-            if (!DefaultResources.ExMotionLocation.equals(combo.getMotionLoc()) || combo == ComboState.NONE
+            if (!(DefaultResources.ExMotionLocation.equals(combo.getMotionLoc()) || DefaultResources.testLocation.equals(combo.getMotionLoc())) || combo == ComboState.NONE
                     || combo == Extra.STANDBY_EX || combo == Extra.STANDBY_INAIR) continue;
             var history = new BladeMotionState.History();
             var before = history.resolve(blade, 0, 100, initial);

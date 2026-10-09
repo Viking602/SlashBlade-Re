@@ -258,6 +258,7 @@ public final class KatanaChoreography {
         String name = combo.getName();
         float t = (timeline.frame()-combo.getStartFrame())/Math.max(1,combo.getEndFrame()-combo.getStartFrame());
         t=Math.clamp(t,0,1);
+        if(name.startsWith("resharped_")) return resharped(name.substring(10),t);
         if(name.equals("ex_judgement_cut")) return preparation(t);
         if(name.startsWith("ex_judgement_cut")) {
             if(name.contains("sheath")) return sheath(t,judgement(1));
@@ -295,6 +296,32 @@ public final class KatanaChoreography {
         }
         if (name.contains("_sheath")) return sheath(t,attack(name,1));
         return attack(name,Math.clamp(t,0,1));
+    }
+    private static Frame resharped(String name,float t) {
+        if(name.startsWith("sakura_end")) {
+            if(name.contains("finish2"))return sheath(t,oneHand(sample(REVERSE,1)));
+            if(name.contains("finish"))return oneHand(sample(REVERSE,1));
+            if(name.contains("right")) return t<.16F
+                    ? mix(oneHand(sample(HORIZONTAL,1)),oneHand(sample(REVERSE,0)),ease(0,.16F,t))
+                    : oneHand(sample(REVERSE,(t-.16F)/.84F));
+            return oneHand(sample(HORIZONTAL,t));
+        }
+        if(name.startsWith("piercing")) {
+            if(name.equals("piercing"))return mix(ready(),sample(THRUST,0),ease(0,1,t));
+            if(name.endsWith("end2"))return sheath(t,sample(THRUST,1));
+            if(name.endsWith("end"))return sample(THRUST,1);
+            return sample(THRUST,Math.clamp(t*2,0,1));
+        }
+        if(name.startsWith("void_slash"))return name.contains("sheath")?sheath(t,judgement(1)):judgement(t);
+        if(name.equals("judgement_cut_end"))return judgement(t);
+        if(name.startsWith("circle_slash")) {
+            if(name.contains("end"))return sheath(name.endsWith("end2")?(21+23*t)/44F:21*t/44F,oneHand(sample(HORIZONTAL,1)));
+            var cut=oneHand(sample(HORIZONTAL,t));
+            return new Frame(cut.blade,cut.sheath,cut.support,cut.mainContact,cut.offContact,cut.active,cut.hip,cut.chest,cut.lean,cut.step,cut.bank);
+        }
+        boolean vertical=name.contains("vertical");var path=vertical?OVERHEAD:HORIZONTAL;
+        if(name.endsWith("_end"))return sheath(t,sample(path,1));
+        return sample(path,Math.clamp(t*2,0,1));
     }
     public static boolean continuous(BladeAnimationTimeline a, BladeAnimationTimeline b) {
         var end=sample(new BladeAnimationTimeline(a.combo(),a.combo().getEndFrame()));

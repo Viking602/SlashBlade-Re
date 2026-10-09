@@ -59,18 +59,31 @@ public class RefineHandler {
         int refineLimit = Math.max(10, level);
 
         var state=SBData.get(result,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
-        int available=event.getPlayer().getAbilities().instabuild ? material.getCount() : Math.min(material.getCount(),event.getPlayer().experienceLevel);
-        int before=state.getRefine();
-        int gain=Math.min(available,Math.max(0,refineLimit-before));
-        // At the cap, a single material can still repair; it cannot create free soul points.
-        int cost=gain>0 ? gain : state.getDamage()>0 && available>0 ? 1 : 0;
-        if(cost==0) return;
-        state.setRefine(before+gain);
-        state.setMaxDamage(ResharpedProgression.addClamped(state.getMaxDamage(),Math.min(before+gain,200)-Math.min(before,200)));
+        if(material.is(mods.flammpfeil.slashblade.init.SBItems.proudsoul_trapezohedron)) refineLimit=mods.flammpfeil.slashblade.SlashBladeConfig.TRAPEZOHEDRON_MAX_REFINE.get();
+        int before=state.getRefine(),after=before,cost=0,xp=0;
+        int unitCost=mods.flammpfeil.slashblade.SlashBladeConfig.REFINE_LEVEL_COST.get();
+        boolean creative=event.getPlayer().getAbilities().instabuild;
+        // Bound attempts by the actual stack, even if an add-on changes the material cost.
+        for(int attempt=0;attempt<material.getCount() && cost<material.getCount();attempt++) {
+            if(after>=refineLimit && (state.getDamage()<=0 || cost>0))break;
+            var progress=new RefineProgressEvent(result,state,cost+1,unitCost,xp,after<refineLimit?after+1:after,event);
+            if(NeoForge.EVENT_BUS.post(progress).isCanceled())break;
+            long nextXp=(long)xp+Math.max(0,progress.getLevelCost());
+            if(progress.getMaterialCost()<=cost || progress.getMaterialCost()>material.getCount() || nextXp>Integer.MAX_VALUE || (!creative && nextXp>event.getPlayer().experienceLevel))break;
+            cost=progress.getMaterialCost();xp=(int)nextXp;after=Math.clamp(progress.getRefineResult(),before,Math.max(before,refineLimit));
+        }
+        if(cost==0)return;
+        var settled=new RefineSettlementEvent(result,state,cost,xp,after,event);
+        if(NeoForge.EVENT_BUS.post(settled).isCanceled())return;
+        cost=settled.getMaterialCost();xp=settled.getCostResult();after=Math.clamp(settled.getRefineResult(),before,Math.max(before,refineLimit));
+        if(cost<=0 || cost>material.getCount() || xp<0 || (!creative && xp>event.getPlayer().experienceLevel))return;
+        int gain=after-before;
+        state.setRefine(after);
+        state.setMaxDamage(ResharpedProgression.addClamped(state.getMaxDamage(),Math.min(after,200)-Math.min(before,200)));
         state.setProudSoulCount(ResharpedProgression.addClamped(state.getProudSoulCount(),gain*Math.min(5000L,(long)level*10)));
         state.setDamage(0);
         event.setMaterialCost(cost);
-        event.setXpCost(cost);
+        event.setXpCost(xp);
         event.setOutput(result);
     }
 

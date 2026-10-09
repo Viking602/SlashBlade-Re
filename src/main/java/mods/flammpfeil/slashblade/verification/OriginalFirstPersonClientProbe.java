@@ -35,7 +35,7 @@ public final class OriginalFirstPersonClientProbe {
             for(var side:HumanoidArm.values()) {
                 player.setMainArm(side);
                 for(var combo:ComboState.NONE.getRegistry().values()) {
-                    if(combo==ComboState.NONE || !DefaultResources.ExMotionLocation.equals(combo.getMotionLoc()))continue;
+                    if(combo==ComboState.NONE || !(DefaultResources.ExMotionLocation.equals(combo.getMotionLoc()) || DefaultResources.testLocation.equals(combo.getMotionLoc())))continue;
                     for(float phase:new float[]{0,.05F,.25F,.45F,.8F,1}) {
                         float elapsed=(combo.getEndFrame()-combo.getStartFrame())/(1.5F*combo.getSpeed())*phase;
                         float partial=elapsed-(int)elapsed;
@@ -72,7 +72,7 @@ public final class OriginalFirstPersonClientProbe {
     private static Map<String,Object> verifyTransitions(LayerMainBlade reference) {
         var clips=new ArrayList<ComboState>();
         for(var c:ComboState.NONE.getRegistry().values())
-            if(c!=ComboState.NONE && DefaultResources.ExMotionLocation.equals(c.getMotionLoc()))clips.add(c);
+            if(c!=ComboState.NONE && (DefaultResources.ExMotionLocation.equals(c.getMotionLoc()) || DefaultResources.testLocation.equals(c.getMotionLoc())))clips.add(c);
         UUID blade=new UUID(0,42);int cases=0;float relativeError=0,boundaryError=0;
         // Every clip can interrupt idle or be interrupted by another draw/SA.
         // Include recoveries, not just the usual A/B/C path.

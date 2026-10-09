@@ -24,6 +24,10 @@ public final class SBItemData {
         if (lookup == null) lookup = net.minecraft.core.RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
         return RegistryOps.create(NbtOps.INSTANCE, lookup);
     }
+    public static HolderLookup.Provider registries(){
+        var server=ServerLifecycleHooks.getCurrentServer();
+        return server!=null?server.registryAccess():registries!=null?registries:net.minecraft.core.RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
+    }
     public static CompoundTag tag(ItemStack stack) { return stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag(); }
     public static boolean hasTag(ItemStack stack) { return !stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).isEmpty(); }
     public static void update(ItemStack stack, Consumer<CompoundTag> update) { CustomData.update(DataComponents.CUSTOM_DATA, stack, update); }

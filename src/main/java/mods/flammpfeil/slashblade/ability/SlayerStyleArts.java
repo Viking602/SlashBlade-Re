@@ -74,6 +74,7 @@ public class SlayerStyleArts {
         Level worldIn = sender.level();
 
         if(!old.contains(InputCommand.SPRINT)){
+            if(current.contains(InputCommand.SPRINT) && NeoForge.EVENT_BUS.post(new mods.flammpfeil.slashblade.event.ability.SprintMoveEvent(sender,current)).isCanceled())return;
 
             boolean isHandled = false;
 

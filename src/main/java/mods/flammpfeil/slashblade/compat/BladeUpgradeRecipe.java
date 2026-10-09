@@ -40,17 +40,28 @@ public final class BladeUpgradeRecipe extends ShapedRecipe {
         for (int slot=0;slot<input.size();slot++) {
             var candidate=input.getItem(slot);
             if (candidate.getItem() instanceof ItemSlashBlade) {
-                // Upgrades consume exactly one existing blade, never silently discard another.
-                if (!base.isEmpty()) return ItemStack.EMPTY;
-                base=candidate;
+                if (base.isEmpty()) base=candidate;
             }
         }
         var result=base.isEmpty() ? output.create() : transfer(base,output.create());
+        if(!base.isEmpty()) {
+            var progress=SBData.get(result,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
+            long souls=0,kills=0,refine=0;var effects=new java.util.LinkedHashSet<>(progress.getSpecialEffects());
+            for(var ingredient:input.items())if(ingredient.getItem() instanceof ItemSlashBlade){
+                var s=SBData.get(ingredient,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
+                souls+=s.getProudSoulCount();kills+=s.getKillCount();
+                refine=mods.flammpfeil.slashblade.SlashBladeConfig.DO_CRAFTING_SUM_REFINE.get()?refine+s.getRefine():Math.max(refine,s.getRefine());
+                effects.addAll(s.getSpecialEffects());mergeEnchantments(ingredient,result);
+            }
+            progress.setProudSoulCount((int)Math.min(Integer.MAX_VALUE,souls));progress.setKillCount((int)Math.min(Integer.MAX_VALUE,kills));progress.setRefine((int)Math.min(Integer.MAX_VALUE,refine));progress.setSpecialEffects(effects);
+        }
         // Vanilla swords in the wooden starter and Rodai routes also carry enchantments.
         for(var source:input.items()) if(!(source.getItem() instanceof ItemSlashBlade)) mergeEnchantments(source,result);
         return result;
     }
     public static ItemStack transfer(ItemStack base, ItemStack result) {
+        var id=SBItemData.tag(result).getStringOr("resharped_definition","");
+        if(!id.isEmpty()) { var resolved=mods.flammpfeil.slashblade.init.BladeCatalog.blade(id);if(!resolved.isEmpty())result=resolved; }
         var upgrade=new AnvilCraftingRecipe(); upgrade.setResult(result);
         result=upgrade.getResult(base);
         var oldState=SBData.get(base,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
@@ -58,6 +69,7 @@ public final class BladeUpgradeRecipe extends ShapedRecipe {
         state.setProudSoulCount(oldState.getProudSoulCount());
         state.setUniqueId(oldState.getUniqueId());
         state.setOwner(oldState.getOwner());
+        var effects=new java.util.LinkedHashSet<>(state.getSpecialEffects());effects.addAll(oldState.getSpecialEffects());state.setSpecialEffects(effects);
         if (base.has(DataComponents.CUSTOM_NAME)) result.set(DataComponents.CUSTOM_NAME,base.get(DataComponents.CUSTOM_NAME));
         return result;
     }

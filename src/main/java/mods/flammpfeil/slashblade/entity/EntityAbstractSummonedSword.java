@@ -506,6 +506,8 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
 
     protected void onHitEntity(EntityHitResult p_213868_1_) {
         Entity targetEntity = p_213868_1_.getEntity();
+        if(getShooter() instanceof LivingEntity living && !mods.flammpfeil.slashblade.util.TargetSelector.canAttack(living,targetEntity))return;
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new mods.flammpfeil.slashblade.event.SlashBladeEvent.SummonedSwordOnHitEntityEvent(this,targetEntity));
         int i = Mth.ceil(this.getDamage());
         if (this.getPierce() > 0) {
             if (this.alreadyHits == null) {

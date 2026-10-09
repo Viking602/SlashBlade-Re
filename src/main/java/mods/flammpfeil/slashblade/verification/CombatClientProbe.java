@@ -80,11 +80,11 @@ public final class CombatClientProbe {
         }
     }
     private static boolean isAttack(net.minecraft.world.entity.Entity entity) {
-        return entity instanceof EntityJudgementCut || entity instanceof EntitySlashEffect;
+        return entity instanceof EntityJudgementCut || entity instanceof EntitySlashEffect || entity instanceof EntityDrive;
     }
     private static String describe(Projectile entity) {
         return entity.getType().toShortString()+" entity "+entity.getId()+" owner "+(entity.getOwner()==null?null:entity.getOwner().getUUID())
-                +" critical="+(entity instanceof EntityJudgementCut cut ? cut.getIsCritical() : ((EntitySlashEffect)entity).getIsCritical());
+                +" critical="+(entity instanceof EntityJudgementCut cut ? cut.getIsCritical() : entity instanceof EntityDrive drive ? drive.getIsCritical() : ((EntitySlashEffect)entity).getIsCritical());
     }
     /** Test-only recording at the renderer's geometry extraction/submission boundaries. */
     public static int extracted(net.minecraft.world.entity.Entity entity) {

@@ -75,7 +75,7 @@ public final class PlayerAnimationClientProbe {
                         mc.getEntityModels(), part -> new PlayerModel(part, slim));
                 var models = java.util.List.of(bodyModel, armor.head(), armor.chest(), armor.legs(), armor.feet());
                 for (var combo : ComboState.NONE.getRegistry().values()) {
-                    if (!DefaultResources.ExMotionLocation.equals(combo.getMotionLoc()) || combo == ComboState.NONE
+                    if (!(DefaultResources.ExMotionLocation.equals(combo.getMotionLoc()) || DefaultResources.testLocation.equals(combo.getMotionLoc())) || combo == ComboState.NONE
                             || combo == Extra.STANDBY_EX || combo == Extra.STANDBY_INAIR) continue;
                     if (!slim) { clips++; clipNames.add(combo.getName()); }
                     for (float progress : new float[] {0.0F, 0.25F, 0.5F, 0.75F, 1.0F}) {

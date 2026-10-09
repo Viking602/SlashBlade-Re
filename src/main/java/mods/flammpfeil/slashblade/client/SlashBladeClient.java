@@ -57,6 +57,7 @@ public final class SlashBladeClient {
         event.registerEntityRenderer(SlashBlade.RegistryEvents.JudgementCut, JudgementCutRenderer::new);
         event.registerEntityRenderer(SlashBlade.RegistryEvents.BladeItem, BladeItemEntityRenderer::new);
         event.registerEntityRenderer(SlashBlade.RegistryEvents.BladeStand, BladeStandEntityRenderer::new);
+        event.registerEntityRenderer(SlashBlade.RegistryEvents.Drive, mods.flammpfeil.slashblade.client.renderer.entity.DriveRenderer::new);
         event.registerEntityRenderer(SlashBlade.RegistryEvents.SlashEffect, SlashEffectRenderer::new);
         event.registerEntityRenderer(SlashBlade.RegistryEvents.PlacePreview, PlacePreviewEntityRenderer::new);
     }

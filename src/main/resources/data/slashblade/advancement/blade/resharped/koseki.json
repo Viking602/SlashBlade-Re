@@ -17,14 +17,18 @@
           "ProudSoul": 0,
           "killCount": 0,
           "RepairCounter": 0,
-          "SpecialAttackType": "judgement_cut",
+          "SpecialAttackType": "slashblade:drive_vertical",
           "ComboRoot": "standby",
           "ComboRootAir": "standby_inair",
           "StandbyRenderType": 3,
           "SummonedSwordColor": 3158064,
           "TargetEntity": -1,
           "isDefaultBewitched": 1,
-          "ModelName": "slashblade:model/named/dios/dios.obj"
+          "ModelName": "slashblade:model/named/dios/dios.obj",
+          "SpecialEffects": [
+            "slashblade:wither_edge"
+          ],
+          "ResharpedArts": true
         },
         "minecraft:max_damage": 70,
         "minecraft:enchantments": {

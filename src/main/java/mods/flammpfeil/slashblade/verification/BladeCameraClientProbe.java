@@ -32,7 +32,7 @@ public final class BladeCameraClientProbe {
             var state=new AvatarRenderState();state.mainArm=hand;
             state.skin=DefaultPlayerSkin.get(new UUID(0,slim?0:9));
             for(var combo:ComboState.NONE.getRegistry().values()) {
-                if(!DefaultResources.ExMotionLocation.equals(combo.getMotionLoc()) || combo==ComboState.NONE) continue;
+                if(!(DefaultResources.ExMotionLocation.equals(combo.getMotionLoc()) || DefaultResources.testLocation.equals(combo.getMotionLoc())) || combo==ComboState.NONE) continue;
                 for(int frame=0;frame<=16;frame++) for(float blend:new float[]{.2F,.55F,1}) {
                     var timeline=new BladeAnimationTimeline(combo,combo.getStartFrame()+(combo.getEndFrame()-combo.getStartFrame())*frame/16F);
                     var pose=PlayerBladeAnimation.sample(new BladeMotionState.Sample(timeline,idle,blend));

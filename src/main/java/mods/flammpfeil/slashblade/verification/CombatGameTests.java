@@ -67,7 +67,7 @@ public final class CombatGameTests {
                 var actor = h.makeMockPlayer(GameType.SURVIVAL);
                 actor.setPos(h.absoluteVec(new Vec3(3,2,3))); actor.setYRot(0); actor.yRotO=0; actor.setOnGround(!air);
                 var stack = blade(h); actor.setItemInHand(InteractionHand.MAIN_HAND, stack); equipAttributes(actor, stack);
-                var target = h.spawn(EntityType.COW,3,2,5); target.setNoAi(true); target.setGlowingTag(true); target.setNoGravity(true); target.setHealth(1);
+                var target = h.spawn(EntityType.HUSK,3,2,5); target.setNoAi(true); target.setGlowingTag(true); target.setNoGravity(true); target.setHealth(1);
                 if (right) SBItems.slashblade.use(h.getLevel(),actor,InteractionHand.MAIN_HAND); else actor.attack(target);
                 h.assertValueEqual(state(stack).getComboSeq(), air?Extra.EX_AERIAL_RAVE_A1:Extra.EX_COMBO_A1, "item starts correct combo");
                 h.onEachTick(() -> ((ItemSlashBlade)SBItems.slashblade).tickInventory(stack,h.getLevel(),actor,true));
@@ -83,7 +83,7 @@ public final class CombatGameTests {
             tests.put((air?"air":"ground")+"_sa_charge_"+charge, h -> {
                 var actor = player(h); actor.setOnGround(!air);
                 var stack = actor.getMainHandItem(); var s = state(stack);
-                var target = h.spawn(EntityType.COW,3,2,7); target.setNoAi(true); target.setGlowingTag(true); target.setNoGravity(true);
+                var target = h.spawn(EntityType.HUSK,3,2,7); target.setNoAi(true); target.setGlowingTag(true); target.setNoGravity(true);
                 target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(200); target.setHealth(200);
                 s.setTargetEntityId(target); s.setComboSeq(ComboState.NONE);
                 // Item.releaseUsing receives remaining use time from Minecraft's release packet.
@@ -127,7 +127,7 @@ public final class CombatGameTests {
             h.assertValueEqual(s.getComboSeq(),ComboState.NONE,"stale blade UUID cannot attack"); h.succeed();
         });
         tests.put("just_sa_repeat_cast",h -> {
-            var actor=player(h); var stack=actor.getMainHandItem(); var target=h.spawn(EntityType.COW,3,2,7);
+            var actor=player(h); var stack=actor.getMainHandItem(); var target=h.spawn(EntityType.HUSK,3,2,7);
             target.setNoAi(true);target.setNoGravity(true);target.setGlowingTag(true);
             target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(200);target.setHealth(200);
             state(stack).setTargetEntityId(target); Set<Integer> attacks=new HashSet<>();
@@ -179,7 +179,7 @@ public final class CombatGameTests {
         tests.put("super_sa_release_stun_wide_damage",h -> {
             var actor=player(h); var stack=actor.getMainHandItem(); var s=state(stack); s.setKillCount(1000);
             stack.set(net.minecraft.core.component.DataComponents.UNBREAKABLE,net.minecraft.util.Unit.INSTANCE);
-            var target=h.spawn(EntityType.COW,3,2,7); target.setNoAi(true); target.setGlowingTag(true); target.setNoGravity(true);
+            var target=h.spawn(EntityType.HUSK,3,2,7); target.setNoAi(true); target.setGlowingTag(true); target.setNoGravity(true);
             target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(200); target.setHealth(200);
             target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR).setBaseValue(20);
             target.setPos(actor.position().add(20,0,0));
@@ -204,7 +204,7 @@ public final class CombatGameTests {
             });
         });
         tests.put("super_sa_freeze_pauses_and_resumes",h -> {
-            var target=h.spawn(EntityType.COW,3,2,7);target.setNoAi(true);target.setNoGravity(true);
+            var target=h.spawn(EntityType.HUSK,3,2,7);target.setNoAi(true);target.setNoGravity(true);
             target.tickCount=37;
             int initialTicks=target.tickCount;var position=target.position();
             SuperSlashArts.freezeUntil(target,h.getLevel().getGameTime()+5);
@@ -219,7 +219,7 @@ public final class CombatGameTests {
             });
         });
         tests.put("super_sa_freeze_tick_order",h -> {
-            var target=h.spawn(EntityType.COW,3,2,7); target.tickCount=41;
+            var target=h.spawn(EntityType.HUSK,3,2,7); target.tickCount=41;
             SuperSlashArts.freezeUntil(target,h.getLevel().getGameTime()+5);
             target.tickCount++;
             var afterIncrement=new net.neoforged.neoforge.event.tick.EntityTickEvent.Pre(target);
@@ -243,7 +243,7 @@ public final class CombatGameTests {
             h.succeed();
         });
         tests.put("super_sa_freeze_sync_local_clock",h -> {
-            var target=h.spawn(EntityType.COW,3,2,7); target.tickCount=27;
+            var target=h.spawn(EntityType.HUSK,3,2,7); target.tickCount=27;
             var buf=new net.minecraft.network.RegistryFriendlyByteBuf(io.netty.buffer.Unpooled.buffer(),h.getLevel().registryAccess());
             try {
                 var server=new FreezeState(321L,903);
@@ -257,6 +257,7 @@ public final class CombatGameTests {
             } finally { buf.release(); }
             h.succeed();
         });
+        ResharpedCombatGameTests.add(tests);
         tests.forEach((name,test) -> event.registerTest(SlashBlade.id("combat_"+name),new GameTestInstance(new TestData<>(environment,SlashBlade.id("port_test"),180,0,true)) {
             @Override public void run(GameTestHelper h) { test.accept(h); }
             @Override public MapCodec<? extends GameTestInstance> codec() { return FunctionGameTestInstance.CODEC; }

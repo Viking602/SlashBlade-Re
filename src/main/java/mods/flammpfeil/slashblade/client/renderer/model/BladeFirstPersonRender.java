@@ -38,7 +38,8 @@ public class BladeFirstPersonRender {
         if (blade == null) return;
         var motion = mods.flammpfeil.slashblade.client.animation.BladeMotionState.sample(mc.player, blade, event.getPartialTick());
         if (mods.flammpfeil.slashblade.client.animation.PlayerBladeAnimation.available()
-                && mods.flammpfeil.slashblade.init.DefaultResources.ExMotionLocation.equals(motion.current().combo().getMotionLoc())) {
+                && (mods.flammpfeil.slashblade.init.DefaultResources.ExMotionLocation.equals(motion.current().combo().getMotionLoc())
+                || mods.flammpfeil.slashblade.init.DefaultResources.testLocation.equals(motion.current().combo().getMotionLoc()))) {
             if (mc.player.isSleeping() || mc.player.isSpectator()) return;
             var meshes = BladeRig.capture(event.getItemStack(),blade,event.getPackedLight());
             var transforms = FirstPersonBladeMotion.transforms(mc.player,blade,motion,event.getPartialTick());

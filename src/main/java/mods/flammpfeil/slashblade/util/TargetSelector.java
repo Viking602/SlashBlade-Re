@@ -38,6 +38,20 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 
 public class TargetSelector {
+    public static final net.minecraft.tags.TagKey<net.minecraft.world.entity.EntityType<?>> ATTACKABLE_BLACKLIST=net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE,mods.flammpfeil.slashblade.SlashBlade.id("blacklist/attackable"));
+    public static boolean canAttack(LivingEntity attacker,Entity target){
+        if(target instanceof net.neoforged.neoforge.entity.PartEntity<?> part)target=part.getParent();
+        if(target==attacker || !target.isAlive() || target.isSpectator() || attacker.hasPassenger(target) || target==attacker.getVehicle() || target.hasPassenger(e->e instanceof net.minecraft.world.entity.player.Player))return false;
+        if(target instanceof net.minecraft.world.entity.player.Player)return mods.flammpfeil.slashblade.SlashBladeConfig.PVP_ENABLE.get() && !attacker.isAlliedTo(target);
+        if(target.getType().builtInRegistryHolder().is(ATTACKABLE_BLACKLIST))return false;
+        if(target instanceof LivingEntity living && !mods.flammpfeil.slashblade.SlashBladeConfig.FRIENDLY_ENABLE.get()) {
+            if(attacker.isAlliedTo(target))return false;
+            if(target instanceof net.minecraft.world.entity.TamableAnimal tame && tame.isOwnedBy(attacker))return false;
+            return target instanceof Enemy || (target instanceof ArmorStand stand && stand.isMarker()) || living.getLastHurtByMob()==attacker || (living instanceof Mob mob && mob.getTarget()==attacker);
+        }
+        return true;
+    }
+
     static public final TargetingConditions lockon = (TargetingConditions.forCombat())
             .range(12.0D)
             .selector((target, level) -> new AttackablePredicate().test(target));
@@ -86,31 +100,11 @@ public class TargetSelector {
 
     static public class AttackablePredicate implements Predicate<LivingEntity> {
         public boolean test(LivingEntity livingentity) {
-            if (livingentity instanceof ArmorStand)
-                if (((ArmorStand) livingentity).isMarker())
-                    return true;
-                else
-                    return false;
-
-            if (livingentity instanceof Enemy)
-                return true;
-
-            if (livingentity.isCurrentlyGlowing())
-                return true;
-
-            if (livingentity instanceof Wolf)
-                if (((Wolf) livingentity).isAngry()/*isAngry()*/)
-                    return true;
-
-            if (livingentity.entityTags().contains(AttackableTag)){
-                livingentity.removeTag(AttackableTag);
-                return true;
-            }
-
-            if(livingentity.getTeam() != null)
-                return true;
-
-            return false;
+            if(livingentity instanceof net.minecraft.world.entity.player.Player)return mods.flammpfeil.slashblade.SlashBladeConfig.PVP_ENABLE.get();
+            if(livingentity instanceof ArmorStand stand)return stand.isMarker();
+            if(livingentity.getType().builtInRegistryHolder().is(ATTACKABLE_BLACKLIST) || livingentity.hasPassenger(e->e instanceof net.minecraft.world.entity.player.Player))return false;
+            if(livingentity.entityTags().contains(AttackableTag)){livingentity.removeTag(AttackableTag);return true;}
+            return livingentity instanceof Enemy || mods.flammpfeil.slashblade.SlashBladeConfig.FRIENDLY_ENABLE.get();
         }
     }
 

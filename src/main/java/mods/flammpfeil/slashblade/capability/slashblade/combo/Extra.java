@@ -148,7 +148,7 @@ public class Extra {
 
     public static final ComboState EX_COMBO_A3 = new ComboState("ex_combo_a3",100,
             ()->200,()->218,()->1.0f,()->false,()->0,
-            ExMotionLocation, ComboState.TimeoutNext.buildFromFrame(9,(a)-> (a.hasEffect(MobEffects.STRENGTH) || a.hasEffect(MobEffects.HUNGER)) ? Extra.EX_COMBO_A4EX : Extra.EX_COMBO_A4) , ()-> Extra.EX_COMBO_A3_END)
+            ExMotionLocation, ComboState.TimeoutNext.buildFromFrame(9,(a)-> AttackManager.isPowered(a) ? Extra.EX_COMBO_A4EX : Extra.EX_COMBO_A4) , ()-> Extra.EX_COMBO_A3_END)
             .addTickAction(ComboState.TimeLineTickAction.getBuilder()
                     .put(2, (entityIn)->AttackManager.doSlash(entityIn,  -61))
                     .put(6, (entityIn)->AttackManager.doSlash(entityIn,  180-42))
@@ -690,7 +690,7 @@ public class Extra {
 
     public static final ComboState EX_RAPID_SLASH = new ComboState("ex_rapid_slash",70,
             ()->2000, ()->2019, ()->1.0f, ()->false,()->0,
-            ExMotionLocation, (a)-> (a.hasEffect(MobEffects.STRENGTH) || a.hasEffect(MobEffects.HUNGER)) ? Extra.EX_RAPID_SLASH_QUICK : Extra.EX_RAPID_SLASH, ()-> Extra.EX_RAPID_SLASH_END)
+            ExMotionLocation, (a)-> AttackManager.isPowered(a) ? Extra.EX_RAPID_SLASH_QUICK : Extra.EX_RAPID_SLASH, ()-> Extra.EX_RAPID_SLASH_END)
             .addHoldAction((e)->{
                 AttributeModifier am = new AttributeModifier(mods.flammpfeil.slashblade.SlashBlade.id("sweeping_damage_ratio"), -3, AttributeModifier.Operation.ADD_VALUE);
                 AttributeInstance mai = e.getAttribute(Attributes.ENTITY_INTERACTION_RANGE);
@@ -733,7 +733,7 @@ public class Extra {
                     if(elapsed % 2 == 0)
                         roll += 180;
 
-                    boolean critical = e.hasEffect(MobEffects.STRENGTH);
+                    boolean critical = AttackManager.isPowered(e);
 
                     AttackManager.doSlash(e,  roll, genRushOffset(e), false, critical, rushDamageBase);
                 }

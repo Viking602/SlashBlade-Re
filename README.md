@@ -10,8 +10,10 @@ Chain your cuts. Time your Slash Arts. Feel the motion carry through your hands,
 
 **[Get started ↓](#get-started)** · [Controls](#make-your-first-cut) · [Build from source](#build-from-source) · [Report an issue](https://github.com/Viking602/SlashBlade-Re/issues)
 
-> **Development preview · `0.1.2-26.1.2-port.25`**<br>
+> **Development preview · `0.1.2-26.1.2-port.26`**<br>
 > This repository provides source code. Build the preview below; a packaged release is not published here yet.
+
+**[port.26: all eight Slash Arts in first person](media/resharped-first-person.mp4)** — normal combos, each SA, Just SA and Super SA against one training Husk, with real damage and no healing.
 
 ![Continuous combat against a training Husk: normal combos, Slash Arts and Super SA](media/combat-preview.gif)
 
@@ -40,7 +42,33 @@ Adapted from the actual [SlashBlade: Resharped 1.9.65 source](https://github.com
 
 Upgrades keep kills, ProudSoul, refine, compatible enchantments, custom names, ownership and blade identity. Previously saved base blades remain usable in upgrades. Old material-box shortcuts, duplication recipes and activated/awakened souls leave normal progression; their existing item IDs remain loadable.
 
-**Scope:** acquisition, upgrades and the item economy follow the reference. Resharped’s additional SA and special-effect implementations are not all ported; affected blades say so in their tooltips and use this build’s existing Slash Arts. Twilight Forest routes require the corresponding entities; no substitute recipe is invented when that mod is absent. Cross-version Forge save migration is unverified.
+**Resharped gameplay, rebuilt for NeoForge.**<br>
+All eight built-in Slash Arts now execute their own attacks. Blade stands can transfer arts, extract and install special effects, and apply enchanted souls. Growth, drops, self-repair, damage and resource costs use the reference rules with server settings. Existing named blades receive their matching art/effect metadata once, preserving later customizations.
+
+### Choose your Slash Art
+
+| Art | What it does |
+| :--- | :--- |
+| Judgement Cut | A targeted cut, with precise-release and Super SA variants. |
+| Sakura End | A two-part crossing slash, with ground and air sequences. |
+| Void Slash | A delayed burst after the draw. |
+| Circle Slash | Successive cuts around the wielder. |
+| Drive — Vertical | A vertical flying slash. |
+| Drive — Horizontal | A horizontal flying slash. |
+| Wave Edge | A moving, multi-hit blade wave. |
+| Piercing | A forward thrust, with a precise-release variant. |
+
+Put a blade on a stand, then left-click the stand with an **SA-bearing Sphere** to install its art. An enchanted Tiny ProudSoul can copy the blade’s SA when the same enchantment is at maximum on the blade. Use an **SE-bearing Crystal** to install an effect; a blank Crystal extracts a removable, copiable effect. These item variants appear separately in creative inventory and JEI.
+
+The reference’s built-in SE, **Wither Edge**, requires **20 experience levels**. At that level it inflicts Wither on melee hits; below it, holding the blade inflicts Wither on the wielder. Enchanted souls also apply enchantments on a blade stand, using the reference’s tiered success chances and consuming the material.
+
+### Tune your world
+
+Server settings live in the world’s `serverconfig/slashblade-server.toml`. They cover PvP and friendly targets (both disabled by default), repair costs, soul drops, summoned-sword costs, refine limits, rusty-blade spawns, and damage multipliers. Client and server share these settings.
+
+Blade definitions and entity drops are synced data-pack registries. Use `data/<namespace>/slashblade/named_blades/<name>.json` and `data/<namespace>/slashblade/entity_drop/<name>.json`; the bundled data supplies all **26 named definitions and 6 entity-drop rules** from the reference. Crafting remains under the modern singular `recipe` directory.
+
+**Compatibility:** the built-in Resharped content and systems are adapted to this version. Its Forge 1.20.1 add-ons, EMI/Patchouli integration, and optional renderer bridges are not binary-compatible ports. JEI and the animation system are integrated here. Twilight Forest drops require matching entities from a compatible installation. Cross-version Forge save migration remains unverified.
 
 ## Start with a wooden blade
 
@@ -91,7 +119,7 @@ Requirements are minimum progress on the input blade, not points consumed by upg
 
 Broken blades drop Tiny ProudSouls. Convert 4 Tiny ProudSouls into 1 ProudSoul, then combine 2 ProudSouls with 1 Iron Ingot for a ProudSoul Ingot. Smelt the Ingot into a Sphere (200 ticks); blast the Sphere into a Crystal (300 ticks), then the Crystal into a Trapezohedron (400 ticks). Crafting conversions retain a single kind of level-I enchantment; mixed enchantments and higher levels are rejected.
 
-Each anvil refine costs **1 material and 1 experience level**, restores durability and adds ProudSoul as below. Maximum durability grows by one for each of the first 200 refines. At a material’s refine cap, it can repair but cannot generate further ProudSoul.
+By default, each anvil refine costs **1 material and 1 experience level**, restores durability and adds ProudSoul as below. Maximum durability grows by one for each of the first 200 refines. At a material’s refine cap, it can repair but cannot generate further ProudSoul.
 
 | Material | Refine cap | ProudSoul per refine |
 | :--- | ---: | ---: |
@@ -102,7 +130,7 @@ Each anvil refine costs **1 material and 1 experience level**, restores durabili
 | Blade Soul Crystal | 200 | 2,000 |
 | Blade Soul Trapezohedron | 2,147,483,647 | 5,000 |
 
-Kills grant ProudSoul from dropped experience and style rank, capped at 100 per award. A summoned sword costs 2; a formation costs 20. Standard SA spends 20 when available, otherwise one durability point. Super SA retains this build’s rules below.
+With default server settings, kills grant ProudSoul from dropped experience and style rank, capped at 100 per award. A summoned sword costs 2; a formation costs 20. Standard SA spends 20 when available, otherwise one durability point. Super SA retains this build’s rules below.
 
 ## Get started
 
@@ -133,13 +161,11 @@ Super SA requires an eligible enchanted blade with at least **1,000 kills**, ful
 
 ## Built. Played. Compared.
 
-`port.25` passes **112 required GameTests**, covering upgrade thresholds, progress transfer, the ProudSoul economy, material conversion, actual drops, blade-stand transformation and legacy blades. JEI and model checks also run in an isolated client with **73 installed mods**.
+`port.26` passes **132 required GameTests**: progression, inheritance, soul economy, acquisition, blade-stand transactions, special effects, configuration, registries, and actual damage from all eight Slash Arts. Client checks run in an isolated instance with **73 installed mods**.
 
-The first-person renderer matched the original VMD weapon tracks across **852 samples**. Another **28,968 transition samples** checked that the blade/saya relationship stays intact and the transition ends within one action tick. Third-person rig checks covered **1,704 samples**, including its visible arms.
+The renderer checks compare first-person geometry with the original VMD tracks, including Piercing; test interruption and sheathing transitions; and sample both hands, head turns and look angles. Third-person tests exercise the character rig and actual entity renderer. First person submits no arm geometry.
 
-Another **1,932 first-person checks** covered the standard skin, both dominant hands, seven look angles from straight up to straight down, and three head-turn angles. The hilt remained visible at rest, with no arm geometry submitted. The articulated third-person sheathing check found no blade/saya collisions across **12,864 samples**; first person preserves the original VMD relationship instead.
-
-These checks cover the built-in blades and default animation set. Custom model proportions, other animation mods, and long multiplayer sessions still need separate testing. A blade can leave the frame briefly during a wide swing.
+The combat fixture releases SA through the item’s server-side charge handler and records a Husk’s actual health loss. It does not heal the target during recording. These checks cover built-in content; custom model proportions, other animation mods and long multiplayer sessions still need separate testing. A wide swing can briefly carry the blade outside the frame.
 
 ## Build from source
 
@@ -162,7 +188,7 @@ cd SlashBlade-Re
 sh ./gradlew build
 ```
 
-Output: `build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.25.jar`.
+Output: `build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.26.jar`.
 
 To run the server-side regression suite, use the same wrapper with `runGameTestServer` in a disposable checkout. The task writes to a sibling `test-gametest` directory.
 
@@ -174,7 +200,7 @@ To run the server-side regression suite, use the same wrapper with `runGameTestS
 
 Based on [SlashBlade 2 by Furia / flammpfeil](https://github.com/flammpfeil/SlashBlade_2), through [Viking602/SlashBlade_2](https://github.com/Viking602/SlashBlade_2). NyMmd is by nyatla; the OBJ importer carries upstream Forge attribution. Existing author and license notices are preserved.
 
-Named-blade recipe and JEI improvements draw on [SlashBlade: Resharped by the M Mysterious Mountain Forging-shop Group](https://github.com/0999312/SlashBlade_Resharped/tree/6e2a0a092fb794d7ea56fd83452869674f3ab1c7). Its MIT notice is retained in the third-party notices. Eighteen additional model/texture files come from Resharped for the newly available blades. They retain their original artwork terms and are not covered by this project’s MIT grant.
+Blade progression, arts, effects, blade-stand interactions, server settings, and data-pack registries draw on [SlashBlade: Resharped by the M Mysterious Mountain Forging-shop Group](https://github.com/0999312/SlashBlade_Resharped/tree/6e2a0a092fb794d7ea56fd83452869674f3ab1c7). Its MIT notice is retained in the third-party notices. Eighteen blade model/texture files, the Drive model, and two Piercing motion files come from Resharped. They retain their original artwork terms and are not covered by this project’s MIT grant.
 
 The MIT scope for original SlashBlade:Re contributions and the licenses of inherited code and assets are documented in [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). **The complete inherited project is not licensed under MIT.**
 

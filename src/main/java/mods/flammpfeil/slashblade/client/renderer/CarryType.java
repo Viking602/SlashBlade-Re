@@ -7,5 +7,6 @@ public enum CarryType {
     NINJA,
     KATANA,
     RNINJA,
+    PSO2,
 
 }

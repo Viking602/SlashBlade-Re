@@ -39,6 +39,7 @@ public class BladeStateCapabilityProvider {
     public Tag serializeNBT() {
         CompoundTag tag = new CompoundTag();
         state.ifPresent(instance -> {
+            tag.putBoolean("ResharpedArts",true);
             //action state
             tag.putLong("lastActionTime" , instance.getLastActionTime());
             tag.putInt("TargetEntity", instance.getTargetEntityId());
@@ -78,6 +79,7 @@ public class BladeStateCapabilityProvider {
             tag.putString("RangeAttackType", instance.getRangeAttackType().getName());
 
             tag.putString("SpecialAttackType", Optional.ofNullable(instance.getSlashArtsKey()).orElse("none"));
+            tag.store("SpecialEffects",Identifier.CODEC.listOf(),java.util.List.copyOf(instance.getSpecialEffects()));
             tag.putBoolean("isDestructable", instance.isDestructable());
             tag.putBoolean("isDefaultBewitched", instance.isDefaultBewitched());
             tag.putByte("rarityType", (byte)instance.getRarity().ordinal());
@@ -155,6 +157,7 @@ public class BladeStateCapabilityProvider {
             instance.setRangeAttackType(RangeAttack.NONE.valueOf(tag.getStringOr("RangeAttackType", "")));
 
             instance.setSlashArtsKey(tag.getStringOr("SpecialAttackType", ""));
+            instance.setSpecialEffects(new java.util.LinkedHashSet<>(tag.read("SpecialEffects",Identifier.CODEC.listOf()).orElse(java.util.List.of())));
             instance.setDestructable(tag.getBooleanOr("isDestructable", false));
             instance.setDefaultBewitched(tag.getBooleanOr("isDefaultBewitched", false));
 

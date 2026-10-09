@@ -34,7 +34,7 @@ public class SlashArts extends RegistryBase<SlashArts> {
         Fail,
         Success,
         Jackpot,
-        Broken
+        Broken, Super
     }
 
     public static final SlashArts NONE = new SlashArts(BaseInstanceName, (e)->ComboState.NONE);
@@ -44,12 +44,31 @@ public class SlashArts extends RegistryBase<SlashArts> {
                     .setComboStateJust((e)->Extra.EX_JUDGEMENT_CUT_SLASH_JUST)
                     .setComboStateBroken((e)->Extra.EX_VOID_SLASH);
 
+    public static final SlashArts SAKURA_END=new SlashArts("sakura_end",e->e.onGround()?mods.flammpfeil.slashblade.slasharts.ResharpedCombos.SAKURA_END_LEFT:mods.flammpfeil.slashblade.slasharts.ResharpedCombos.SAKURA_END_LEFT_AIR);
+    public static final SlashArts VOID_SLASH=new SlashArts("void_slash",e->mods.flammpfeil.slashblade.slasharts.ResharpedCombos.VOID_SLASH);
+    public static final SlashArts CIRCLE_SLASH=new SlashArts("circle_slash",e->mods.flammpfeil.slashblade.slasharts.ResharpedCombos.CIRCLE_SLASH);
+    public static final SlashArts DRIVE_VERTICAL=new SlashArts("drive_vertical",e->mods.flammpfeil.slashblade.slasharts.ResharpedCombos.DRIVE_VERTICAL);
+    public static final SlashArts DRIVE_HORIZONTAL=new SlashArts("drive_horizontal",e->mods.flammpfeil.slashblade.slasharts.ResharpedCombos.DRIVE_HORIZONTAL);
+    public static final SlashArts WAVE_EDGE=new SlashArts("wave_edge",e->mods.flammpfeil.slashblade.slasharts.ResharpedCombos.WAVE_EDGE_VERTICAL);
+    public static final SlashArts PIERCING=new SlashArts("piercing",e->mods.flammpfeil.slashblade.slasharts.ResharpedCombos.PIERCING).setComboStateJust(e->mods.flammpfeil.slashblade.slasharts.ResharpedCombos.PIERCING_JUST);
+    private int proudSoulCost=20;
+    public int getProudSoulCost(){return proudSoulCost;}
+    public SlashArts setProudSoulCost(int value){proudSoulCost=Math.max(0,value);return this;}
+    @Override public SlashArts valueOf(String name){
+        if(name==null || name.isBlank()) return JUDGEMENT_CUT;
+        var id=Identifier.tryParse(name.indexOf(':')>=0?name:"slashblade:"+name);
+        if(id==null) return null;
+        if(!id.getNamespace().equals("slashblade")) return mods.flammpfeil.slashblade.registry.SlashArtsRegistry.VALUES.getValue(id);
+        return super.valueOf(id.getPath().replace("slasharts/",""));
+    }
+    public net.minecraft.network.chat.Component getDescription(){return net.minecraft.network.chat.Component.translatable("slash_art.slashblade."+getName());}
     private Function<LivingEntity,ComboState> comboState;
     private Function<LivingEntity,ComboState> comboStateJust;
     private Function<LivingEntity,ComboState> comboStateBroken;
 
     public ComboState doArts(ArtsType type, LivingEntity user) {
         switch (type){
+            case Super: return mods.flammpfeil.slashblade.slasharts.ResharpedCombos.JUDGEMENT_CUT_END;
             case Jackpot:
                 return getComboStateJust(user);
             case Success:
