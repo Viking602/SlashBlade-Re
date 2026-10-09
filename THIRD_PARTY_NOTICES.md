@@ -36,3 +36,32 @@ Epic Fight, Weapons of Miracles, and Devil May Cry are credited as design refere
 ---
 
 中文说明：本项目新增原创贡献采用 MIT；上游主体源码、模型、贴图、动作资源及其他第三方内容保留原许可。修改文件或新建独立仓库不会自动使继承内容变为 MIT。本仓库不声明整份项目统一采用 MIT。
+
+## SlashBlade: Resharped
+
+Reference and adaptation source: [0999312/SlashBlade_Resharped](https://github.com/0999312/SlashBlade_Resharped/tree/6e2a0a092fb794d7ea56fd83452869674f3ab1c7), version 1.9.65, commit `6e2a0a092fb794d7ea56fd83452869674f3ab1c7`.
+
+The named-blade JEI subtype strategy, progress-preserving direct upgrades, damaged-Yamato repair pattern, and Rusted Blade / Doutanuki definitions informed this integration. Minecraft 26.1.2 ingredient, recipe and display implementations are adapted for this port. Costs and progression remain compatible with the existing port; Resharped's full roster and combat systems are not claimed as included. No additional Resharped artwork was copied; the referenced models and textures were already in the SlashBlade 2 baseline. Upstream distinguishes MIT code from art resources reserved by their authors.
+
+The Resharped code license follows, preserved verbatim:
+MIT License
+
+Copyright (c) 2024 M Mysterious Mountain Forging-shop Group
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

@@ -42,16 +42,16 @@ public final class BladeIconClientProbe {
                     require(!state.isEmpty(), "item definition missing");
                     require(!state.usesBlockLight(), "GUI lighting differs from the flat item setting");
                     var reported = state.getModelBoundingBox();
-                    require(reported.minX >= -.476 && reported.maxX <= .476 && reported.minY >= -.476 && reported.maxY <= .476,
+                    require(reported.minX >= -.494 && reported.maxX <= .494 && reported.minY >= -.494 && reported.maxY <= .494,
                             "model reports inflated GUI extents");
                     var capture = new Capture();
                     state.submit(new PoseStack(), capture, 15728880, OverlayTexture.NO_OVERLAY, 0);
                     require(capture.all.vertices > 0 && capture.first.vertices > 0, "special renderer did not submit geometry");
                     double edge = Math.min(Math.min(capture.all.minX + .5, .5 - capture.all.maxX),
                             Math.min(capture.all.minY + .5, .5 - capture.all.maxY)) * 16;
-                    require(edge >= .399, "icon is clipped: " + model + "/" + variant + "/" + damage);
+                    require(edge >= .099, "icon is clipped: " + model + "/" + variant + "/" + damage);
                     double size = Math.max(capture.first.maxX - capture.first.minX, capture.first.maxY - capture.first.minY) * 16;
-                    require(size >= (variant == 2 ? 14.0 : 15.19), "blade silhouette is undersized: " + model + " size=" + size);
+                    require(size >= (variant == 2 ? 14.5 : 15.79), "blade silhouette is undersized: " + model + " size=" + size);
                     margin = Math.min(margin, edge);
                     cases++;
                     if (!glint && damage == 0) {

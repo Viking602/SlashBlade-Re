@@ -1,0 +1,80 @@
+{
+  "type": "slashblade:blade_upgrade",
+  "category": "equipment",
+  "pattern": [
+    "#SD",
+    "RCL",
+    "ISG"
+  ],
+  "key": {
+    "#": "minecraft:emerald_block",
+    "S": "slashblade:proudsoul_sphere",
+    "D": "minecraft:diamond_block",
+    "R": "minecraft:redstone_block",
+    "C": {
+      "neoforge:ingredient_type": "slashblade:blade_requirement",
+      "name": "item.slashblade.simple.iron",
+      "broken": false,
+      "kills": 0,
+      "refine": 0,
+      "display": {
+        "id": "slashblade:slashblade",
+        "components": {
+          "slashblade:blade_state": {
+            "isSealed": 0,
+            "isNoScabbard": 0,
+            "translationKey": "item.slashblade.simple.iron",
+            "isDestructable": 0,
+            "SummonedSwordColor": -13421569,
+            "currentCombo": "arts_rapid_slash",
+            "RepairCounter": 0,
+            "Damage": 0.0,
+            "rarityType": 1,
+            "ComboRoot": "standby",
+            "lastPosHash": "",
+            "RangeAttackType": "none",
+            "isDefaultBewitched": 0,
+            "SpecialAttackType": "none",
+            "TextureName": "slashblade:model/blade.png",
+            "ModelName": "slashblade:model/named/yamato.obj",
+            "baseAttackModifier": 4.0,
+            "StandbyRenderType": 0,
+            "ComboRootAir": "standby_inair",
+            "isBroken": 0,
+            "killCount": 0
+          }
+        }
+      }
+    },
+    "L": "minecraft:lapis_block",
+    "I": "minecraft:iron_block",
+    "G": "minecraft:gold_block"
+  },
+  "result": {
+    "id": "slashblade:slashblade",
+    "components": {
+      "slashblade:blade_state": {
+        "isSealed": 0,
+        "isNoScabbard": 0,
+        "translationKey": "item.slashblade.ex.tukumo",
+        "isDestructable": 0,
+        "SummonedSwordColor": 16165059,
+        "currentCombo": "arts_rapid_slash",
+        "RepairCounter": 0,
+        "Damage": 0.0,
+        "rarityType": 3,
+        "ComboRoot": "standby",
+        "lastPosHash": "",
+        "RangeAttackType": "none",
+        "isDefaultBewitched": 0,
+        "SpecialAttackType": "none",
+        "TextureName": "slashblade:model/named/a_tukumo.png",
+        "ModelName": "slashblade:model/named/agito.obj",
+        "baseAttackModifier": 6.0,
+        "StandbyRenderType": 0,
+        "ComboRootAir": "standby_inair"
+      },
+      "minecraft:rarity": "epic"
+    }
+  }
+}

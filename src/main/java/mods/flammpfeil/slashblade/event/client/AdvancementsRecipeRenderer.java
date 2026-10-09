@@ -21,6 +21,7 @@ public final class AdvancementsRecipeRenderer {
     public static AdvancementsRecipeRenderer getInstance() { return INSTANCE; }
     public void register() { NeoForge.EVENT_BUS.register(this); }
     private RecipeMap recipes=RecipeMap.EMPTY;
+    public RecipeMap recipes() { return recipes; }
     private Identifier current;
     private record Slot(int x,int y,SlotDisplay display) {}
     private record View(Identifier texture, List<Slot> slots) {}

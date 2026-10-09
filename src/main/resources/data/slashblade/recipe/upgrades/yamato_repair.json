@@ -1,0 +1,71 @@
+{
+  "type": "slashblade:blade_upgrade",
+  "category": "equipment",
+  "pattern": [
+    "PPP",
+    "PBP",
+    "PPP"
+  ],
+  "key": {
+    "P": "slashblade:proudsoul_sphere",
+    "B": {
+      "neoforge:ingredient_type": "slashblade:blade_requirement",
+      "name": "item.slashblade.yamato",
+      "broken": true,
+      "kills": 0,
+      "refine": 0,
+      "display": {
+        "id": "slashblade:slashblade",
+        "components": {
+          "slashblade:blade_state": {
+            "translationKey": "item.slashblade.yamato",
+            "TextureName": "slashblade:model/named/yamato.png",
+            "ModelName": "slashblade:model/named/yamato.obj",
+            "baseAttackModifier": 9.0,
+            "isSealed": 0,
+            "isNoScabbard": 0,
+            "isDestructable": 0,
+            "SummonedSwordColor": -13421569,
+            "RepairCounter": 0,
+            "rarityType": 3,
+            "ComboRoot": "standby",
+            "RangeAttackType": "none",
+            "isDefaultBewitched": 0,
+            "SpecialAttackType": "none",
+            "SummonedSwordColorInverse": 0,
+            "isBroken": 1,
+            "StandbyRenderType": 0,
+            "ComboRootAir": "standby_inair",
+            "Damage": 1.0,
+            "killCount": 0
+          }
+        }
+      }
+    }
+  },
+  "result": {
+    "id": "slashblade:slashblade",
+    "components": {
+      "slashblade:blade_state": {
+        "translationKey": "item.slashblade.yamato",
+        "TextureName": "slashblade:model/named/yamato.png",
+        "ModelName": "slashblade:model/named/yamato.obj",
+        "baseAttackModifier": 9.0,
+        "isSealed": 0,
+        "isNoScabbard": 0,
+        "isDestructable": 0,
+        "SummonedSwordColor": -13421569,
+        "RepairCounter": 0,
+        "rarityType": 3,
+        "ComboRoot": "standby",
+        "RangeAttackType": "none",
+        "isDefaultBewitched": 0,
+        "SpecialAttackType": "none",
+        "SummonedSwordColorInverse": 0,
+        "isBroken": 0,
+        "StandbyRenderType": 0,
+        "ComboRootAir": "standby_inair"
+      }
+    }
+  }
+}

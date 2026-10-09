@@ -358,6 +358,9 @@ public interface ISlashBladeState {
 
     default <T extends LivingEntity> void damageBlade(ItemStack stack, int amount, T entityIn, Consumer<T> onBroken){
         if(amount <= 0) return;
+        // The original ItemStack.hurtAndBreak path skipped creative durability.
+        // Blade damage now lives in our component, so retain that guard explicitly.
+        if(entityIn instanceof Player player && player.getAbilities().instabuild) return;
 
         boolean current = this.isBroken();
 

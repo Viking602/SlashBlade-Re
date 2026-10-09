@@ -1,0 +1,25 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "slashblade:slashblade"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_blade"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "slashblade:upgrades/muramasa"
+    ]
+  }
+}

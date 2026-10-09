@@ -36,6 +36,7 @@ public final class PortGameTests {
     public static void register(RegisterGameTestsEvent event) {
         var environment = event.registerEnvironment(SlashBlade.id("port_verification"));
         Map<String, Consumer<GameTestHelper>> tests = new LinkedHashMap<>();
+        BladeRecipeGameTests.add(tests);
         tests.put("registrations", h -> {
             h.assertValueEqual(BuiltInRegistries.ITEM.keySet().stream().filter(id -> id.getNamespace().equals("slashblade")).count(), 15L, "items");
             h.assertValueEqual(BuiltInRegistries.ENTITY_TYPE.keySet().stream().filter(id -> id.getNamespace().equals("slashblade")).count(), 10L, "entities");
@@ -44,13 +45,13 @@ public final class PortGameTests {
         tests.put("recipes_and_advancements", h -> {
             var manager = h.getLevel().getServer().getResourceManager();
             var recipes = manager.listResources("recipe", id -> id.getNamespace().equals("slashblade") && id.getPath().endsWith(".json"));
-            h.assertValueEqual(recipes.size(), 39, "recipe resources");
+            h.assertValueEqual(recipes.size(), 41, "recipe resources");
             for (var id : recipes.keySet()) {
                 var name = Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath().substring(7, id.getPath().length()-5));
                 h.assertTrue(h.getLevel().getServer().getRecipeManager().byKey(ResourceKey.create(Registries.RECIPE, name)).isPresent(), "Recipe failed to load: " + name);
             }
             var advancements = manager.listResources("advancement", id -> id.getNamespace().equals("slashblade") && id.getPath().endsWith(".json"));
-            h.assertValueEqual(advancements.size(), 57, "advancement resources");
+            h.assertValueEqual(advancements.size(), 70, "advancement resources");
             for (var id : advancements.keySet()) {
                 var name = Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath().substring(12, id.getPath().length()-5));
                 h.assertTrue(h.getLevel().getServer().getAdvancements().get(name) != null, "Advancement failed to load: " + name);
@@ -92,6 +93,30 @@ public final class PortGameTests {
             h.assertFalse(e.getOutput().isEmpty(), "refine output"); h.assertFalse(state(e.getOutput()).isBroken(), "repaired blade");
             h.assertValueEqual(state(e.getOutput()).getRefine(), 1, "refine count"); h.assertValueEqual(e.getMaterialCost(), 1, "material cost");
             h.assertTrue(state(stack).isBroken(), "input must remain broken");
+        });
+        tests.put("creative_attacks_preserve_blade", h -> {
+            var player=h.makeMockPlayer(net.minecraft.world.level.GameType.CREATIVE);
+            net.minecraft.world.level.GameType.CREATIVE.updatePlayerAbilities(player.getAbilities());
+            var stack=blade();player.setItemInHand(InteractionHand.MAIN_HAND,stack);
+            var target=h.spawn(EntityType.ZOMBIE,3,2,4);target.setNoAi(true);
+            for(int i=0;i<stack.getMaxDamage()*2;i++)((ItemSlashBlade)stack.getItem()).hurtEnemy(stack,target,player);
+            h.assertValueEqual(state(stack).getDamage(),0F,"creative attacks consumed blade durability");
+            h.assertFalse(state(stack).isBroken(),"creative practice changed full katana into broken mesh");
+        });
+        tests.put("survival_blade_still_breaks", h -> {
+            var player=h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);var stack=blade();
+            int[] broken={0};state(stack).damageBlade(stack,stack.getMaxDamage(),player,p->broken[0]++);
+            h.assertTrue(state(stack).isBroken(),"survival wear must retain broken blade");
+            h.assertValueEqual(state(stack).getDamage(),1F,"survival durability reaches zero");
+            h.assertValueEqual(broken[0],1,"one break callback");
+        });
+        tests.put("creative_preserves_existing_broken_blade", h -> {
+            var player=h.makeMockPlayer(net.minecraft.world.level.GameType.CREATIVE);var stack=blade();
+            net.minecraft.world.level.GameType.CREATIVE.updatePlayerAbilities(player.getAbilities());
+            state(stack).setDamage(1);state(stack).setBroken(true);
+            state(stack).damageBlade(stack,1,player,p->{throw new IllegalStateException("creative break callback");});
+            h.assertTrue(state(stack).isBroken(),"intentionally broken items must remain broken");
+            h.assertValueEqual(state(stack).getDamage(),1F,"creative guard must not silently repair inventory");
         });
         tests.put("anvil_requirements", h -> {
             var stack = blade(); var s = state(stack); s.setTranslationKey("item.slashblade.yamato");

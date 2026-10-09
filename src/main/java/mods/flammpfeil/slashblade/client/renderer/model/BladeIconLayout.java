@@ -13,8 +13,8 @@ import java.util.function.Consumer;
 
 /** Fits the GUI silhouette once per loaded OBJ; the sword and its damage gauge have separate sizes. */
 public final class BladeIconLayout {
-    public static final float BLADE_SPAN = 15.2F / 16.0F;
-    private static final float GAUGE_SPAN = 12.0F / 16.0F;
+    public static final float BLADE_SPAN = 15.8F / 16.0F;
+    private static final float GAUGE_SPAN = 10.5F / 16.0F;
     private final Matrix4f display, projection, inverseProjection;
     private final Map<WavefrontObject, Variants> blades = new IdentityHashMap<>();
     private final Map<WavefrontObject, Fit> gauges = new IdentityHashMap<>();

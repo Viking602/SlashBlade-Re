@@ -1,0 +1,75 @@
+{
+  "type": "slashblade:blade_upgrade",
+  "category": "equipment",
+  "pattern": [
+    "  #",
+    " # ",
+    "CD "
+  ],
+  "key": {
+    "#": "minecraft:soul_sand",
+    "C": {
+      "neoforge:ingredient_type": "slashblade:blade_requirement",
+      "name": "item.slashblade.simple.iron",
+      "broken": false,
+      "kills": 0,
+      "refine": 0,
+      "display": {
+        "id": "slashblade:slashblade",
+        "components": {
+          "slashblade:blade_state": {
+            "isSealed": 0,
+            "isNoScabbard": 0,
+            "translationKey": "item.slashblade.simple.iron",
+            "isDestructable": 0,
+            "SummonedSwordColor": -13421569,
+            "currentCombo": "arts_rapid_slash",
+            "RepairCounter": 0,
+            "Damage": 0.0,
+            "rarityType": 1,
+            "ComboRoot": "standby",
+            "lastPosHash": "",
+            "RangeAttackType": "none",
+            "isDefaultBewitched": 0,
+            "SpecialAttackType": "none",
+            "TextureName": "slashblade:model/blade.png",
+            "ModelName": "slashblade:model/named/yamato.obj",
+            "baseAttackModifier": 4.0,
+            "StandbyRenderType": 0,
+            "ComboRootAir": "standby_inair",
+            "isBroken": 0,
+            "killCount": 0
+          }
+        }
+      }
+    },
+    "D": "slashblade:proudsoul_trapezohedron"
+  },
+  "result": {
+    "id": "slashblade:slashblade",
+    "components": {
+      "slashblade:blade_state": {
+        "isSealed": 0,
+        "isNoScabbard": 0,
+        "translationKey": "item.slashblade.ex.muramasa",
+        "isDestructable": 0,
+        "SummonedSwordColor": 15658734,
+        "currentCombo": "arts_rapid_slash",
+        "RepairCounter": 0,
+        "Damage": 0.0,
+        "rarityType": 3,
+        "ComboRoot": "standby",
+        "lastPosHash": "",
+        "RangeAttackType": "none",
+        "isDefaultBewitched": 0,
+        "SpecialAttackType": "none",
+        "TextureName": "slashblade:model/named/muramasa/muramasa.png",
+        "ModelName": "slashblade:model/named/muramasa/muramasa.obj",
+        "baseAttackModifier": 8.0,
+        "StandbyRenderType": 0,
+        "ComboRootAir": "standby_inair"
+      },
+      "minecraft:rarity": "epic"
+    }
+  }
+}

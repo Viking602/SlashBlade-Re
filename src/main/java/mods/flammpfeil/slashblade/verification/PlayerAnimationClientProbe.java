@@ -128,7 +128,10 @@ public final class PlayerAnimationClientProbe {
                 var values = com.google.gson.JsonParser.parseReader(reader).getAsJsonObject();
                 for (var entry : values.entrySet()) chinese.put(entry.getKey(), entry.getValue().getAsString());
             }
-            require(chinese.size() == 146, "incomplete Chinese language file");
+            try (var reader = mc.getResourceManager().openAsReader(SlashBlade.id("lang/en_us.json"))) {
+                var english = com.google.gson.JsonParser.parseReader(reader).getAsJsonObject();
+                require(chinese.size() >= 146 && chinese.keySet().containsAll(english.keySet()), "incomplete Chinese language file");
+            }
             if ("zh_cn".equals(mc.options.languageCode)) {
                 for (var entry : chinese.entrySet()) require(language.getOrDefault(entry.getKey()).equals(entry.getValue()),
                         "Chinese locale did not load " + entry.getKey());

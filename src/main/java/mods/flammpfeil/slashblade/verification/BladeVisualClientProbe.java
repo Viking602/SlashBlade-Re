@@ -48,10 +48,20 @@ public final class BladeVisualClientProbe {
             ,new Scene("sequence-draw-sheath-oblique", CameraType.THIRD_PERSON_FRONT, Extra.STANDBY_EX, 0, 0)
             ,new Scene("sequence-interrupted-draw", CameraType.THIRD_PERSON_FRONT, Extra.STANDBY_EX, 0, 0)
     };
-    private static final Scene[] scenes=Boolean.getBoolean("slashblade.firstPersonFraming") ? framingScenes()
+    private static final Scene[] scenes=Boolean.getBoolean("slashblade.bladeSizeComparison") ? sizeScenes()
+            : Boolean.getBoolean("slashblade.firstPersonFraming") ? framingScenes()
             : Boolean.getBoolean("slashblade.perspectiveComparison")
             ? new Scene[]{new Scene("sequence-third",CameraType.THIRD_PERSON_FRONT,Extra.STANDBY_EX,0,20),
                           new Scene("sequence-first",CameraType.FIRST_PERSON,Extra.STANDBY_EX,0,20)} : allScenes;
+    private static Scene[] sizeScenes() {
+        var result=new java.util.ArrayList<Scene>();
+        for(String variant:new String[]{"intact","broken"}) {
+            result.add(new Scene("size-"+variant+"-third-cut",CameraType.THIRD_PERSON_FRONT,Extra.EX_COMBO_A1,5,0));
+            result.add(new Scene("size-"+variant+"-third-idle",CameraType.THIRD_PERSON_FRONT,Extra.STANDBY_EX,0,0));
+            result.add(new Scene("size-"+variant+"-first",CameraType.FIRST_PERSON,Extra.EX_COMBO_A1,3,0));
+        }
+        return result.toArray(Scene[]::new);
+    }
     private static Scene[] framingScenes() {
         var result=new java.util.ArrayList<Scene>();
         for(int pitch:new int[]{0,45,65,80,89,-65}) {
@@ -113,6 +123,12 @@ public final class BladeVisualClientProbe {
             mc.player.setMainArm(scene.name().endsWith("left") ? HumanoidArm.LEFT : HumanoidArm.RIGHT);
             mc.player.setItemInHand(InteractionHand.MAIN_HAND, sword);
             var blade = SBData.get(sword, ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
+            if(Boolean.getBoolean("slashblade.bladeSizeComparison")) {
+                blade.setModel(SlashBlade.id("model/named/agito.obj"));
+                blade.setTexture(SlashBlade.id("model/named/a_tukumo.png"));
+                blade.setDamage(scene.name().contains("broken")?1:0);
+                blade.setBroken(scene.name().contains("broken"));
+            }
             blade.setComboSeq(scene.combo()); blade.setLastActionTime(mc.level.getGameTime() - scene.elapsedTicks());
             if (scene.name().startsWith("sequence")) {
                 int[] starts = {0, 20, 36, 52, 74, 112, 188, 220};
@@ -160,7 +176,8 @@ public final class BladeVisualClientProbe {
                     frames = sequence ? 29 : 0; pending = false;
                     if (sceneIndex == scenes.length) {
                         started=false; scriptedSample=null; mc.setCameraEntity(mc.player);
-                        if(Boolean.getBoolean("slashblade.firstPersonFraming")) mc.stop();
+                        if(Boolean.getBoolean("slashblade.recipeShowcase")) BladeRecipeClientProbe.start();
+                        else if(Boolean.getBoolean("slashblade.firstPersonFraming")) mc.stop();
                         else CombatShowcaseClientProbe.start();
                     }
                 });

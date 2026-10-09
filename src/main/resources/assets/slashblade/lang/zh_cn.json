@@ -144,5 +144,10 @@
   "adv.slashblade.exeffect.feather_falling.desc": "根据摔落缓冲等级，降低空中招式的下落速度。",
   "key.slashblade.super_sa": "超级 SA",
   "slashblade.super_sa.hint": "超级 SA：长按 %s 至少 1 秒后松开",
-  "slashblade.super_sa.requirements": "需要至少千斩、满耐久的妖刀（附魔且已命名或被指定为妖刀）"
+  "slashblade.super_sa.requirements": "需要至少千斩、满耐久的妖刀（附魔且已命名或被指定为妖刀）",
+  "item.slashblade.ex.sabigatana": "锈刀",
+  "item.slashblade.ex.doutanuki": "刀铭「同田贯」",
+  "slashblade.jei.forge": "将对应刀与材料箱放入铁砧锻造，消耗 %s 级经验。",
+  "slashblade.jei.requirements": "需要击杀数 %s、精炼 %s。附魔与断刀要求见输入刀的提示。",
+  "slashblade.jei.progress": "可按此处的合成或铁砧配方升级，保留击杀数、精炼和附魔。粉色耐久环与短刀身表示刀已损坏，可用耀魂在铁砧修复。创造模式攻击不消耗耐久。"
 }

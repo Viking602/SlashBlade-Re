@@ -7,6 +7,11 @@ version = mod_version
 group = mod_group_id
 base { archivesName = 'SlashBlade-26.1.2' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+repositories { maven { url = 'https://maven.blamejared.com' } }
+dependencies {
+    // Optional integration; dedicated servers and clients without JEI remain supported.
+    compileOnly('mezz.jei:jei-26.1.2-neoforge:29.43.0.107') { transitive = false }
+}
 neoForge {
     version = neo_version
     runs {

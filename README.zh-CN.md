@@ -10,12 +10,12 @@
 
 **[开始游玩 ↓](#开始游玩)** · [基础操作](#挥出第一刀) · [从源码构建](#从源码构建) · [反馈问题](https://github.com/Viking602/SlashBlade-Re/issues)
 
-> **开发预览版 · `0.1.2-26.1.2-port.23`**<br>
+> **开发预览版 · `0.1.2-26.1.2-port.24`**<br>
 > 当前仓库提供源码，可按下方步骤构建；暂未在此发布打包下载版。
 
 ![对尸壳练习靶连续施展普通连招、标准 SA 与超级 SA](media/combat-preview.gif)
 
-**[观看完整战斗演示](media/combat-showcase.mp4)** · [第一人称实录](media/first-person-combat.mp4) · [原版刀路对照](media/first-person-original.mp4)
+**[观看完整战斗演示](media/combat-showcase.mp4)** · [第一人称实录](https://cdn.jsdelivr.net/gh/Viking602/SlashBlade-Re@7bf343ad5039dfab8b6275542618887e4e8f2b81/media/first-person-combat.mp4) · [原版刀路对照](media/first-person-original.mp4)
 
 *全新连续实录：普通与强化连招、标准 SA、精准 SA、超级 SA，保留完整收势与收刀。静止尸壳练习靶增加了生命值；画面显示实际伤害，全程不回血。原速播放，无音轨。*
 
@@ -34,6 +34,13 @@
 
 **熟悉的拔刀剑，继续向前。**<br>
 地面与空中连招、SA、精准 SA、Super SA，以及刀剑、合成成长、魂系材料和幻影剑系统，在新版本中延续。内置英文与简体中文。
+
+**下一把刀，找得到，也做得出。**<br>
+参考[拔刀剑：重锋](https://github.com/0999312/SlashBlade_Resharped)的具名刀配方和 JEI 区分方式，**13 种具名刀**均可单独检索，包括新增的锈刀与同田贯。提供 **13 条直接合成升级配方**，保留原有 **9 条材料箱铁砧升级路线**。升级保留击杀数、精炼和附魔；直接合成还保留刀的标识、所有者和自定义名称。
+
+JEI 为可选模组；未安装时仍可使用配方书和进度内配方查看。锈刀的获取与同田贯的 100 击杀要求适配了本版本的成长机制。本次尚未合入重锋的全部刀种、耀魂计数、特殊效果与新增 SA。
+
+创造模式攻击不再消耗刀的耐久。粉色耐久环与短刃表示刀已损坏，可在铁砧中用耀魂修复；更新不会自动重置已有刀的数据。
 
 ## 开始游玩
 
@@ -64,7 +71,9 @@ Super SA 需要满足妖刀条件的附魔刀：击杀数至少 **1,000**、满�
 
 ## 构建之外，也经实机检验。
 
-`port.23` 已通过 **91 项必需 GameTests**，以及装有 **73 个模组**的隔离客户端检查。第一人称渲染与原版 VMD 武器轨迹完成 **852 组对照**；另有 **28,968 组过渡采样**检查刀鞘相对关系不变、过渡在一个动作 tick 内结束。第三人称骨骼完成 **1,704 组渲染检查**，包括手臂正常显示。
+`port.24` 已通过 **98 项必需 GameTests**，以及装有 **73 个模组**的隔离客户端检查。13 条直接升级配方均通过实际合成、成长保留与网络编解码测试；实际 JEI 运行环境验证了具名刀区分、材料显示和配方检索。物品栏图标长边使用 16 像素格内的 15.8 像素，并缩小耐久环，突出刀身。
+
+第一人称渲染与原版 VMD 武器轨迹完成 **852 组对照**；另有 **28,968 组过渡采样**检查刀鞘相对关系不变、过渡在一个动作 tick 内结束。第三人称骨骼完成 **1,704 组渲染检查**，包括手臂正常显示。
 
 另有 **1,932 组第一人称取景检查**，覆盖标准皮肤、左右持刀、从抬头到低头的七种角度，以及三种转头角度。待机刀柄保持可见，手臂几何体不再提交渲染。第三人称骨骼的 **12,864 组收刀采样**未发现刀身与刀鞘碰撞；第一人称则保留原版 VMD 中两者的相对关系。
 
@@ -91,7 +100,7 @@ cd SlashBlade-Re
 sh ./gradlew build
 ```
 
-产物：`build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.22.jar`。
+产物：`build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.24.jar`。
 
 在临时检出目录中，使用相同 wrapper 执行 `runGameTestServer` 可运行服务端回归测试。该任务会写入同级的 `test-gametest` 目录。
 
@@ -102,6 +111,8 @@ sh ./gradlew build
 ## 致谢与许可
 
 项目基于 [Furia / flammpfeil 的 SlashBlade 2](https://github.com/flammpfeil/SlashBlade_2)，经由 [Viking602/SlashBlade_2](https://github.com/Viking602/SlashBlade_2) 移植。NyMmd 作者为 nyatla；OBJ 导入器保留上游 Forge 归属说明。原有作者与许可声明均予以保留。
+
+具名刀配方与 JEI 改进参考[妖怪之山锻刀铺团队的拔刀剑：重锋](https://github.com/0999312/SlashBlade_Resharped/tree/6e2a0a092fb794d7ea56fd83452869674f3ab1c7)，第三方声明中保留其 MIT 许可。本次使用的模型与贴图均已存在于拔刀剑 2 基底中。
 
 SlashBlade:Re 原创贡献的 MIT 适用范围，以及继承代码和资源的许可，见 [LICENSE](LICENSE) 与 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。**MIT 不覆盖整个继承项目。**
 
