@@ -1,35 +1,17 @@
 {
-  "display": {
-    "title": {
-      "translate": "item.slashblade.slashblade"
-    },
-    "description": {
-      "translate": "item.slashblade.slashblade.desc"
-    },
-    "icon": {
-      "id": "slashblade:slashblade",
-      "components": {
-        "minecraft:custom_data": {
-          "Crafting": "slashblade:simple_slashblade"
-        }
-      }
-    },
-    "frame": "task",
-    "hidden": true
-  },
-  "parent": "slashblade:root",
+  "parent": "slashblade:blade/s_iron",
   "criteria": {
-    "crafting": {
+    "blade": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": [
-              "slashblade:slashblade"
-            ],
+            "items": "slashblade:slashblade",
             "predicates": {
               "slashblade:blade": {
-                "translationKey": ""
+                "translationKey": "",
+                "isBroken": 0,
+                "isSealed": 0
               }
             }
           }

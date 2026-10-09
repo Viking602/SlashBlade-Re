@@ -24,9 +24,9 @@ public final class SlashBladeJeiPlugin implements IModPlugin {
     public static IJeiRuntime runtime() { return runtime; }
     @Override public Identifier getPluginUid() { return SlashBlade.id("jei"); }
     @Override public void registerItemSubtypes(ISubtypeRegistration registration) {
-        registration.registerSubtypeInterpreter(SBItems.slashblade, (stack, context) -> {
+        for (var blade:SBItems.blades()) registration.registerSubtypeInterpreter(blade, (stack, context) -> {
             var s=SBData.get(stack,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
-            return List.of(s.getTranslationKey(),s.isBroken(),s.isNoScabbard());
+            return List.of(s.getTranslationKey(),s.isBroken(),s.isSealed(),s.isNoScabbard());
         });
         // Material boxes are ordinary chests with a recipe component. Keep each box searchable.
         registration.registerSubtypeInterpreter(Items.CHEST, (stack, context) -> {
@@ -41,35 +41,33 @@ public final class SlashBladeJeiPlugin implements IModPlugin {
         var catalog=BladeCatalog.items();
         var factory=registration.getVanillaRecipeFactory();
         var anvils=new ArrayList<mezz.jei.api.recipe.vanilla.IJeiAnvilRecipe>();
-        var map=AdvancementsRecipeRenderer.getInstance().recipes();
-        for (var holder:map.byType(RecipeType.CRAFTING)) {
-            if (!holder.id().identifier().getNamespace().equals("slashblade")) continue;
-            for (var display:holder.value().display()) for (var material:display.result().resolveForStacks(registration.getContextMap())) {
-                var recipe=AnvilCraftingRecipe.getRecipe(material);
-                if (recipe==null) continue;
-                var candidates=catalog.stream().filter(s -> recipe.getTranslationKey().isEmpty()
-                        || SBData.get(s,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new).getTranslationKey().equals(recipe.getTranslationKey())).toList();
-                for (var candidate:candidates) {
-                    var base=candidate.copy(); var state=SBData.get(base,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
-                    state.setKillCount(recipe.getKillcount()); state.setRefine(recipe.getRefine());
-                    state.setBroken(recipe.isBroken()); state.setDamage(recipe.isBroken()?1:0); state.setNoScabbard(recipe.isNoScabbard());
-                    SBEnchantments.set(recipe.getEnchantments(),base);
-                    if (!recipe.matches(base)) continue;
-                    var output=recipe.getResult(base);
-                    if (output.isEmpty()) continue;
-                    anvils.add(factory.createAnvilRecipe(base,List.of(material),List.of(output),
-                            SlashBlade.id("anvil/"+holder.id().identifier().getPath())));
-                    registration.addItemStackInfo(output,Component.translatable("slashblade.jei.forge",recipe.getLevel()),
-                            Component.translatable("slashblade.jei.requirements",recipe.getKillcount(),recipe.getRefine()));
-                }
-            }
+        int index=0;
+        for(var base:catalog) {
+          int bladeIndex=index++;
+          for(var material:List.of(SBItems.proudsoul_tiny,SBItems.proudsoul,SBItems.proudsoul_ingot,SBItems.proudsoul_sphere,SBItems.proudsoul_crystal,SBItems.proudsoul_trapezohedron)) {
+            var soul=new ItemStack(material);var output=base.copy();
+            int enchantability=soul.get(net.minecraft.core.component.DataComponents.ENCHANTABLE).value();
+            var state=SBData.get(output,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
+            state.setRefine(1);state.setProudSoulCount((int)Math.min(5000L,(long)enchantability*10));state.setMaxDamage(state.getMaxDamage()+1);state.setDamage(0);
+            anvils.add(factory.createAnvilRecipe(base,List.of(soul),List.of(output),SlashBlade.id("refine/"+bladeIndex+"/"+net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(material).getPath())));
+            if(bladeIndex==0) registration.addItemStackInfo(soul,Component.translatable("slashblade.jei.refine_material",Math.max(10,enchantability),(int)Math.min(5000L,(long)enchantability*10)));
+          }
         }
         registration.addRecipes(RecipeTypes.ANVIL,anvils);
         registration.addItemStackInfo(catalog,Component.translatable("slashblade.jei.progress"));
-        SlashBlade.LOGGER.info("SlashBlade JEI: {} named blades, {} actual anvil upgrades",catalog.size(),anvils.size());
+        for(var blade:catalog) {
+            var state=SBData.get(blade,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
+            String key=SBItemData.tag(blade).getStringOr("resharped_definition",net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(blade.getItem()).getPath());
+            registration.addItemStackInfo(blade,Component.translatable("slashblade.route."+key));
+        }
+        SlashBlade.LOGGER.info("SlashBlade JEI: {} blade variants, {} refining recipes",catalog.size(),anvils.size());
     }
     @Override public void onRuntimeAvailable(IJeiRuntime available) {
         runtime=available;
+        available.getIngredientManager().removeIngredientsAtRuntime(VanillaTypes.ITEM_STACK,List.of(new ItemStack(SBItems.proudsoul_activated),new ItemStack(SBItems.proudsoul_awakened)));
+        var vanillaRepairs=available.getRecipeManager().createRecipeLookup(RecipeTypes.ANVIL).get()
+                .filter(r -> r.getUid()!=null && r.getUid().getNamespace().equals("slashblade") && !r.getUid().getPath().startsWith("refine/")).toList();
+        available.getRecipeManager().hideRecipes(RecipeTypes.ANVIL,vanillaRepairs);
         // Upstream stored advancement illustrations as impossible smithing recipes.
         // Keep the advancement help but never offer a barrier-template recipe in JEI.
         var examples=AdvancementsRecipeRenderer.getInstance().recipes().byType(RecipeType.SMITHING).stream()

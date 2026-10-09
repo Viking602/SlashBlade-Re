@@ -1,0 +1,68 @@
+{
+  "parent": "slashblade:blade/s_wood",
+  "display": {
+    "icon": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.tagayasan",
+          "TextureName": "slashblade:model/named/tagayasan.png",
+          "baseAttackModifier": 5.0,
+          "MaxDamage": 70,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 4,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 1
+        },
+        "minecraft:max_damage": 70,
+        "minecraft:enchantments": {
+          "minecraft:smite": 3,
+          "minecraft:unbreaking": 3
+        },
+        "minecraft:custom_data": {
+          "resharped_definition": "tagayasan",
+          "resharped_slash_art": "slashblade:drive_vertical",
+          "resharped_special_effects": [],
+          "Crafting": "slashblade:upgrades/tagayasan"
+        }
+      }
+    },
+    "title": {
+      "translate": "item.slashblade.tagayasan"
+    },
+    "description": {
+      "translate": "slashblade.route.tagayasan"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "slashblade:slashblade",
+            "predicates": {
+              "slashblade:blade": {
+                "translationKey": "item.slashblade.tagayasan",
+                "isBroken": 0,
+                "isSealed": 0
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

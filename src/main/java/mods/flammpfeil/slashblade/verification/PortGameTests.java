@@ -37,21 +37,22 @@ public final class PortGameTests {
         var environment = event.registerEnvironment(SlashBlade.id("port_verification"));
         Map<String, Consumer<GameTestHelper>> tests = new LinkedHashMap<>();
         BladeRecipeGameTests.add(tests);
+        ResharpedProgressionGameTests.add(tests);
         tests.put("registrations", h -> {
-            h.assertValueEqual(BuiltInRegistries.ITEM.keySet().stream().filter(id -> id.getNamespace().equals("slashblade")).count(), 15L, "items");
+            h.assertValueEqual(BuiltInRegistries.ITEM.keySet().stream().filter(id -> id.getNamespace().equals("slashblade")).count(), 19L, "items");
             h.assertValueEqual(BuiltInRegistries.ENTITY_TYPE.keySet().stream().filter(id -> id.getNamespace().equals("slashblade")).count(), 10L, "entities");
             h.assertValueEqual(state(blade()).getTargetEntityId(), -1, "fresh blade has no lock-on target");
         });
         tests.put("recipes_and_advancements", h -> {
             var manager = h.getLevel().getServer().getResourceManager();
             var recipes = manager.listResources("recipe", id -> id.getNamespace().equals("slashblade") && id.getPath().endsWith(".json"));
-            h.assertValueEqual(recipes.size(), 41, "recipe resources");
+            h.assertValueEqual(recipes.size(), 36, "recipe resources");
             for (var id : recipes.keySet()) {
                 var name = Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath().substring(7, id.getPath().length()-5));
                 h.assertTrue(h.getLevel().getServer().getRecipeManager().byKey(ResourceKey.create(Registries.RECIPE, name)).isPresent(), "Recipe failed to load: " + name);
             }
             var advancements = manager.listResources("advancement", id -> id.getNamespace().equals("slashblade") && id.getPath().endsWith(".json"));
-            h.assertValueEqual(advancements.size(), 70, "advancement resources");
+            h.assertValueEqual(advancements.size(), 112, "advancement resources");
             for (var id : advancements.keySet()) {
                 var name = Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath().substring(12, id.getPath().length()-5));
                 h.assertTrue(h.getLevel().getServer().getAdvancements().get(name) != null, "Advancement failed to load: " + name);
@@ -59,11 +60,12 @@ public final class PortGameTests {
         });
         tests.put("state_save_reload", h -> {
             ItemStack stack = blade(); var s = state(stack); UUID owner = UUID.randomUUID();
-            s.setKillCount(123); s.setRefine(41); s.setDamage(.45f); s.setBaseAttackModifier(9);
+            s.setProudSoulCount(12345); s.setMaxDamage(150); s.setKillCount(123); s.setRefine(41); s.setDamage(.45f); s.setBaseAttackModifier(9);
             s.setTranslationKey("item.slashblade.yamato"); s.setOwner(owner); s.setModel(SlashBlade.id("model/named/yamato.obj"));
             s.setTexture(SlashBlade.id("model/named/yamato.png")); s.setColorCode(0x1288ff); s.setComboRootName(Extra.STANDBY_EX.getName()); s.setComboRootAirName(Extra.STANDBY_INAIR.getName());
             s.setNoScabbard(true); s.setSealed(true); s.setSlashArtsKey("judgement_cut");
             ItemStack restored = SBItemData.load(SBItemData.save(stack)); var r = state(restored);
+            h.assertValueEqual(r.getProudSoulCount(),12345,"persisted ProudSoul"); h.assertValueEqual(restored.getMaxDamage(),150,"persisted durability");
             h.assertValueEqual(r.getKillCount(), 123, "kills"); h.assertValueEqual(r.getRefine(), 41, "refine");
             h.assertValueEqual(r.getOwner(), owner, "owner"); h.assertValueEqual(r.getUniqueId(), s.getUniqueId(), "blade UUID");
             h.assertValueEqual(r.getDamage(), .45f, "damage"); h.assertValueEqual(r.getBaseAttackModifier(), 9f, "attack");
@@ -88,6 +90,7 @@ public final class PortGameTests {
         tests.put("damage_and_repair", h -> {
             var stack = blade(); var s = state(stack); s.setDamage(1f); s.setBroken(true);
             var player = h.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+            player.experienceLevel=10;
             var e = new AnvilUpdateEvent(stack, new ItemStack(SBItems.proudsoul), null, ItemStack.EMPTY, 0, 0, player);
             RefineHandler.getInstance().onAnvilUpdateEvent(e);
             h.assertFalse(e.getOutput().isEmpty(), "refine output"); h.assertFalse(state(e.getOutput()).isBroken(), "repaired blade");
@@ -370,7 +373,7 @@ public final class PortGameTests {
             final int mode=variant;
             tests.put("summoned_sword_art_"+variant,h -> {
                 var player=new net.neoforged.neoforge.common.util.FakePlayer(h.getLevel(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"SlashBladeTest"));
-                player.setPos(h.absoluteVec(new Vec3(3,2,3)));player.setItemInHand(InteractionHand.MAIN_HAND,blade());player.experienceLevel=100;
+                player.setPos(h.absoluteVec(new Vec3(3,2,3)));player.setItemInHand(InteractionHand.MAIN_HAND,blade());player.experienceLevel=100;state(player.getMainHandItem()).setProudSoulCount(100);
                 var target=h.spawn(EntityType.ZOMBIE,3,2,5);target.setNoAi(true);state(player.getMainHandItem()).setTargetEntityId(target);
                 var input=player.getData(SBData.INPUT);long now=h.getLevel().getGameTime();input.getLastPressTimes().put(InputCommand.M_DOWN,now);
                 input.getCommands().add(InputCommand.M_DOWN);
@@ -381,7 +384,8 @@ public final class PortGameTests {
                 EntityType<?> expected=switch(mode) {case 0->SlashBlade.RegistryEvents.SpiralSwords;case 1->SlashBlade.RegistryEvents.StormSwords;case 2->SlashBlade.RegistryEvents.BlisteringSwords;default->SlashBlade.RegistryEvents.HeavyRainSwords;};
                 var host=mode==1?target:player;
                 h.assertTrue(EntityAbstractSummonedSword.formationSwords(host).stream().anyMatch(entity->entity.getType()==expected),"summoned sword formation "+expected);
-                h.assertTrue(player.experienceLevel<100,"summoning consumed experience");
+                h.assertValueEqual(state(player.getMainHandItem()).getProudSoulCount(),78,"one summon plus formation consume 2+20 souls");
+                h.assertValueEqual(player.experienceLevel,100,"summoning must not consume XP");
                 var swords=new ArrayList<>(EntityAbstractSummonedSword.formationSwords(host));
                 for(var sword:swords) { sword.tickCount++; sword.rideTick(); }
                 if(mode==0) {var sword=swords.getFirst();var before=sword.position();player.setPos(player.position().add(1,0,0));sword.tickCount++;sword.tick();h.assertTrue(sword.position().distanceToSqr(before)>.5,"orbit follows player movement");}

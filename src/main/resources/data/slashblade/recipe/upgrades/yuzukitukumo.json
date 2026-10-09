@@ -1,0 +1,98 @@
+{
+  "type": "slashblade:blade_upgrade",
+  "category": "equipment",
+  "pattern": [
+    "ESD",
+    "RBL",
+    "ISG"
+  ],
+  "key": {
+    "B": {
+      "neoforge:ingredient_type": "slashblade:blade_requirement",
+      "item": "slashblade:slashblade",
+      "name": "",
+      "kills": 0,
+      "refine": 0,
+      "proud_soul": 0,
+      "broken": false,
+      "sealed": false,
+      "enchantments": {
+        "minecraft:fire_aspect": 1
+      },
+      "display": {
+        "id": "slashblade:slashblade",
+        "count": 1,
+        "components": {
+          "slashblade:blade_state": {
+            "translationKey": "",
+            "TextureName": "slashblade:model/blade.png",
+            "baseAttackModifier": 4.0,
+            "MaxDamage": 40,
+            "isDestructable": 0,
+            "isBroken": 0,
+            "isSealed": 0,
+            "Damage": 0.0,
+            "ProudSoul": 0,
+            "killCount": 0,
+            "RepairCounter": 0,
+            "SpecialAttackType": "judgement_cut",
+            "ComboRoot": "standby",
+            "ComboRootAir": "standby_inair",
+            "StandbyRenderType": 2,
+            "SummonedSwordColor": -13421569,
+            "TargetEntity": -1
+          },
+          "minecraft:max_damage": 40,
+          "minecraft:enchantments": {
+            "minecraft:fire_aspect": 1
+          }
+        }
+      }
+    },
+    "D": "#c:storage_blocks/diamond",
+    "E": "#c:storage_blocks/emerald",
+    "G": "#c:storage_blocks/gold",
+    "I": "#c:storage_blocks/iron",
+    "L": "#c:storage_blocks/lapis",
+    "R": "#c:storage_blocks/redstone",
+    "S": "slashblade:proudsoul_sphere"
+  },
+  "result": {
+    "id": "slashblade:slashblade",
+    "count": 1,
+    "components": {
+      "slashblade:blade_state": {
+        "translationKey": "item.slashblade.yuzukitukumo",
+        "TextureName": "slashblade:model/named/a_tukumo.png",
+        "baseAttackModifier": 6.0,
+        "MaxDamage": 40,
+        "isDestructable": 0,
+        "isBroken": 0,
+        "isSealed": 0,
+        "Damage": 0.0,
+        "ProudSoul": 0,
+        "killCount": 0,
+        "RepairCounter": 0,
+        "SpecialAttackType": "judgement_cut",
+        "ComboRoot": "standby",
+        "ComboRootAir": "standby_inair",
+        "StandbyRenderType": 2,
+        "SummonedSwordColor": -13421569,
+        "TargetEntity": -1,
+        "isDefaultBewitched": 1,
+        "ModelName": "slashblade:model/named/agito.obj"
+      },
+      "minecraft:max_damage": 40,
+      "minecraft:enchantments": {
+        "minecraft:fire_aspect": 1,
+        "minecraft:sharpness": 4,
+        "minecraft:unbreaking": 3
+      },
+      "minecraft:custom_data": {
+        "resharped_definition": "yuzukitukumo",
+        "resharped_slash_art": "slashblade:drive_horizontal",
+        "resharped_special_effects": []
+      }
+    }
+  }
+}

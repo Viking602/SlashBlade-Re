@@ -1,72 +1,60 @@
 {
+  "parent": "slashblade:blade/s_silverbamboo",
   "display": {
-    "title": {
-      "translate": "adv.slashblade.imitation_broken"
-    },
-    "description": {
-      "translate": "adv.slashblade.imitation_broken.desc"
-    },
     "icon": {
-      "id": "slashblade:slashblade",
+      "id": "slashblade:slashblade_silverbamboo",
+      "count": 1,
       "components": {
         "slashblade:blade_state": {
-          "isSealed": 1,
-          "isNoScabbard": 0,
-          "translationKey": "item.slashblade.simple.silverbamboo",
-          "isDestructable": 0,
-          "HasShield": 0,
-          "SummonedSwordColor": -3355647,
-          "lastActionTime": 0,
-          "_onClick": 0,
-          "fallDecreaseRate": 0.0,
-          "currentCombo": "arts_rapid_slash",
-          "killCount": 0,
-          "isCharged": 0,
-          "RepairCounter": 0,
-          "Damage": 1.0,
-          "rarityType": 0,
-          "ComboRoot": "standby",
-          "adjustXYZ": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "lastPosHash": "",
-          "RangeAttackType": "none",
-          "isDefaultBewitched": 0,
-          "AttackAmplifier": 0.0,
-          "TargetEntity": -1,
-          "SpecialAttackType": "none",
+          "translationKey": "",
           "TextureName": "slashblade:model/silverbamboo.png",
-          "SummonedSwordColorInverse": 0,
+          "baseAttackModifier": 3.0,
+          "MaxDamage": 40,
+          "isDestructable": 0,
           "isBroken": 1,
-          "baseAttackModifier": 2.0,
-          "StandbyRenderType": 0,
-          "ComboRootAir": "standby_inair"
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1
         },
-        "minecraft:rarity": "common"
-      }
-    },
-    "frame": "task",
-    "hidden": true
-  },
-  "parent": "slashblade:blade/s_silverbamboo",
-  "criteria": {
-    "broken_edge": {
-      "trigger": "minecraft:consume_item",
-      "conditions": {
-        "item": {
-          "items": [
-            "slashblade:slashblade"
-          ],
-          "nbt": "{ShareTag:{translationKey:\"item.slashblade.simple.silverbamboo\"}}"
+        "minecraft:max_damage": 40,
+        "minecraft:custom_data": {
+          "Crafting": "slashblade:upgrades/slashblade_silverbamboo"
         }
       }
-    }
+    },
+    "title": {
+      "translate": "slashblade.route.broken_imitation.title"
+    },
+    "description": {
+      "translate": "slashblade.route.broken_imitation"
+    },
+    "frame": "task"
   },
-  "rewards": {
-    "recipes": [
-      "slashblade:ex/ruby"
-    ]
+  "criteria": {
+    "blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "slashblade:slashblade_silverbamboo",
+            "predicates": {
+              "slashblade:blade": {
+                "translationKey": "",
+                "isBroken": 1,
+                "isSealed": 0
+              }
+            }
+          }
+        ]
+      }
+    }
   }
 }

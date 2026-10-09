@@ -1,0 +1,64 @@
+{
+  "parent": "slashblade:root",
+  "display": {
+    "icon": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.yamato",
+          "TextureName": "slashblade:model/named/yamato.png",
+          "baseAttackModifier": 7.0,
+          "MaxDamage": 40,
+          "isDestructable": 0,
+          "isBroken": 1,
+          "isSealed": 1,
+          "Damage": 1.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0,
+          "ModelName": "slashblade:model/named/yamato.obj"
+        },
+        "minecraft:max_damage": 40,
+        "minecraft:custom_data": {
+          "resharped_definition": "yamato_broken",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    },
+    "title": {
+      "translate": "item.slashblade.yamato"
+    },
+    "description": {
+      "translate": "slashblade.route.yamato_broken"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "slashblade:slashblade",
+            "predicates": {
+              "slashblade:blade": {
+                "translationKey": "item.slashblade.yamato",
+                "isBroken": 1,
+                "isSealed": 1
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

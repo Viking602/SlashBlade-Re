@@ -1,73 +1,60 @@
 {
+  "parent": "slashblade:blade/s_iron",
   "display": {
-    "title": {
-      "translate": "item.slashblade.ex.muramasa"
-    },
-    "description": {
-      "translate": "item.slashblade.ex.muramasa.desc"
-    },
     "icon": {
       "id": "slashblade:slashblade",
+      "count": 1,
       "components": {
         "slashblade:blade_state": {
-          "isSealed": 1,
-          "isNoScabbard": 0,
-          "translationKey": "item.slashblade.ex.muramasa",
-          "isDestructable": 0,
-          "HasShield": 0,
-          "SummonedSwordColor": -3355647,
-          "lastActionTime": 0,
-          "_onClick": 0,
-          "fallDecreaseRate": 0.0,
-          "currentCombo": "arts_rapid_slash",
-          "killCount": 0,
-          "isCharged": 0,
-          "RepairCounter": 0,
-          "Damage": 0.0,
-          "rarityType": 0,
-          "ComboRoot": "standby",
-          "adjustXYZ": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "lastPosHash": "",
-          "RangeAttackType": "none",
-          "isDefaultBewitched": 0,
-          "AttackAmplifier": 0.0,
-          "TargetEntity": -1,
-          "SpecialAttackType": "none",
+          "translationKey": "item.slashblade.muramasa",
           "TextureName": "slashblade:model/named/muramasa/muramasa.png",
-          "ModelName": "slashblade:model/named/muramasa/muramasa.obj",
-          "SummonedSwordColorInverse": 0,
+          "baseAttackModifier": 7.0,
+          "MaxDamage": 50,
+          "isDestructable": 0,
           "isBroken": 0,
-          "baseAttackModifier": 2.0,
-          "StandbyRenderType": 0,
-          "ComboRootAir": "standby_inair"
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0,
+          "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
         },
-        "minecraft:rarity": "common",
+        "minecraft:max_damage": 50,
         "minecraft:custom_data": {
-          "Crafting": "slashblade:ex/muramasa"
+          "resharped_definition": "muramasa",
+          "resharped_slash_art": "slashblade:drive_vertical",
+          "resharped_special_effects": [],
+          "Crafting": "slashblade:upgrades/muramasa"
         }
       }
     },
-    "frame": "task",
-    "hidden": true
+    "title": {
+      "translate": "item.slashblade.muramasa"
+    },
+    "description": {
+      "translate": "slashblade.route.muramasa"
+    },
+    "frame": "task"
   },
-  "parent": "slashblade:blade/s_iron",
   "criteria": {
-    "crafting": {
+    "blade": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": [
-              "slashblade:slashblade"
-            ],
+            "items": "slashblade:slashblade",
             "predicates": {
               "slashblade:blade": {
-                "translationKey": "item.slashblade.ex.muramasa",
-                "isBroken": 0
+                "translationKey": "item.slashblade.muramasa",
+                "isBroken": 0,
+                "isSealed": 0
               }
             }
           }

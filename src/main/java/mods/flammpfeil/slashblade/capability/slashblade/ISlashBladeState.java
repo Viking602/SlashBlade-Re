@@ -116,6 +116,11 @@ public interface ISlashBladeState {
     float getBaseAttackModifier();
 	void setBaseAttackModifier(float baseAttackModifier);
 
+    int getProudSoulCount();
+    void setProudSoulCount(int count);
+    int getMaxDamage();
+    void setMaxDamage(int damage);
+
     int getKillCount();
 	void setKillCount(int killCount);
 
@@ -416,7 +421,7 @@ public interface ISlashBladeState {
                 .remove("lastPosHash")
                 .remove("HasShield")
 
-                .remove("killCount")
+                .remove("killCount").remove("ProudSoul")
 
                 .remove("Damage");
     }
@@ -437,7 +442,7 @@ public interface ISlashBladeState {
                 .put("lastPosHash", this.getLastPosHash())
                 .put("HasShield", this.hasShield())
 
-                .put("killCount", this.getKillCount())
+                .put("killCount", this.getKillCount()).put("ProudSoul",this.getProudSoulCount())
 
                 .put("Damage", this.getDamage())
 
@@ -460,7 +465,7 @@ public interface ISlashBladeState {
                 .get("lastPosHash", this::setLastPosHash)
                 .get("HasShield", this::setHasShield)
 
-                .get("killCount", this::setKillCount)
+                .get("killCount", this::setKillCount).get("ProudSoul",this::setProudSoulCount)
 
                 .get("Damage", this::setDamage)
 

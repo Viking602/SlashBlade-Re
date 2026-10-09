@@ -1,72 +1,65 @@
 {
+  "parent": "slashblade:blade/ex/ruby",
   "display": {
-    "title": {
-      "translate": "item.slashblade.ex.fox.black"
-    },
-    "description": {
-      "translate": "item.slashblade.ex.fox.black.desc"
-    },
     "icon": {
       "id": "slashblade:slashblade",
+      "count": 1,
       "components": {
         "slashblade:blade_state": {
-          "isSealed": 1,
-          "isNoScabbard": 0,
-          "translationKey": "item.slashblade.ex.fox.black",
-          "isDestructable": 0,
-          "HasShield": 0,
-          "SummonedSwordColor": -3355647,
-          "lastActionTime": 0,
-          "_onClick": 0,
-          "fallDecreaseRate": 0.0,
-          "currentCombo": "arts_rapid_slash",
-          "killCount": 0,
-          "isCharged": 0,
-          "RepairCounter": 0,
-          "Damage": 0.0,
-          "rarityType": 0,
-          "ComboRoot": "standby",
-          "adjustXYZ": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "lastPosHash": "",
-          "RangeAttackType": "none",
-          "isDefaultBewitched": 0,
-          "AttackAmplifier": 0.0,
-          "TargetEntity": -1,
-          "SpecialAttackType": "none",
+          "translationKey": "item.slashblade.fox_black",
           "TextureName": "slashblade:model/named/sange/black.png",
-          "ModelName": "slashblade:model/named/sange/sange.obj",
-          "SummonedSwordColorInverse": 0,
+          "baseAttackModifier": 5.0,
+          "MaxDamage": 70,
+          "isDestructable": 0,
           "isBroken": 0,
-          "baseAttackModifier": 2.0,
-          "StandbyRenderType": 0,
-          "ComboRootAir": "standby_inair"
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 1,
+          "ModelName": "slashblade:model/named/sange/sange.obj"
         },
-        "minecraft:rarity": "common",
+        "minecraft:max_damage": 70,
+        "minecraft:enchantments": {
+          "minecraft:smite": 4,
+          "minecraft:knockback": 2,
+          "minecraft:fire_aspect": 2
+        },
         "minecraft:custom_data": {
-          "Crafting": "slashblade:ex/fox_black"
+          "resharped_definition": "fox_black",
+          "resharped_slash_art": "slashblade:piercing",
+          "resharped_special_effects": [],
+          "Crafting": "slashblade:upgrades/fox_black"
         }
       }
     },
+    "title": {
+      "translate": "item.slashblade.fox_black"
+    },
+    "description": {
+      "translate": "slashblade.route.fox_black"
+    },
     "frame": "task"
   },
-  "parent": "slashblade:blade/ex/ruby",
   "criteria": {
-    "crafting": {
+    "blade": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": [
-              "slashblade:slashblade"
-            ],
+            "items": "slashblade:slashblade",
             "predicates": {
               "slashblade:blade": {
-                "translationKey": "item.slashblade.ex.fox.black",
-                "isBroken": 0
+                "translationKey": "item.slashblade.fox_black",
+                "isBroken": 0,
+                "isSealed": 0
               }
             }
           }

@@ -32,8 +32,6 @@
     }
   },
   "rewards": {
-    "recipes": [
-      "slashblade:material/trapezohedron_smoking"
-    ]
+    "recipes": []
   }
 }

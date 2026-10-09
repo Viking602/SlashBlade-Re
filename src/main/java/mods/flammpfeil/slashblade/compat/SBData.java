@@ -71,6 +71,7 @@ public final class SBData {
         synchronized void load(ItemStack item) {
             loading = true;
             state = new SlashBladeState();
+            mods.flammpfeil.slashblade.init.BladeCatalog.initializeBase(item.getItem(),state);
             seen = item.getOrDefault(BLADE_STATE.get(), CustomData.EMPTY);
             if (!seen.isEmpty()) new BladeStateCapabilityProvider(state).deserializeNBT(seen.copyTag());
             state.setChangeListener(this::save);
@@ -83,6 +84,7 @@ public final class SBData {
             seen = CustomData.of((CompoundTag)new BladeStateCapabilityProvider(state).serializeNBT());
             item.set(BLADE_STATE.get(), seen);
             item.set(net.minecraft.core.component.DataComponents.RARITY, state.getRarity());
+            item.set(net.minecraft.core.component.DataComponents.MAX_DAMAGE,state.getMaxDamage());
         }
         synchronized SlashBladeState get(ItemStack item) {
             if (!item.getOrDefault(BLADE_STATE.get(), CustomData.EMPTY).equals(seen)) load(item);

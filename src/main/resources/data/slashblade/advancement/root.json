@@ -56,13 +56,5 @@
       "trigger": "minecraft:player_hurt_entity"
     }
   },
-  "rewards": {
-    "recipes": [
-      "slashblade:simple_slashblade",
-      "slashblade:s_wood"
-    ],
-    "loot": [
-      "slashblade:rewards/first"
-    ]
-  }
+  "rewards": {}
 }

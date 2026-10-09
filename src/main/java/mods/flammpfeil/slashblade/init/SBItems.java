@@ -17,13 +17,18 @@ import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
 public final class SBItems {
-    public static Item slashblade, proudsoul, proudsoul_ingot, proudsoul_tiny, proudsoul_sphere, proudsoul_crystal,
+    public static Item slashblade, slashblade_wood, slashblade_bamboo, slashblade_silverbamboo, slashblade_white, proudsoul, proudsoul_ingot, proudsoul_tiny, proudsoul_sphere, proudsoul_crystal,
         proudsoul_trapezohedron, proudsoul_activated, proudsoul_awakened,
         bladestand_1, bladestand_2, bladestand_v, bladestand_s, bladestand_1w, bladestand_2w;
     private static Item.Properties properties(String name) { return new Item.Properties().setId(ResourceKey.create(Registries.ITEM, SlashBlade.id(name))); }
     private static class SoulItem extends Item {
         SoulItem(Properties properties, int enchantability) { super(properties.enchantable(enchantability)); }
         @Override public boolean isFoil(ItemStack stack) { return true; }
+        @Override public void appendHoverText(ItemStack stack,Item.TooltipContext context,net.minecraft.world.item.component.TooltipDisplay display,java.util.function.Consumer<net.minecraft.network.chat.Component> tooltip,TooltipFlag flag) {
+            int value=stack.get(net.minecraft.core.component.DataComponents.ENCHANTABLE).value();
+            tooltip.accept(net.minecraft.network.chat.Component.translatable("slashblade.tooltip.soul_material",Math.max(10,value),(int)Math.min(5000L,(long)value*10)));
+            super.appendHoverText(stack,context,display,tooltip,flag);
+        }
         @Override public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
             if (this == proudsoul && !(entity instanceof mods.flammpfeil.slashblade.entity.BladeItemEntity)) {
                 entity.health = 50;
@@ -36,18 +41,16 @@ public final class SBItems {
     public static void register(RegisterEvent event) {
         event.register(Registries.ITEM, helper -> {
             helper.register(SlashBlade.id("slashblade"), slashblade = new ItemSlashBlade(new ItemTierSlashBlade(), 1, -2.4F, properties("slashblade")));
+            helper.register(SlashBlade.id("slashblade_wood"), slashblade_wood = blade("slashblade_wood"));
+            helper.register(SlashBlade.id("slashblade_bamboo"), slashblade_bamboo = blade("slashblade_bamboo"));
+            helper.register(SlashBlade.id("slashblade_silverbamboo"), slashblade_silverbamboo = blade("slashblade_silverbamboo"));
+            helper.register(SlashBlade.id("slashblade_white"), slashblade_white = blade("slashblade_white"));
             helper.register(SlashBlade.id("proudsoul"), proudsoul = new SoulItem(properties("proudsoul"), 50));
             helper.register(SlashBlade.id("proudsoul_ingot"), proudsoul_ingot = new SoulItem(properties("proudsoul_ingot"), 100));
             helper.register(SlashBlade.id("proudsoul_tiny"), proudsoul_tiny = new SoulItem(properties("proudsoul_tiny"), 10));
             helper.register(SlashBlade.id("proudsoul_sphere"), proudsoul_sphere = new SoulItem(properties("proudsoul_sphere").rarity(Rarity.UNCOMMON), 150));
             helper.register(SlashBlade.id("proudsoul_crystal"), proudsoul_crystal = new SoulItem(properties("proudsoul_crystal").rarity(Rarity.RARE), 200));
-            helper.register(SlashBlade.id("proudsoul_trapezohedron"), proudsoul_trapezohedron = new SoulItem(properties("proudsoul_trapezohedron").rarity(Rarity.EPIC), Integer.MAX_VALUE) {
-                @Override public InteractionResult use(Level level, Player player, InteractionHand hand) {
-                    if (!player.isCrouching()) return InteractionResult.PASS;
-                    level.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.NEUTRAL, 1.5F, 1);
-                    return InteractionResult.SUCCESS.heldItemTransformedTo(ItemUtils.createFilledResult(player.getItemInHand(hand), player, new ItemStack(proudsoul_activated)));
-                }
-            });
+            helper.register(SlashBlade.id("proudsoul_trapezohedron"), proudsoul_trapezohedron = new SoulItem(properties("proudsoul_trapezohedron").rarity(Rarity.EPIC), Integer.MAX_VALUE));
             helper.register(SlashBlade.id("proudsoul_activated"), proudsoul_activated = new ItemSoulActivated(properties("proudsoul_activated").durability(1200).rarity(Rarity.EPIC).enchantable(Integer.MAX_VALUE)) {
                 @Override public boolean isFoil(ItemStack stack) { return true; }
             });
@@ -62,6 +65,11 @@ public final class SBItems {
             helper.register(SlashBlade.id("bladestand_2w"), bladestand_2w = new BladeStandItem(properties("bladestand_2w"), true));
         });
     }
+    private static Item blade(String id) {
+        int durability=switch(id) { case "slashblade_wood" -> 60;case "slashblade_bamboo","slashblade_white" -> 70;default -> 40; };
+        return new ItemSlashBlade(new ItemTierSlashBlade(durability),1,-2.4F,properties(id));
+    }
+    public static java.util.List<Item> blades() { return java.util.List.of(slashblade,slashblade_wood,slashblade_bamboo,slashblade_silverbamboo,slashblade_white); }
     public static ItemStack yamatoIcon() {
         ItemStack stack = new ItemStack(slashblade);
         SBData.get(stack, ItemSlashBlade.BLADESTATE).ifPresent(state -> {
@@ -71,8 +79,8 @@ public final class SBItems {
         return stack;
     }
     public static void displayItems(CreativeModeTab.Output output) {
-        for (Item item : new Item[]{slashblade, proudsoul, proudsoul_tiny, proudsoul_ingot, proudsoul_sphere, proudsoul_crystal,
-            proudsoul_trapezohedron, proudsoul_activated, proudsoul_awakened, bladestand_1, bladestand_1w, bladestand_2, bladestand_2w, bladestand_s, bladestand_v})
+        for (Item item : new Item[]{proudsoul, proudsoul_tiny, proudsoul_ingot, proudsoul_sphere, proudsoul_crystal,
+            proudsoul_trapezohedron, bladestand_1, bladestand_1w, bladestand_2, bladestand_2w, bladestand_s, bladestand_v})
             output.accept(item, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
         BladeCatalog.displayItems(output);
     }

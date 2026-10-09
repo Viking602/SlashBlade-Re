@@ -1,0 +1,80 @@
+{
+  "type": "slashblade:blade_smithing",
+  "template": "minecraft:netherite_upgrade_smithing_template",
+  "base": {
+    "neoforge:ingredient_type": "slashblade:blade_requirement",
+    "item": "slashblade:slashblade",
+    "name": "item.slashblade.rodai_diamond",
+    "kills": 0,
+    "refine": 0,
+    "proud_soul": 0,
+    "broken": false,
+    "sealed": false,
+    "enchantments": {},
+    "display": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.rodai_diamond",
+          "TextureName": "slashblade:model/rodai_diamond.png",
+          "baseAttackModifier": 7.0,
+          "MaxDamage": 1561,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0
+        },
+        "minecraft:max_damage": 1561,
+        "minecraft:custom_data": {
+          "resharped_definition": "rodai_diamond",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  "addition": "#c:ingots/netherite",
+  "result": {
+    "id": "slashblade:slashblade",
+    "count": 1,
+    "components": {
+      "slashblade:blade_state": {
+        "translationKey": "item.slashblade.rodai_netherite",
+        "TextureName": "slashblade:model/rodai_netherite.png",
+        "baseAttackModifier": 8.0,
+        "MaxDamage": 2031,
+        "isDestructable": 0,
+        "isBroken": 0,
+        "isSealed": 0,
+        "Damage": 0.0,
+        "ProudSoul": 0,
+        "killCount": 0,
+        "RepairCounter": 0,
+        "SpecialAttackType": "judgement_cut",
+        "ComboRoot": "standby",
+        "ComboRootAir": "standby_inair",
+        "StandbyRenderType": 2,
+        "SummonedSwordColor": -13421569,
+        "TargetEntity": -1,
+        "isDefaultBewitched": 0
+      },
+      "minecraft:max_damage": 2031,
+      "minecraft:custom_data": {
+        "resharped_definition": "rodai_netherite",
+        "resharped_slash_art": "slashblade:judgement_cut",
+        "resharped_special_effects": []
+      }
+    }
+  }
+}

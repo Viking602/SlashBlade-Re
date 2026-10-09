@@ -110,9 +110,8 @@ public class SummonedSwordArts {
                             //summon
                             SBData.get(entity.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
 
-                                if (entity.experienceLevel <= 0) return;
-
-                                entity.giveExperiencePoints(-5);
+                                if (state.getProudSoulCount()<20) return;
+                            state.setProudSoulCount(state.getProudSoulCount()-20);
 
 
                                 AdvancementHelper.grantCriterion(entity, ADVANCEMENT_SPIRAL_SWORDS);
@@ -177,9 +176,8 @@ public class SummonedSwordArts {
 
                             if(target == null) return;
 
-                            if (entity.experienceLevel <= 0) return;
-
-                            entity.giveExperiencePoints(-5);
+                            if (state.getProudSoulCount()<20) return;
+                            state.setProudSoulCount(state.getProudSoulCount()-20);
 
                             AdvancementHelper.grantCriterion(entity, ADVANCEMENT_STORM_SWORDS);
 
@@ -236,9 +234,8 @@ public class SummonedSwordArts {
 
                             Level worldIn = entity.level();
 
-                            if (entity.experienceLevel <= 0) return;
-
-                            entity.giveExperiencePoints(-5);
+                            if (state.getProudSoulCount()<20) return;
+                            state.setProudSoulCount(state.getProudSoulCount()-20);
 
                             AdvancementHelper.grantCriterion(entity, ADVANCEMENT_BLISTERING_SWORDS);
 
@@ -296,9 +293,8 @@ public class SummonedSwordArts {
                             Level worldIn = entity.level();
                             Entity target = state.getTargetEntity(worldIn);
 
-                            if (entity.experienceLevel <= 0) return;
-
-                            entity.giveExperiencePoints(-5);
+                            if (state.getProudSoulCount()<20) return;
+                            state.setProudSoulCount(state.getProudSoulCount()-20);
 
                             AdvancementHelper.grantCriterion(entity, ADVANCEMENT_HEAVY_RAIN_SWORDS);
 
@@ -370,10 +366,8 @@ public class SummonedSwordArts {
             });
 
             SBData.get(sender.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state)->{
-                if(sender.experienceLevel <= 0)
-                    return;
-
-                sender.giveExperiencePoints(-1);
+                if(state.getProudSoulCount()<2) return;
+                state.setProudSoulCount(state.getProudSoulCount()-2);
 
                 AdvancementHelper.grantCriterion(sender, ADVANCEMENT_SUMMONEDSWORDS);
 

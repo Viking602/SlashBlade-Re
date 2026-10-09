@@ -1,0 +1,64 @@
+{
+  "parent": "slashblade:blade/broken_imitation",
+  "display": {
+    "icon": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.rodai_diamond",
+          "TextureName": "slashblade:model/rodai_diamond.png",
+          "baseAttackModifier": 7.0,
+          "MaxDamage": 1561,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0
+        },
+        "minecraft:max_damage": 1561,
+        "minecraft:custom_data": {
+          "resharped_definition": "rodai_diamond",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": [],
+          "Crafting": "slashblade:upgrades/rodai_diamond"
+        }
+      }
+    },
+    "title": {
+      "translate": "item.slashblade.rodai_diamond"
+    },
+    "description": {
+      "translate": "slashblade.route.rodai_diamond"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "slashblade:slashblade",
+            "predicates": {
+              "slashblade:blade": {
+                "translationKey": "item.slashblade.rodai_diamond",
+                "isBroken": 0,
+                "isSealed": 0
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

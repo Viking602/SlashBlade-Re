@@ -1,71 +1,60 @@
 {
+  "parent": "slashblade:blade/s_white",
   "display": {
-    "title": {
-      "translate": "adv.slashblade.white_broken"
-    },
-    "description": {
-      "translate": "adv.slashblade.white_broken.desc"
-    },
     "icon": {
-      "id": "slashblade:slashblade",
+      "id": "slashblade:slashblade_white",
+      "count": 1,
       "components": {
         "slashblade:blade_state": {
-          "isSealed": 1,
-          "isNoScabbard": 0,
-          "translationKey": "item.slashblade.simple.white",
-          "isDestructable": 0,
-          "HasShield": 0,
-          "SummonedSwordColor": -3355647,
-          "lastActionTime": 0,
-          "_onClick": 0,
-          "fallDecreaseRate": 0.0,
-          "currentCombo": "arts_rapid_slash",
-          "killCount": 0,
-          "isCharged": 0,
-          "RepairCounter": 0,
-          "Damage": 1.0,
-          "rarityType": 0,
-          "ComboRoot": "standby",
-          "adjustXYZ": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "lastPosHash": "",
-          "RangeAttackType": "none",
-          "isDefaultBewitched": 0,
-          "AttackAmplifier": 0.0,
-          "TargetEntity": -1,
-          "SpecialAttackType": "none",
+          "translationKey": "",
           "TextureName": "slashblade:model/white.png",
-          "SummonedSwordColorInverse": 0,
+          "baseAttackModifier": 4.0,
+          "MaxDamage": 70,
+          "isDestructable": 0,
           "isBroken": 1,
-          "baseAttackModifier": 2.0,
-          "StandbyRenderType": 0,
-          "ComboRootAir": "standby_inair"
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1
         },
-        "minecraft:rarity": "common"
+        "minecraft:max_damage": 70,
+        "minecraft:custom_data": {
+          "Crafting": "slashblade:upgrades/slashblade_white"
+        }
       }
+    },
+    "title": {
+      "translate": "slashblade.route.broken_white.title"
+    },
+    "description": {
+      "translate": "slashblade.route.broken_white"
     },
     "frame": "task"
   },
-  "parent": "slashblade:blade/s_white",
   "criteria": {
-    "BrokenBlade": {
-      "trigger": "minecraft:consume_item",
+    "blade": {
+      "trigger": "minecraft:inventory_changed",
       "conditions": {
-        "item": {
-          "items": [
-            "slashblade:slashblade"
-          ],
-          "nbt": "{ShareTag:{translationKey:\"item.slashblade.simple.white\"}}"
-        }
+        "items": [
+          {
+            "items": "slashblade:slashblade_white",
+            "predicates": {
+              "slashblade:blade": {
+                "translationKey": "",
+                "isBroken": 1,
+                "isSealed": 0
+              }
+            }
+          }
+        ]
       }
     }
-  },
-  "rewards": {
-    "recipes": [
-      "slashblade:s_iron"
-    ]
   }
 }

@@ -10,7 +10,7 @@ Chain your cuts. Time your Slash Arts. Feel the motion carry through your hands,
 
 **[Get started ↓](#get-started)** · [Controls](#make-your-first-cut) · [Build from source](#build-from-source) · [Report an issue](https://github.com/Viking602/SlashBlade-Re/issues)
 
-> **Development preview · `0.1.2-26.1.2-port.24`**<br>
+> **Development preview · `0.1.2-26.1.2-port.25`**<br>
 > This repository provides source code. Build the preview below; a packaged release is not published here yet.
 
 ![Continuous combat against a training Husk: normal combos, Slash Arts and Super SA](media/combat-preview.gif)
@@ -35,12 +35,74 @@ Both views share the action clock and katana size. Third person uses the articul
 **SlashBlade, carried forward.**<br>
 Ground and air combos, Slash Arts, Just SA, and Super SA join the familiar blades, crafting progression, soul materials, and summoned swords. English and Simplified Chinese are built in.
 
-**Find your next blade.**<br>
-Inspired by [SlashBlade: Resharped](https://github.com/0999312/SlashBlade_Resharped), named blades have distinct JEI entries and direct crafting upgrades. All **13 named variants** are searchable, including Rusted Blade and Doutanuki. **13 direct upgrade recipes** sit alongside the original **9 material-box anvil routes**. Upgrades preserve kills, refine and enchantments; direct upgrades also retain blade identity, owner and custom name.
+**Grow your blade along Resharped’s routes.**<br>
+Adapted from the actual [SlashBlade: Resharped 1.9.65 source](https://github.com/0999312/SlashBlade_Resharped/tree/6e2a0a092fb794d7ea56fd83452869674f3ab1c7), this build includes **5 base items and 26 named definitions (including broken/sealed variants)**, **23 crafting upgrades, 1 netherite smithing upgrade, 6 soul-material recipes and 6 blade-stand recipes**. JEI distinguishes the blade variants; hover a required blade to read its growth thresholds.
 
-JEI is optional. Without it, use the recipe book and advancement recipe views. The new Rusted Blade route and Doutanuki's 100-kill requirement are adapted to this port's existing progression; this build does not include Resharped's full weapon roster, Proud Soul counter, special effects or additional SA set.
+Upgrades keep kills, ProudSoul, refine, compatible enchantments, custom names, ownership and blade identity. Previously saved base blades remain usable in upgrades. Old material-box shortcuts, duplication recipes and activated/awakened souls leave normal progression; their existing item IDs remain loadable.
 
-Creative attacks no longer consume blade durability. A short blade with a pink durability gauge is broken: repair it on an anvil with a Proud Soul. Existing damaged items are not silently reset.
+**Scope:** acquisition, upgrades and the item economy follow the reference. Resharped’s additional SA and special-effect implementations are not all ported; affected blades say so in their tooltips and use this build’s existing Slash Arts. Twilight Forest routes require the corresponding entities; no substitute recipe is invented when that mod is absent. Cross-version Forge save migration is unverified.
+
+## Start with a wooden blade
+
+The main path is **Wooden Sword → Wooden Blade → White Sheath → Broken White Sheath → unnamed SlashBlade**. The other branch is **Wooden Blade → Bamboo → Silver Bamboo → Broken Silver Bamboo → Ruby → White/Black Fox**. Normal use wears the blade: Wood and Bamboo are destructible; White and Silver Bamboo leave a broken blade. Sealed broken blades require their specific repair recipe.
+
+Requirements are minimum progress on the input blade, not points consumed by upgrading. Use the recipe book or JEI for the exact grid.
+
+| Target | Materials and requirements |
+| :--- | :--- |
+| Anonymity -Wood- | Craft: 2 × log, 1 × wooden sword. |
+| Anonymity -Bamboo Light- | Craft: 2 × bamboo, 1 × Anonymity -Wood-. |
+| Noted -Silver Bamboo Light- | Craft: 1 × egg, 1 × iron ingot, 2 × string, 1 × Anonymity -Bamboo Light-, 1 × black dye, 1 × paper. |
+| Sharpness -White- | Craft: 2 × Blade Soul Ingot, 1 × Anonymity -Wood-, 1 × gold ingot. |
+| Anonymity -Nameless- | Craft: 1 × blaze rod, 2 × gold ingot, 1 × blue dye, 1 × Sharpness -White-, 1 × coal block, 1 × string. Required blade: broken. |
+| Sharpness -nameless- Ruby | Craft: 1 × red dye, 2 × Blade Soul Ingot, 1 × Proud Soul, 1 × Noted -Silver Bamboo Light-, 1 × string. Required blade: broken. |
+| -Haze- SakuraFox | Craft: 1 × obsidian, 1 × feathers, 1 × blaze powder, 1 × Sharpness -nameless- Ruby, 1 × Blade Soul Crystal, 1 × crops wheat, 1 × quartz block. Required blade: smite 1. |
+| -Weiss- SakuraFox | Craft: 1 × obsidian, 1 × feathers, 1 × blaze powder, 1 × Sharpness -nameless- Ruby, 1 × Blade Soul Crystal, 1 × crops wheat, 1 × quartz block. Required blade: looting 1. |
+| -Chizuru- Muramasa | Craft: 8 × Blade Soul Sphere, 1 × Anonymity -Nameless-. Required blade: ProudSoul ≥ 10,000; refine ≥ 20. |
+| Noble -Tukumo- Violet | Craft: 1 × emerald block, 2 × Blade Soul Sphere, 1 × diamond block, 1 × redstone block, 1 × Anonymity -Nameless-, 1 × lapis block, 1 × iron block, 1 × gold block. Required blade: fire aspect 1. |
+| Ironwood -Tagayasan- | Craft: 4 × Blade Soul Sphere, 2 × ender eye, 2 × ender pearl, 1 × Anonymity -Wood-. Required blade: ProudSoul ≥ 1,000; refine ≥ 10; unbreaking 1. |
+| Sabigatana | Zombies can spawn carrying this blade (5% × local difficulty multiplier, within the 15% blade-carrying pool). It can also be repaired from the broken, sealed variant with 2 ProudSoul Ingots. Normal equipment-drop rules apply. |
+| Steel -Doutanuki- | Craft: 2 × Blade Soul Sphere, 1 × Sabigatana. Required blade: kills ≥ 100; ProudSoul ≥ 1,000; refine ≥ 10. |
+| -Agito- | Craft: 4 × Proud Soul, 1 × Rust -Agito-. Required blade: kills ≥ 100. |
+| -Agito- | Craft: 4 × Proud Soul, 1 × Rust -Agito-. Required blade: kills ≥ 100. |
+| -Orotiagito- | Craft: 4 × Proud Soul, 4 × Blade Soul Sphere, 1 × -Agito-. Required blade: kills ≥ 1,000; ProudSoul ≥ 1,000; refine ≥ 10. |
+| Yamato | Craft: 8 × Blade Soul Sphere, 1 × Yamato. Required blade: broken; sealed. |
+| -Wooden- Rodai | Craft: 1 × Blade Soul Crystal, 1 × Noted -Silver Bamboo Light-, 1 × wooden sword, 1 × string. Required blade: kills ≥ 100; broken. |
+| -Stone- Rodai | Craft: 1 × Blade Soul Crystal, 1 × Noted -Silver Bamboo Light-, 1 × stone sword, 1 × string. Required blade: kills ≥ 100; broken. |
+| Named -Steel- Rodai | Craft: 1 × Blade Soul Crystal, 1 × Noted -Silver Bamboo Light-, 1 × iron sword, 1 × string. Required blade: kills ≥ 100; broken. |
+| Named -Golden- Rodai | Craft: 1 × Blade Soul Crystal, 1 × Noted -Silver Bamboo Light-, 1 × golden sword, 1 × string. Required blade: kills ≥ 100; broken. |
+| Named -Diamond- Rodai | Craft: 1 × Blade Soul Trapezohedron, 1 × Noted -Silver Bamboo Light-, 1 × diamond sword, 1 × string. Required blade: kills ≥ 100; broken. |
+| Named -Netherite- Rodai | Craft: 1 × Blade Soul Trapezohedron, 1 × Noted -Silver Bamboo Light-, 1 × netherite sword, 1 × string. Required blade: kills ≥ 100; broken. Alternatively, smith Diamond Rodai with a Netherite Upgrade Template and a Netherite Ingot; progress is retained. |
+
+### Find blades through combat
+
+| Blade | Acquisition |
+| :--- | :--- |
+| Sabigatana (broken/sealed) | Unarmed zombies can receive a blade on spawning: 5% × difficulty intact, the next 10% broken and sealed. Drowned and zombified piglins are excluded. |
+| Yamato (broken/sealed) | Defeat the Ender Dragon. Broken, sealed Yamato drops at (0, 60, 0) in the End. Repair it with 8 ProudSoul Spheres. |
+| Sange | Defeat a Wither while holding a SlashBlade: 30% drop chance, +10 percentage points per Looting level. |
+| koseki | Place an unnamed basic SlashBlade on a blade stand and let a Wither explosion strike the stand. |
+| Rust -Agito- | Requires Twilight Forest: Naga drops it at 30%, +10 percentage points per Looting level. No substitute crafting recipe. |
+| Rust -Agito- | Requires Twilight Forest: Hydra drops it at 30%, +10 percentage points per Looting level. No substitute crafting recipe. |
+| Yasha | Requires Twilight Forest: defeat a Minotaur while holding a SlashBlade. 5% drop chance, +10 percentage points per Looting level. |
+| Yasha -Kikouku- | Requires Twilight Forest: defeat a Minoshroom while holding a SlashBlade. 20% drop chance, +10 percentage points per Looting level. |
+
+### Souls and refining
+
+Broken blades drop Tiny ProudSouls. Convert 4 Tiny ProudSouls into 1 ProudSoul, then combine 2 ProudSouls with 1 Iron Ingot for a ProudSoul Ingot. Smelt the Ingot into a Sphere (200 ticks); blast the Sphere into a Crystal (300 ticks), then the Crystal into a Trapezohedron (400 ticks). Crafting conversions retain a single kind of level-I enchantment; mixed enchantments and higher levels are rejected.
+
+Each anvil refine costs **1 material and 1 experience level**, restores durability and adds ProudSoul as below. Maximum durability grows by one for each of the first 200 refines. At a material’s refine cap, it can repair but cannot generate further ProudSoul.
+
+| Material | Refine cap | ProudSoul per refine |
+| :--- | ---: | ---: |
+| Tiny Proud Soul | 10 | 100 |
+| Proud Soul | 50 | 500 |
+| Blade Soul Ingot | 100 | 1,000 |
+| Blade Soul Sphere | 150 | 1,500 |
+| Blade Soul Crystal | 200 | 2,000 |
+| Blade Soul Trapezohedron | 2,147,483,647 | 5,000 |
+
+Kills grant ProudSoul from dropped experience and style rank, capped at 100 per award. A summoned sword costs 2; a formation costs 20. Standard SA spends 20 when available, otherwise one durability point. Super SA retains this build’s rules below.
 
 ## Get started
 
@@ -71,7 +133,7 @@ Super SA requires an eligible enchanted blade with at least **1,000 kills**, ful
 
 ## Built. Played. Compared.
 
-The `port.24` verification run passed **98 required GameTests** and an isolated client check with **73 installed mods**. All 13 direct upgrades passed crafting, progress-retention and network round-trip tests; the actual JEI runtime verified distinct named blades, visible materials and recipe lookups. GUI icons fill a 15.8-pixel span inside a 16-pixel slot, with a smaller durability gauge.
+`port.25` passes **112 required GameTests**, covering upgrade thresholds, progress transfer, the ProudSoul economy, material conversion, actual drops, blade-stand transformation and legacy blades. JEI and model checks also run in an isolated client with **73 installed mods**.
 
 The first-person renderer matched the original VMD weapon tracks across **852 samples**. Another **28,968 transition samples** checked that the blade/saya relationship stays intact and the transition ends within one action tick. Third-person rig checks covered **1,704 samples**, including its visible arms.
 
@@ -100,7 +162,7 @@ cd SlashBlade-Re
 sh ./gradlew build
 ```
 
-Output: `build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.24.jar`.
+Output: `build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.25.jar`.
 
 To run the server-side regression suite, use the same wrapper with `runGameTestServer` in a disposable checkout. The task writes to a sibling `test-gametest` directory.
 
@@ -112,7 +174,7 @@ To run the server-side regression suite, use the same wrapper with `runGameTestS
 
 Based on [SlashBlade 2 by Furia / flammpfeil](https://github.com/flammpfeil/SlashBlade_2), through [Viking602/SlashBlade_2](https://github.com/Viking602/SlashBlade_2). NyMmd is by nyatla; the OBJ importer carries upstream Forge attribution. Existing author and license notices are preserved.
 
-Named-blade recipe and JEI improvements draw on [SlashBlade: Resharped by the M Mysterious Mountain Forging-shop Group](https://github.com/0999312/SlashBlade_Resharped/tree/6e2a0a092fb794d7ea56fd83452869674f3ab1c7). Its MIT notice is retained in the third-party notices. This integration uses models and textures already present in the SlashBlade 2 baseline.
+Named-blade recipe and JEI improvements draw on [SlashBlade: Resharped by the M Mysterious Mountain Forging-shop Group](https://github.com/0999312/SlashBlade_Resharped/tree/6e2a0a092fb794d7ea56fd83452869674f3ab1c7). Its MIT notice is retained in the third-party notices. Eighteen additional model/texture files come from Resharped for the newly available blades. They retain their original artwork terms and are not covered by this project’s MIT grant.
 
 The MIT scope for original SlashBlade:Re contributions and the licenses of inherited code and assets are documented in [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). **The complete inherited project is not licensed under MIT.**
 

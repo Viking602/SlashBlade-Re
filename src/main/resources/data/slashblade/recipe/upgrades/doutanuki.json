@@ -7,67 +7,82 @@
     "P  "
   ],
   "key": {
-    "P": "slashblade:proudsoul_sphere",
     "B": {
       "neoforge:ingredient_type": "slashblade:blade_requirement",
-      "name": "item.slashblade.ex.sabigatana",
-      "broken": false,
+      "item": "slashblade:slashblade",
+      "name": "item.slashblade.sabigatana",
       "kills": 100,
-      "refine": 0,
+      "refine": 10,
+      "proud_soul": 1000,
+      "broken": false,
+      "sealed": false,
+      "enchantments": {},
       "display": {
         "id": "slashblade:slashblade",
+        "count": 1,
         "components": {
           "slashblade:blade_state": {
-            "isSealed": 1,
-            "isNoScabbard": 0,
-            "translationKey": "item.slashblade.ex.sabigatana",
-            "isDestructable": 0,
-            "SummonedSwordColor": 15658734,
-            "currentCombo": "arts_rapid_slash",
-            "RepairCounter": 0,
-            "Damage": 0.0,
-            "rarityType": 0,
-            "ComboRoot": "standby",
-            "lastPosHash": "",
-            "RangeAttackType": "none",
-            "isDefaultBewitched": 0,
-            "SpecialAttackType": "none",
+            "translationKey": "item.slashblade.sabigatana",
             "TextureName": "slashblade:model/named/muramasa/sabigatana.png",
-            "ModelName": "slashblade:model/named/muramasa/muramasa.obj",
             "baseAttackModifier": 3.0,
-            "StandbyRenderType": 0,
-            "ComboRootAir": "standby_inair",
+            "MaxDamage": 40,
+            "isDestructable": 0,
             "isBroken": 0,
-            "killCount": 100
+            "isSealed": 0,
+            "Damage": 0.0,
+            "ProudSoul": 1000,
+            "killCount": 100,
+            "RepairCounter": 10,
+            "SpecialAttackType": "judgement_cut",
+            "ComboRoot": "standby",
+            "ComboRootAir": "standby_inair",
+            "StandbyRenderType": 2,
+            "SummonedSwordColor": -13421569,
+            "TargetEntity": -1,
+            "isDefaultBewitched": 0,
+            "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
+          },
+          "minecraft:max_damage": 40,
+          "minecraft:custom_data": {
+            "resharped_definition": "sabigatana",
+            "resharped_slash_art": "slashblade:judgement_cut",
+            "resharped_special_effects": []
           }
         }
       }
-    }
+    },
+    "P": "slashblade:proudsoul_sphere"
   },
   "result": {
     "id": "slashblade:slashblade",
+    "count": 1,
     "components": {
       "slashblade:blade_state": {
-        "isSealed": 0,
-        "isNoScabbard": 0,
-        "translationKey": "item.slashblade.ex.doutanuki",
-        "isDestructable": 0,
-        "SummonedSwordColor": 15658734,
-        "currentCombo": "arts_rapid_slash",
-        "RepairCounter": 0,
-        "Damage": 0.0,
-        "rarityType": 2,
-        "ComboRoot": "standby",
-        "lastPosHash": "",
-        "RangeAttackType": "none",
-        "isDefaultBewitched": 0,
-        "SpecialAttackType": "none",
+        "translationKey": "item.slashblade.doutanuki",
         "TextureName": "slashblade:model/named/muramasa/doutanuki.png",
-        "ModelName": "slashblade:model/named/muramasa/muramasa.obj",
         "baseAttackModifier": 5.0,
-        "StandbyRenderType": 0,
+        "MaxDamage": 60,
+        "isDestructable": 0,
+        "isBroken": 0,
+        "isSealed": 0,
+        "Damage": 0.0,
+        "ProudSoul": 0,
+        "killCount": 0,
+        "RepairCounter": 0,
+        "SpecialAttackType": "judgement_cut",
+        "ComboRoot": "standby",
         "ComboRootAir": "standby_inair",
-        "isBroken": 0
+        "StandbyRenderType": 2,
+        "SummonedSwordColor": -13421569,
+        "TargetEntity": -1,
+        "isDefaultBewitched": 1,
+        "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
+      },
+      "minecraft:max_damage": 60,
+      "minecraft:custom_data": {
+        "resharped_definition": "doutanuki",
+        "resharped_slash_art": "slashblade:circle_slash",
+        "resharped_special_effects": []
       }
     }
   }

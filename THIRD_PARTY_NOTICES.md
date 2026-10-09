@@ -41,7 +41,9 @@ Epic Fight, Weapons of Miracles, and Devil May Cry are credited as design refere
 
 Reference and adaptation source: [0999312/SlashBlade_Resharped](https://github.com/0999312/SlashBlade_Resharped/tree/6e2a0a092fb794d7ea56fd83452869674f3ab1c7), version 1.9.65, commit `6e2a0a092fb794d7ea56fd83452869674f3ab1c7`.
 
-The named-blade JEI subtype strategy, progress-preserving direct upgrades, damaged-Yamato repair pattern, and Rusted Blade / Doutanuki definitions informed this integration. Minecraft 26.1.2 ingredient, recipe and display implementations are adapted for this port. Costs and progression remain compatible with the existing port; Resharped's full roster and combat systems are not claimed as included. No additional Resharped artwork was copied; the referenced models and textures were already in the SlashBlade 2 baseline. Upstream distinguishes MIT code from art resources reserved by their authors.
+The built-in blade definitions, progression recipes, requirements, soul material conversions, growth economy, acquisition rules and JEI subtype strategy are adapted from this reference for Minecraft 26.1.2. The reference's defaults are used; its configurable settings, complete additional Slash Arts and special-effect implementations are not claimed as included.
+
+The port adds these 18 model/texture resources from the reference under `assets/slashblade/model/`: `named/agito_false.png`, `named/agito_rust.png`, `named/dios/dios.obj`, `named/dios/koseki.png`, `named/orotiagito.png`, `named/agito_rust_true.png`, `named/agito_true.png`, `rodai_diamond.png`, `rodai_golden.png`, `rodai_iron.png`, `rodai_netherite.png`, `rodai_stone.png`, `rodai_wooden.png`, `named/sange/sange.png`, `named/tagayasan.png`, `named/yasha/yasha.obj`, `named/yasha/yasha.png`, and `named/yasha/yasha_true.obj`. Upstream reserves artwork rights to the respective authors; these resources are not relicensed under this repository's MIT grant. Existing artwork retains its prior notices.
 
 The Resharped code license follows, preserved verbatim:
 MIT License

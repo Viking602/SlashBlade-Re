@@ -1,0 +1,39 @@
+{
+  "type": "slashblade:blade_upgrade",
+  "category": "equipment",
+  "pattern": [
+    "  L",
+    " L ",
+    "B  "
+  ],
+  "key": {
+    "B": "minecraft:wooden_sword",
+    "L": "#minecraft:logs"
+  },
+  "result": {
+    "id": "slashblade:slashblade_wood",
+    "count": 1,
+    "components": {
+      "slashblade:blade_state": {
+        "translationKey": "",
+        "TextureName": "slashblade:model/wood.png",
+        "baseAttackModifier": 2.0,
+        "MaxDamage": 60,
+        "isDestructable": 1,
+        "isBroken": 0,
+        "isSealed": 0,
+        "Damage": 0.0,
+        "ProudSoul": 0,
+        "killCount": 0,
+        "RepairCounter": 0,
+        "SpecialAttackType": "judgement_cut",
+        "ComboRoot": "standby",
+        "ComboRootAir": "standby_inair",
+        "StandbyRenderType": 2,
+        "SummonedSwordColor": -13421569,
+        "TargetEntity": -1
+      },
+      "minecraft:max_damage": 60
+    }
+  }
+}

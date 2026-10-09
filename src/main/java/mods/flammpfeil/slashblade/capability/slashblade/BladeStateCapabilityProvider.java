@@ -60,6 +60,8 @@ public class BladeStateCapabilityProvider {
 
             tag.putFloat("baseAttackModifier", instance.getBaseAttackModifier());
 
+            tag.putInt("ProudSoul", instance.getProudSoulCount());
+            tag.putInt("MaxDamage", instance.getMaxDamage());
             tag.putInt("killCount", instance.getKillCount());
             tag.putInt("RepairCounter", instance.getRefine());
 
@@ -140,6 +142,8 @@ public class BladeStateCapabilityProvider {
 
             instance.setBaseAttackModifier(tag.getFloatOr("baseAttackModifier", 0.0F));
 
+            instance.setProudSoulCount(tag.getIntOr("ProudSoul", 0));
+            instance.setMaxDamage(tag.getIntOr("MaxDamage", instance.getMaxDamage()));
             instance.setKillCount(tag.getIntOr("killCount", 0));
             instance.setRefine(tag.getIntOr("RepairCounter", 0));
 

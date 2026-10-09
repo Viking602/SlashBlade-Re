@@ -9,9 +9,7 @@
     "icon": {
       "id": "minecraft:anvil",
       "components": {
-        "minecraft:custom_data": {
-          "Crafting": "slashblade:anvilcrafting/refine"
-        }
+        "minecraft:custom_data": {}
       }
     },
     "frame": "challenge"

@@ -1,83 +1,60 @@
 {
+  "parent": "slashblade:blade/broken_white",
   "display": {
-    "title": {
-      "translate": "item.slashblade.simple.iron"
-    },
-    "description": {
-      "translate": "item.slashblade.simple.iron.desc"
-    },
     "icon": {
       "id": "slashblade:slashblade",
+      "count": 1,
       "components": {
         "slashblade:blade_state": {
-          "isSealed": 1,
-          "isNoScabbard": 0,
-          "translationKey": "item.slashblade.simple.iron",
-          "isDestructable": 0,
-          "HasShield": 0,
-          "SummonedSwordColor": -3355647,
-          "lastActionTime": 0,
-          "_onClick": 0,
-          "fallDecreaseRate": 0.0,
-          "currentCombo": "arts_rapid_slash",
-          "killCount": 0,
-          "isCharged": 0,
-          "RepairCounter": 0,
-          "Damage": 0.0,
-          "rarityType": 0,
-          "ComboRoot": "standby",
-          "adjustXYZ": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "lastPosHash": "",
-          "RangeAttackType": "none",
-          "isDefaultBewitched": 0,
-          "AttackAmplifier": 0.0,
-          "TargetEntity": -1,
-          "SpecialAttackType": "none",
-          "ModelName": "slashblade:model/named/yamato.obj",
+          "translationKey": "",
           "TextureName": "slashblade:model/blade.png",
-          "SummonedSwordColorInverse": 0,
+          "baseAttackModifier": 4.0,
+          "MaxDamage": 40,
+          "isDestructable": 0,
           "isBroken": 0,
-          "baseAttackModifier": 2.0,
-          "StandbyRenderType": 0,
-          "ComboRootAir": "standby_inair"
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1
         },
-        "minecraft:rarity": "common",
+        "minecraft:max_damage": 40,
         "minecraft:custom_data": {
-          "Crafting": "slashblade:s_iron"
+          "Crafting": "slashblade:upgrades/slashblade"
         }
       }
     },
+    "title": {
+      "translate": "item.slashblade.slashblade"
+    },
+    "description": {
+      "translate": "slashblade.route.slashblade"
+    },
     "frame": "task"
   },
-  "parent": "slashblade:blade/broken_white",
   "criteria": {
-    "crafting": {
+    "blade": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": [
-              "slashblade:slashblade"
-            ],
+            "items": "slashblade:slashblade",
             "predicates": {
               "slashblade:blade": {
-                "translationKey": "item.slashblade.simple.iron",
-                "isBroken": 0
+                "translationKey": "",
+                "isBroken": 0,
+                "isSealed": 0
               }
             }
           }
         ]
       }
     }
-  },
-  "rewards": {
-    "recipes": [
-      "slashblade:ex/tukumo",
-      "slashblade:ex/muramasa"
-    ]
   }
 }

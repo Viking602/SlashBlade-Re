@@ -9,9 +9,7 @@
     "icon": {
       "id": "slashblade:proudsoul_trapezohedron",
       "components": {
-        "minecraft:custom_data": {
-          "Crafting": "slashblade:material/trapezohedron_smoking"
-        }
+        "minecraft:custom_data": {}
       }
     },
     "frame": "task"

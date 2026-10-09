@@ -220,6 +220,7 @@ public class AnvilCraftingRecipe {
 
             SBData.get(base, ItemSlashBlade.BLADESTATE).ifPresent((oldState)->{
                 SBData.get(result, ItemSlashBlade.BLADESTATE).ifPresent((newState)->{
+                    newState.setProudSoulCount(oldState.getProudSoulCount());
                     newState.setKillCount(oldState.getKillCount());
                     newState.setRefine(oldState.getRefine());
                 });
@@ -237,9 +238,10 @@ public class AnvilCraftingRecipe {
                     //Overwrite with higher
                     int destLevel = destMap.get(key);
                     if(destLevel < srcLevel)
-                        destMap.put(key, srcLevel);
+                        destMap.put(key, Math.min(srcLevel,key.value().getMaxLevel()));
                 }else{
-                    destMap.put(key, srcLevel);
+                    if (destMap.keySet().stream().allMatch(existing -> net.minecraft.world.item.enchantment.Enchantment.areCompatible(existing,key)))
+                        destMap.put(key, Math.min(srcLevel,key.value().getMaxLevel()));
                 }
             }
 

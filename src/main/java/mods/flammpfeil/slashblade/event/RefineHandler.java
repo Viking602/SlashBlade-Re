@@ -35,8 +35,6 @@ public class RefineHandler {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onAnvilUpdateEvent(AnvilUpdateEvent event){
-        if(!event.getOutput().isEmpty()) return;
-
         ItemStack base = event.getLeft();
         ItemStack material = event.getRight();
 
@@ -47,6 +45,10 @@ public class RefineHandler {
         boolean isRepairable = base.isValidRepairItem(material);
 
         if(!isRepairable) return;
+        // NeoForge 26 supplies the vanilla repair result before this event. Replace it
+        // for soul materials; otherwise damaged blades silently skip refine and soul gain.
+        if(mods.flammpfeil.slashblade.compat.SBItemData.tag(material).contains("RequiredBlade")) return;
+        event.setOutput(ItemStack.EMPTY);
 
         int level = java.util.Optional.ofNullable(material.get(net.minecraft.core.component.DataComponents.ENCHANTABLE)).map(net.minecraft.world.item.enchantment.Enchantable::value).orElse(0);
 
@@ -56,23 +58,19 @@ public class RefineHandler {
 
         int refineLimit = Math.max(10, level);
 
-        int cost = 0;
-        while(cost < material.getCount()){
-            cost ++;
-
-            float damage = SBData.get(result, ItemSlashBlade.BLADESTATE).map(s->{
-                s.setDamage(s.getDamage() - (0.2f + 0.05f * level));
-                if(s.getRefine() < refineLimit)
-                    s.setRefine(s.getRefine() + 1);
-                return s.getDamage();
-            }).orElse(0f);
-
-            if(damage <= 0f) break;
-        }
-
+        var state=SBData.get(result,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
+        int available=event.getPlayer().getAbilities().instabuild ? material.getCount() : Math.min(material.getCount(),event.getPlayer().experienceLevel);
+        int before=state.getRefine();
+        int gain=Math.min(available,Math.max(0,refineLimit-before));
+        // At the cap, a single material can still repair; it cannot create free soul points.
+        int cost=gain>0 ? gain : state.getDamage()>0 && available>0 ? 1 : 0;
+        if(cost==0) return;
+        state.setRefine(before+gain);
+        state.setMaxDamage(ResharpedProgression.addClamped(state.getMaxDamage(),Math.min(before+gain,200)-Math.min(before,200)));
+        state.setProudSoulCount(ResharpedProgression.addClamped(state.getProudSoulCount(),gain*Math.min(5000L,(long)level*10)));
+        state.setDamage(0);
         event.setMaterialCost(cost);
-        int levelCostBase = 1;
-        event.setXpCost(levelCostBase * cost);
+        event.setXpCost(cost);
         event.setOutput(result);
     }
 

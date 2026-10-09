@@ -46,7 +46,7 @@ public final class BladeRecipeClientProbe {
         var runtime=Objects.requireNonNull(SlashBladeJeiPlugin.runtime(),"JEI runtime unavailable");
         var manager=runtime.getRecipeManager();var category=manager.getRecipeCategory(RecipeTypes.CRAFTING);
         var catalog=BladeCatalog.items();var helper=runtime.getIngredientManager().getIngredientHelper(VanillaTypes.ITEM_STACK);
-        require(catalog.stream().map(s -> helper.getUid(s,UidContext.Recipe)).distinct().count()==13,"JEI merged named blades");
+        require(catalog.stream().map(s -> helper.getUid(s,UidContext.Recipe)).distinct().count()==31,"JEI merged named blades");
         int count=0;
         for(var holder:manager.createRecipeLookup(RecipeTypes.CRAFTING).get().toList()) {
             if (!holder.id().identifier().getNamespace().equals("slashblade")) continue;
@@ -61,22 +61,26 @@ public final class BladeRecipeClientProbe {
             var focus=runtime.getJeiHelpers().getFocusFactory().createFocus(RecipeIngredientRole.OUTPUT,VanillaTypes.ITEM_STACK,outputs.getFirst());
             require(manager.createRecipeLookup(RecipeTypes.CRAFTING).limitFocus(List.of(focus)).get().anyMatch(r -> r.id().equals(holder.id())),"named output recipe cannot be found: "+holder.id());
         }
-        require(count==13,"missing direct upgrade recipes: "+count);
+        require(count==23,"missing direct upgrade recipes: "+count);
         long anvils=manager.createRecipeLookup(RecipeTypes.ANVIL).get().filter(r -> r.getUid()!=null && r.getUid().getNamespace().equals("slashblade")).count();
-        require(anvils>=9,"material-box anvil recipes missing");
+        require(anvils==186,"refining recipes missing: "+anvils);
+        for(var material:List.of(mods.flammpfeil.slashblade.init.SBItems.proudsoul_tiny,mods.flammpfeil.slashblade.init.SBItems.proudsoul,mods.flammpfeil.slashblade.init.SBItems.proudsoul_ingot,mods.flammpfeil.slashblade.init.SBItems.proudsoul_sphere,mods.flammpfeil.slashblade.init.SBItems.proudsoul_crystal,mods.flammpfeil.slashblade.init.SBItems.proudsoul_trapezohedron)) {
+            var focus=runtime.getJeiHelpers().getFocusFactory().createFocus(RecipeIngredientRole.INPUT,VanillaTypes.ITEM_STACK,new net.minecraft.world.item.ItemStack(material));
+            require(manager.createRecipeLookup(RecipeTypes.ANVIL).limitFocus(List.of(focus)).get().anyMatch(r -> r.getUid()!=null && r.getUid().getNamespace().equals("slashblade")),"refining lookup missing for "+material);
+        }
         require(manager.createRecipeLookup(RecipeTypes.SMITHING).get().noneMatch(r -> r.id().identifier().getNamespace().equals("slashblade") && r.id().identifier().getPath().startsWith("anvilcrafting/")),"barrier example leaked into JEI");
-        SlashBlade.LOGGER.info("Recipe client verification PASSED: 13 named blades, {} direct upgrades, {} anvil upgrades",count,anvils);
-        return Map.of("status","passed","namedBlades",13,"directUpgrades",count,"anvilUpgrades",anvils,"scope","real JEI runtime, subtype identities, visible materials, layouts and named-output recipe lookups");
+        SlashBlade.LOGGER.info("Recipe client verification PASSED: 31 blade variants, {} direct upgrades, {} anvil upgrades",count,anvils);
+        return Map.of("status","passed","bladeVariants",31,"directUpgrades",count,"refiningRecipes",anvils,"scope","real JEI runtime, subtype identities, visible materials, layouts and named-output recipe lookups");
     }
     private static void show() {
         var mc=Minecraft.getInstance();var runtime=SlashBladeJeiPlugin.runtime();
         if(stage==0) { mc.setScreen(new IconScreen()); return; }
         var manager=runtime.getRecipeManager();
         if(stage==5) {
-            var recipes=manager.createRecipeLookup(RecipeTypes.ANVIL).get().filter(r -> r.getUid()!=null && r.getUid().getNamespace().equals("slashblade")).toList();
+            var recipes=manager.createRecipeLookup(RecipeTypes.ANVIL).get().filter(r -> r.getUid()!=null && r.getUid().getNamespace().equals("slashblade") && r.getUid().getPath().startsWith("refine/0/")).toList();
             runtime.getRecipesGui().showRecipes(manager.getRecipeCategory(RecipeTypes.ANVIL),recipes,List.of());
         } else {
-            String id=switch(stage) { case 1 -> "s_white";case 2 -> "ruby";case 3 -> "fox_black";default -> "doutanuki"; };
+            String id=switch(stage) { case 1 -> "slashblade_white";case 2 -> "ruby";case 3 -> "fox_black";default -> "doutanuki"; };
             var recipes=manager.createRecipeLookup(RecipeTypes.CRAFTING).get().filter(r -> r.id().identifier().equals(SlashBlade.id("upgrades/"+id))).toList();
             runtime.getRecipesGui().showRecipes(manager.getRecipeCategory(RecipeTypes.CRAFTING),recipes,List.of());
         }
@@ -86,13 +90,13 @@ public final class BladeRecipeClientProbe {
         @Override public boolean isPauseScreen() { return false; }
         @Override public void extractRenderState(GuiGraphicsExtractor g,int mx,int my,float delta) {
             g.fill(0,0,width,height,0xff18222e);
-            g.text(font,"SlashBlade:Re / 13 named blades / actual GUI item renderer",25,25,0xffe8edf2,false);
+            g.text(font,"SlashBlade:Re / 31 blade variants / actual GUI item renderer",25,25,0xffe8edf2,false);
             var items=BladeCatalog.items();
             for(int i=0;i<items.size();i++) {
-                int x=30+(i%4)*160,y=65+(i/4)*85;var item=items.get(i);
+                int x=30+(i%5)*128,y=65+(i/5)*52;var item=items.get(i);
                 g.fill(x-1,y-1,x+17,y+17,0xff6b6b6b);g.fakeItem(item,x,y);
-                g.text(font,item.getHoverName(),x+23,y+4,0xffffffff,false);
-                g.pose().pushMatrix();g.pose().translate(x+50,y+24);g.pose().scale(2,2);
+                g.text(font,item.getHoverName(),x+20,y+4,0xffffffff,false);
+                g.pose().pushMatrix();g.pose().translate(x+30,y+18);g.pose().scale(2,2);
                 g.fakeItem(item,0,0);g.pose().popMatrix();
             }
         }

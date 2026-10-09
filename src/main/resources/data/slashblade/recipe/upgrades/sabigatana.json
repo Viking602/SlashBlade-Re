@@ -2,72 +2,87 @@
   "type": "slashblade:blade_upgrade",
   "category": "equipment",
   "pattern": [
-    "  I",
-    " BI",
-    "P  "
+    "  P",
+    " P ",
+    "B  "
   ],
   "key": {
-    "I": "minecraft:iron_ingot",
-    "P": "slashblade:proudsoul",
     "B": {
       "neoforge:ingredient_type": "slashblade:blade_requirement",
-      "name": "item.slashblade.simple.white",
-      "broken": false,
+      "item": "slashblade:slashblade",
+      "name": "item.slashblade.sabigatana",
       "kills": 0,
       "refine": 0,
+      "proud_soul": 0,
+      "broken": true,
+      "sealed": true,
+      "enchantments": {},
       "display": {
         "id": "slashblade:slashblade",
+        "count": 1,
         "components": {
           "slashblade:blade_state": {
-            "isSealed": 0,
-            "isNoScabbard": 0,
-            "translationKey": "item.slashblade.simple.white",
+            "translationKey": "item.slashblade.sabigatana",
+            "TextureName": "slashblade:model/named/muramasa/sabigatana.png",
+            "baseAttackModifier": 3.0,
+            "MaxDamage": 40,
             "isDestructable": 0,
-            "SummonedSwordColor": -13421569,
-            "currentCombo": "arts_rapid_slash",
+            "isBroken": 1,
+            "isSealed": 1,
+            "Damage": 1.0,
+            "ProudSoul": 0,
+            "killCount": 0,
             "RepairCounter": 0,
-            "Damage": 0.0,
-            "rarityType": 0,
+            "SpecialAttackType": "judgement_cut",
             "ComboRoot": "standby",
-            "lastPosHash": "",
-            "RangeAttackType": "none",
-            "isDefaultBewitched": 0,
-            "SpecialAttackType": "none",
-            "TextureName": "slashblade:model/white.png",
-            "baseAttackModifier": 2.0,
-            "StandbyRenderType": 0,
             "ComboRootAir": "standby_inair",
-            "isBroken": 0,
-            "killCount": 0
+            "StandbyRenderType": 2,
+            "SummonedSwordColor": -13421569,
+            "TargetEntity": -1,
+            "isDefaultBewitched": 0,
+            "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
+          },
+          "minecraft:max_damage": 40,
+          "minecraft:custom_data": {
+            "resharped_definition": "sabigatana",
+            "resharped_slash_art": "slashblade:judgement_cut",
+            "resharped_special_effects": []
           }
         }
       }
-    }
+    },
+    "P": "slashblade:proudsoul_ingot"
   },
   "result": {
     "id": "slashblade:slashblade",
+    "count": 1,
     "components": {
       "slashblade:blade_state": {
-        "isSealed": 1,
-        "isNoScabbard": 0,
-        "translationKey": "item.slashblade.ex.sabigatana",
-        "isDestructable": 0,
-        "SummonedSwordColor": 15658734,
-        "currentCombo": "arts_rapid_slash",
-        "RepairCounter": 0,
-        "Damage": 0.0,
-        "rarityType": 0,
-        "ComboRoot": "standby",
-        "lastPosHash": "",
-        "RangeAttackType": "none",
-        "isDefaultBewitched": 0,
-        "SpecialAttackType": "none",
+        "translationKey": "item.slashblade.sabigatana",
         "TextureName": "slashblade:model/named/muramasa/sabigatana.png",
-        "ModelName": "slashblade:model/named/muramasa/muramasa.obj",
         "baseAttackModifier": 3.0,
-        "StandbyRenderType": 0,
+        "MaxDamage": 40,
+        "isDestructable": 0,
+        "isBroken": 0,
+        "isSealed": 0,
+        "Damage": 0.0,
+        "ProudSoul": 0,
+        "killCount": 0,
+        "RepairCounter": 0,
+        "SpecialAttackType": "judgement_cut",
+        "ComboRoot": "standby",
         "ComboRootAir": "standby_inair",
-        "isBroken": 0
+        "StandbyRenderType": 2,
+        "SummonedSwordColor": -13421569,
+        "TargetEntity": -1,
+        "isDefaultBewitched": 0,
+        "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
+      },
+      "minecraft:max_damage": 40,
+      "minecraft:custom_data": {
+        "resharped_definition": "sabigatana",
+        "resharped_slash_art": "slashblade:judgement_cut",
+        "resharped_special_effects": []
       }
     }
   }

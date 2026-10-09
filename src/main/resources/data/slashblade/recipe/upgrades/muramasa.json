@@ -2,74 +2,81 @@
   "type": "slashblade:blade_upgrade",
   "category": "equipment",
   "pattern": [
-    "  #",
-    " # ",
-    "CD "
+    "SSS",
+    "SBS",
+    "SSS"
   ],
   "key": {
-    "#": "minecraft:soul_sand",
-    "C": {
+    "B": {
       "neoforge:ingredient_type": "slashblade:blade_requirement",
-      "name": "item.slashblade.simple.iron",
-      "broken": false,
+      "item": "slashblade:slashblade",
+      "name": "",
       "kills": 0,
-      "refine": 0,
+      "refine": 20,
+      "proud_soul": 10000,
+      "broken": false,
+      "sealed": false,
+      "enchantments": {},
       "display": {
         "id": "slashblade:slashblade",
+        "count": 1,
         "components": {
           "slashblade:blade_state": {
-            "isSealed": 0,
-            "isNoScabbard": 0,
-            "translationKey": "item.slashblade.simple.iron",
-            "isDestructable": 0,
-            "SummonedSwordColor": -13421569,
-            "currentCombo": "arts_rapid_slash",
-            "RepairCounter": 0,
-            "Damage": 0.0,
-            "rarityType": 1,
-            "ComboRoot": "standby",
-            "lastPosHash": "",
-            "RangeAttackType": "none",
-            "isDefaultBewitched": 0,
-            "SpecialAttackType": "none",
+            "translationKey": "",
             "TextureName": "slashblade:model/blade.png",
-            "ModelName": "slashblade:model/named/yamato.obj",
             "baseAttackModifier": 4.0,
-            "StandbyRenderType": 0,
-            "ComboRootAir": "standby_inair",
+            "MaxDamage": 40,
+            "isDestructable": 0,
             "isBroken": 0,
-            "killCount": 0
-          }
+            "isSealed": 0,
+            "Damage": 0.0,
+            "ProudSoul": 10000,
+            "killCount": 0,
+            "RepairCounter": 20,
+            "SpecialAttackType": "judgement_cut",
+            "ComboRoot": "standby",
+            "ComboRootAir": "standby_inair",
+            "StandbyRenderType": 2,
+            "SummonedSwordColor": -13421569,
+            "TargetEntity": -1
+          },
+          "minecraft:max_damage": 40
         }
       }
     },
-    "D": "slashblade:proudsoul_trapezohedron"
+    "S": "slashblade:proudsoul_sphere"
   },
   "result": {
     "id": "slashblade:slashblade",
+    "count": 1,
     "components": {
       "slashblade:blade_state": {
-        "isSealed": 0,
-        "isNoScabbard": 0,
-        "translationKey": "item.slashblade.ex.muramasa",
-        "isDestructable": 0,
-        "SummonedSwordColor": 15658734,
-        "currentCombo": "arts_rapid_slash",
-        "RepairCounter": 0,
-        "Damage": 0.0,
-        "rarityType": 3,
-        "ComboRoot": "standby",
-        "lastPosHash": "",
-        "RangeAttackType": "none",
-        "isDefaultBewitched": 0,
-        "SpecialAttackType": "none",
+        "translationKey": "item.slashblade.muramasa",
         "TextureName": "slashblade:model/named/muramasa/muramasa.png",
-        "ModelName": "slashblade:model/named/muramasa/muramasa.obj",
-        "baseAttackModifier": 8.0,
-        "StandbyRenderType": 0,
-        "ComboRootAir": "standby_inair"
+        "baseAttackModifier": 7.0,
+        "MaxDamage": 50,
+        "isDestructable": 0,
+        "isBroken": 0,
+        "isSealed": 0,
+        "Damage": 0.0,
+        "ProudSoul": 0,
+        "killCount": 0,
+        "RepairCounter": 0,
+        "SpecialAttackType": "judgement_cut",
+        "ComboRoot": "standby",
+        "ComboRootAir": "standby_inair",
+        "StandbyRenderType": 2,
+        "SummonedSwordColor": -13421569,
+        "TargetEntity": -1,
+        "isDefaultBewitched": 0,
+        "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
       },
-      "minecraft:rarity": "epic"
+      "minecraft:max_damage": 50,
+      "minecraft:custom_data": {
+        "resharped_definition": "muramasa",
+        "resharped_slash_art": "slashblade:drive_vertical",
+        "resharped_special_effects": []
+      }
     }
   }
 }

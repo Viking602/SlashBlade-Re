@@ -1,0 +1,76 @@
+{
+  "type": "slashblade:blade_upgrade",
+  "category": "equipment",
+  "pattern": [
+    "  L",
+    " L ",
+    "BG "
+  ],
+  "key": {
+    "B": {
+      "neoforge:ingredient_type": "slashblade:blade_requirement",
+      "item": "slashblade:slashblade_wood",
+      "name": "",
+      "kills": 0,
+      "refine": 0,
+      "proud_soul": 0,
+      "broken": false,
+      "sealed": false,
+      "enchantments": {},
+      "display": {
+        "id": "slashblade:slashblade_wood",
+        "count": 1,
+        "components": {
+          "slashblade:blade_state": {
+            "translationKey": "",
+            "TextureName": "slashblade:model/wood.png",
+            "baseAttackModifier": 2.0,
+            "MaxDamage": 60,
+            "isDestructable": 1,
+            "isBroken": 0,
+            "isSealed": 0,
+            "Damage": 0.0,
+            "ProudSoul": 0,
+            "killCount": 0,
+            "RepairCounter": 0,
+            "SpecialAttackType": "judgement_cut",
+            "ComboRoot": "standby",
+            "ComboRootAir": "standby_inair",
+            "StandbyRenderType": 2,
+            "SummonedSwordColor": -13421569,
+            "TargetEntity": -1
+          },
+          "minecraft:max_damage": 60
+        }
+      }
+    },
+    "G": "#c:ingots/gold",
+    "L": "slashblade:proudsoul_ingot"
+  },
+  "result": {
+    "id": "slashblade:slashblade_white",
+    "count": 1,
+    "components": {
+      "slashblade:blade_state": {
+        "translationKey": "",
+        "TextureName": "slashblade:model/white.png",
+        "baseAttackModifier": 4.0,
+        "MaxDamage": 70,
+        "isDestructable": 0,
+        "isBroken": 0,
+        "isSealed": 0,
+        "Damage": 0.0,
+        "ProudSoul": 0,
+        "killCount": 0,
+        "RepairCounter": 0,
+        "SpecialAttackType": "judgement_cut",
+        "ComboRoot": "standby",
+        "ComboRootAir": "standby_inair",
+        "StandbyRenderType": 2,
+        "SummonedSwordColor": -13421569,
+        "TargetEntity": -1
+      },
+      "minecraft:max_damage": 70
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "parent": "slashblade:blade/s_iron",
+  "display": {
+    "icon": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.koseki",
+          "TextureName": "slashblade:model/named/dios/koseki.png",
+          "baseAttackModifier": 5.0,
+          "MaxDamage": 70,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 3,
+          "SummonedSwordColor": 3158064,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 1,
+          "ModelName": "slashblade:model/named/dios/dios.obj"
+        },
+        "minecraft:max_damage": 70,
+        "minecraft:enchantments": {
+          "minecraft:power": 2
+        },
+        "minecraft:custom_data": {
+          "resharped_definition": "koseki",
+          "resharped_slash_art": "slashblade:drive_vertical",
+          "resharped_special_effects": [
+            "slashblade:wither_edge"
+          ]
+        }
+      }
+    },
+    "title": {
+      "translate": "item.slashblade.koseki"
+    },
+    "description": {
+      "translate": "slashblade.route.koseki"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "slashblade:slashblade",
+            "predicates": {
+              "slashblade:blade": {
+                "translationKey": "item.slashblade.koseki",
+                "isBroken": 0,
+                "isSealed": 0
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

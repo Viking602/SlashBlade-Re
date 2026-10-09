@@ -53,6 +53,7 @@ public class SlashBlade {
         AnvilCrafting.getInstance().register();
         RefineHandler.getInstance().register();
         KillCounter.getInstance().register();
+        NeoForge.EVENT_BUS.register(new mods.flammpfeil.slashblade.event.ResharpedProgression());
         RankPointHandler.getInstance().register();
         AllowFlightOverrwrite.getInstance().register();
         NeoForge.EVENT_BUS.addListener(TargetSelector::onInputChange);

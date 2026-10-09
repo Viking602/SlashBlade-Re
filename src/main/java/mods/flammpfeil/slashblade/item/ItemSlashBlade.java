@@ -122,38 +122,22 @@ public class ItemSlashBlade extends Item {
         return (user)->{
             user.onEquippedItemBroken(stack.getItem(), user.getUsedItemHand() == InteractionHand.OFF_HAND ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND);
 
-            ItemStack soul = new ItemStack(SBItems.proudsoul);
-
-            CompoundTag blade = SBItemData.save(stack);
-            SBItemData.put(soul, BladeMaterialTooltips.BLADE_DATA, blade);
-
-            SBData.get(stack, BLADESTATE).ifPresent(s->{
-                s.getTexture().ifPresent(r->SBItemData.put(soul, "Texture", StringTag.valueOf(r.toString())));
-                s.getModel().ifPresent(r->SBItemData.put(soul, "Model", StringTag.valueOf(r.toString())));
-            });
-
-            {//add clone blade recipe
-                ItemStack cpBlade = stack.copy();
-                SBData.get(cpBlade, BLADESTATE).ifPresent(s->{
-                    s.setDamage(0);
-                    s.setOwner(null);
-                    s.setRefine(0);
-                    s.setKillCount(0);
-                });
-                cpBlade.remove(net.minecraft.core.component.DataComponents.ENCHANTMENTS);
-
-                AnvilCraftingRecipe recipe = new AnvilCraftingRecipe();
-                recipe.setLevel(10);
-                recipe.setKillcount(0);
-                recipe.setRefine(0);
-                recipe.setBroken(false);
-                recipe.setNoScabbard(false);
-                recipe.setTranslationKey("item.slashblade.slashblade");
-                recipe.setResultWithNBT(SBItemData.save(cpBlade));
-                recipe.setOverwriteTag(null);
-
-                SBItemData.put(soul, "RequiredBlade", recipe.writeNBT());
+            var state = SBData.get(stack,BLADESTATE).orElseThrow(IllegalStateException::new);
+            if (stack.isEnchanted() && user.level() instanceof ServerLevel level) {
+                var pool=level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).listElements()
+                    .filter(e -> e.value().isSupportedItem(stack)).toList();
+                int count=Math.max(1,Math.min(10,state.getProudSoulCount()/100));
+                for (int i=0;i<count && !pool.isEmpty();i++) {
+                    var tiny=new ItemStack(SBItems.proudsoul_tiny);
+                    tiny.enchant(pool.get(user.getRandom().nextInt(pool.size())),1);
+                    var drop=new ItemEntity(level,user.getX(),user.getY(),user.getZ(),tiny);
+                    drop.setDefaultPickUpDelay();level.addFreshEntity(drop);
+                    state.setProudSoulCount(state.getProudSoulCount()-100);
+                }
             }
+            int count=Math.max(1,Math.min(10,state.getProudSoulCount()/100));
+            ItemStack soul = new ItemStack(SBItems.proudsoul_tiny,count);
+            state.setProudSoulCount(state.getProudSoulCount()-count*100);
 
             ItemEntity itementity = new ItemEntity(user.level(), user.getX(), user.getY() , user.getZ(), soul);
             BladeItemEntity e = new BladeItemEntity(SlashBlade.RegistryEvents.BladeItem, user.level()){
@@ -195,10 +179,10 @@ public class ItemSlashBlade extends Item {
 
             user.getPersistentData().putLong(BREAK_ACTION_TIMEOUT, user.level().getGameTime() + 20*5);
 
-            SBData.get(stack, ItemSlashBlade.BLADESTATE).ifPresent(state->{
-                if(0 < state.getRefine()){
-                    state.setRefine(state.getRefine() - 1);
-                    state.doBrokenAction(user);
+            SBData.get(stack, ItemSlashBlade.BLADESTATE).ifPresent(brokenState->{
+                if(0 < brokenState.getRefine()){
+                    brokenState.setRefine(brokenState.getRefine() - 1);
+                    brokenState.doBrokenAction(user);
                 }
             });
         };
@@ -241,7 +225,9 @@ public class ItemSlashBlade extends Item {
 
                 //sa.tickAction(entityLiving);
                 if (sa != ComboState.NONE){
-                    state.damageBlade(stack, 1, entityLiving, this.getOnBroken(stack));
+                    boolean creative=entityLiving instanceof Player player && player.getAbilities().instabuild;
+                    if(!creative && state.getProudSoulCount()>=20) state.setProudSoulCount(state.getProudSoulCount()-20);
+                    else if(!creative) state.damageBlade(stack, 1, entityLiving, this.getOnBroken(stack));
                     entityLiving.swing(InteractionHand.MAIN_HAND);
                 }
             });
@@ -324,41 +310,17 @@ public class ItemSlashBlade extends Item {
 
 
     //damage ----------------------------------------------------------
-    int getHalfMaxdamage(){
-        return 100 / 2;
+    @Override public int getDamage(ItemStack stack) {
+        return SBData.get(stack,BLADESTATE).map(s -> Math.round(s.getDamage()*s.getMaxDamage())).orElse(0);
     }
-    
-    @Override
-    public int getDamage(ItemStack stack) {
-        return getHalfMaxdamage();
+    @Override public void setDamage(ItemStack stack,int damage) {
+        SBData.get(stack,BLADESTATE).ifPresent(s -> s.setDamage(damage/(float)s.getMaxDamage()));
     }
-
-    @Override
-    public void setDamage(ItemStack stack, int damage) {
-        if(damage == getHalfMaxdamage())
-            return;
-        
-        //anti shrink damageItem
-        if(damage > stack.getMaxDamage())
-            stack.setCount(2);
-
-        SBData.get(stack, BLADESTATE).ifPresent((s)->{
-            float amount = (damage - getHalfMaxdamage()) / (float)100;
-
-            s.setDamage(s.getDamage() + amount);
-        });
+    @Override public boolean isDamaged(ItemStack stack) { return getDamage(stack)>0; }
+    @Override public <T extends LivingEntity> int damageItem(ItemStack stack,int amount,@Nullable T entity,Consumer<Item> onBroken) {
+        // Gameplay wear is applied in hurtEnemy/mineBlock/charge; vanilla's weapon component must not apply it a second time or delete a broken blade.
+        return 0;
     }
-
-    @Override
-    public boolean isDamaged(ItemStack stack) {
-        return SBData.get(stack, BLADESTATE).map(s->0 < s.getDamage()).orElse(false);
-    }
-
-    @Override
-    public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, @Nullable T entity, Consumer<Item> onBroken) {
-        return Math.min(amount, getHalfMaxdamage() / 2);
-    }
-
 
     // GUI icons render their own diamond-shaped durability gauge in SlashBladeTEISR.
     @Override public boolean isBarVisible(ItemStack stack) { return false; }
@@ -407,6 +369,12 @@ public class ItemSlashBlade extends Item {
 
     @Override public void appendHoverText(ItemStack stack, Item.TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
         SBData.get(stack, BLADESTATE).ifPresent(state -> {
+            tooltip.accept(Component.translatable("slashblade.tooltip.proud_soul",state.getProudSoulCount()));
+            if (state.isBroken()) tooltip.accept(Component.translatable("slashblade.tooltip.broken"));
+            if (state.isSealed()) tooltip.accept(Component.translatable("slashblade.tooltip.sealed"));
+            var source=SBItemData.tag(stack);
+            if(source.contains("resharped_definition") && (!source.getStringOr("resharped_slash_art","slashblade:judgement_cut").equals("slashblade:judgement_cut") || !source.getListOrEmpty("resharped_special_effects").isEmpty()))
+                tooltip.accept(Component.translatable("slashblade.tooltip.source_art").withStyle(ChatFormatting.DARK_GRAY));
             if (state.getKillCount() > 0) tooltip.accept(Component.translatable("slashblade.tooltip.killcount", state.getKillCount()));
             if (state.getRefine() > 0) tooltip.accept(Component.translatable("slashblade.tooltip.refine", state.getRefine()).withStyle((ChatFormatting)refineColor.get(state.getRefine())));
         });

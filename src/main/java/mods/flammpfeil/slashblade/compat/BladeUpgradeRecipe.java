@@ -45,14 +45,29 @@ public final class BladeUpgradeRecipe extends ShapedRecipe {
                 base=candidate;
             }
         }
-        if (base.isEmpty()) return output.create();
-        var upgrade=new AnvilCraftingRecipe(); upgrade.setResult(output.create());
-        var result=upgrade.getResult(base);
+        var result=base.isEmpty() ? output.create() : transfer(base,output.create());
+        // Vanilla swords in the wooden starter and Rodai routes also carry enchantments.
+        for(var source:input.items()) if(!(source.getItem() instanceof ItemSlashBlade)) mergeEnchantments(source,result);
+        return result;
+    }
+    public static ItemStack transfer(ItemStack base, ItemStack result) {
+        var upgrade=new AnvilCraftingRecipe(); upgrade.setResult(result);
+        result=upgrade.getResult(base);
         var oldState=SBData.get(base,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
         var state=SBData.get(result,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
+        state.setProudSoulCount(oldState.getProudSoulCount());
         state.setUniqueId(oldState.getUniqueId());
         state.setOwner(oldState.getOwner());
         if (base.has(DataComponents.CUSTOM_NAME)) result.set(DataComponents.CUSTOM_NAME,base.get(DataComponents.CUSTOM_NAME));
         return result;
+    }
+    public static void mergeEnchantments(ItemStack source,ItemStack target) {
+        var dest=SBEnchantments.map(target);
+        SBEnchantments.map(source).forEach((enchantment,level) -> {
+            int clamped=Math.min(level,enchantment.value().getMaxLevel());
+            if(dest.containsKey(enchantment)) dest.put(enchantment,Math.max(dest.get(enchantment),clamped));
+            else if(dest.keySet().stream().allMatch(e -> net.minecraft.world.item.enchantment.Enchantment.areCompatible(e,enchantment))) dest.put(enchantment,clamped);
+        });
+        SBEnchantments.set(dest,target);
     }
 }

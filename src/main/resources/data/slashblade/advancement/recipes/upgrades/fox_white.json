@@ -1,20 +1,13 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_blade": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [
-          {
-            "items": "slashblade:slashblade"
-          }
-        ]
-      }
+    "inventory": {
+      "trigger": "minecraft:inventory_changed"
     }
   },
   "requirements": [
     [
-      "has_blade"
+      "inventory"
     ]
   ],
   "rewards": {

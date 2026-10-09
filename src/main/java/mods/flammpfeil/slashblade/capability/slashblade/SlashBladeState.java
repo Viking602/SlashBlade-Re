@@ -68,6 +68,13 @@ public class SlashBladeState implements ISlashBladeState{
 
     protected float baseAttackModifier; //BaseAttackModifier
 
+    private int proudSoulCount;
+    private int maxDamage = 100;
+    @Override public int getProudSoulCount() { return proudSoulCount; }
+    @Override public void setProudSoulCount(int count) { proudSoulCount=Math.max(0,count); setHasChangedActiveState(true); changeListener.run(); }
+    @Override public int getMaxDamage() { return maxDamage; }
+    @Override public void setMaxDamage(int damage) { maxDamage=Math.max(1,damage); changeListener.run(); }
+
     protected int killCount; //killCount
     protected int refine; //RepairCounter
 

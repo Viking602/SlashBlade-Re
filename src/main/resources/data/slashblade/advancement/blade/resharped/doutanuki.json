@@ -1,0 +1,65 @@
+{
+  "parent": "slashblade:blade/resharped/sabigatana",
+  "display": {
+    "icon": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.doutanuki",
+          "TextureName": "slashblade:model/named/muramasa/doutanuki.png",
+          "baseAttackModifier": 5.0,
+          "MaxDamage": 60,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 1,
+          "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
+        },
+        "minecraft:max_damage": 60,
+        "minecraft:custom_data": {
+          "resharped_definition": "doutanuki",
+          "resharped_slash_art": "slashblade:circle_slash",
+          "resharped_special_effects": [],
+          "Crafting": "slashblade:upgrades/doutanuki"
+        }
+      }
+    },
+    "title": {
+      "translate": "item.slashblade.doutanuki"
+    },
+    "description": {
+      "translate": "slashblade.route.doutanuki"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "slashblade:slashblade",
+            "predicates": {
+              "slashblade:blade": {
+                "translationKey": "item.slashblade.doutanuki",
+                "isBroken": 0,
+                "isSealed": 0
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

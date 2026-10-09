@@ -2,73 +2,83 @@
   "type": "slashblade:blade_upgrade",
   "category": "equipment",
   "pattern": [
-    "  X",
-    " X ",
-    "IP "
+    "DPI",
+    "PB ",
+    "S  "
   ],
   "key": {
-    "X": "slashblade:proudsoul_ingot",
-    "P": "slashblade:proudsoul_crystal",
-    "I": {
+    "B": {
       "neoforge:ingredient_type": "slashblade:blade_requirement",
-      "name": "item.slashblade.simple.silverbamboo",
-      "broken": true,
+      "item": "slashblade:slashblade_silverbamboo",
+      "name": "",
       "kills": 0,
       "refine": 0,
+      "proud_soul": 0,
+      "broken": true,
+      "sealed": false,
+      "enchantments": {},
       "display": {
-        "id": "slashblade:slashblade",
+        "id": "slashblade:slashblade_silverbamboo",
+        "count": 1,
         "components": {
           "slashblade:blade_state": {
-            "isSealed": 1,
-            "isNoScabbard": 0,
-            "translationKey": "item.slashblade.simple.silverbamboo",
-            "isDestructable": 0,
-            "SummonedSwordColor": -13421569,
-            "currentCombo": "arts_rapid_slash",
-            "RepairCounter": 0,
-            "Damage": 1.0,
-            "rarityType": 1,
-            "ComboRoot": "standby",
-            "lastPosHash": "",
-            "RangeAttackType": "none",
-            "isDefaultBewitched": 0,
-            "SpecialAttackType": "none",
+            "translationKey": "",
             "TextureName": "slashblade:model/silverbamboo.png",
-            "baseAttackModifier": 1.5,
-            "StandbyRenderType": 0,
-            "ComboRootAir": "standby_inair",
+            "baseAttackModifier": 3.0,
+            "MaxDamage": 40,
+            "isDestructable": 0,
             "isBroken": 1,
-            "killCount": 0
-          }
+            "isSealed": 0,
+            "Damage": 1.0,
+            "ProudSoul": 0,
+            "killCount": 0,
+            "RepairCounter": 0,
+            "SpecialAttackType": "judgement_cut",
+            "ComboRoot": "standby",
+            "ComboRootAir": "standby_inair",
+            "StandbyRenderType": 2,
+            "SummonedSwordColor": -13421569,
+            "TargetEntity": -1
+          },
+          "minecraft:max_damage": 40
         }
       }
-    }
+    },
+    "D": "#c:dyes/red",
+    "I": "slashblade:proudsoul",
+    "P": "slashblade:proudsoul_ingot",
+    "S": "#c:strings"
   },
   "result": {
     "id": "slashblade:slashblade",
+    "count": 1,
     "components": {
       "slashblade:blade_state": {
-        "isSealed": 0,
-        "isNoScabbard": 0,
-        "translationKey": "item.slashblade.ex.ruby",
-        "isDestructable": 0,
-        "SummonedSwordColor": 14684511,
-        "currentCombo": "arts_rapid_slash",
-        "RepairCounter": 0,
-        "Damage": 0.0,
-        "rarityType": 2,
-        "ComboRoot": "standby",
-        "lastPosHash": "",
-        "RangeAttackType": "none",
-        "isDefaultBewitched": 0,
-        "SpecialAttackType": "none",
+        "translationKey": "item.slashblade.ruby",
         "TextureName": "slashblade:model/ruby.png",
-        "ModelName": "slashblade:model/named/yamato.obj",
-        "baseAttackModifier": 6.0,
-        "StandbyRenderType": 0,
-        "ComboRootAir": "standby_inair"
+        "baseAttackModifier": 5.0,
+        "MaxDamage": 45,
+        "isDestructable": 0,
+        "isBroken": 0,
+        "isSealed": 0,
+        "Damage": 0.0,
+        "ProudSoul": 0,
+        "killCount": 0,
+        "RepairCounter": 0,
+        "SpecialAttackType": "judgement_cut",
+        "ComboRoot": "standby",
+        "ComboRootAir": "standby_inair",
+        "StandbyRenderType": 2,
+        "SummonedSwordColor": -13421569,
+        "TargetEntity": -1,
+        "isDefaultBewitched": 0
       },
-      "minecraft:rarity": "rare"
+      "minecraft:max_damage": 45,
+      "minecraft:custom_data": {
+        "resharped_definition": "ruby",
+        "resharped_slash_art": "slashblade:judgement_cut",
+        "resharped_special_effects": []
+      }
     }
   }
 }

@@ -1,271 +1,1106 @@
 [
   {
-    "isSealed": 1,
-    "isNoScabbard": 0,
-    "translationKey": "item.slashblade.simple.bamboo",
-    "isDestructable": 1,
-    "SummonedSwordColor": -13421569,
-    "currentCombo": "arts_rapid_slash",
-    "RepairCounter": 0,
-    "Damage": 0.0,
-    "rarityType": 0,
-    "ComboRoot": "standby",
-    "lastPosHash": "",
-    "RangeAttackType": "none",
-    "isDefaultBewitched": 0,
-    "SpecialAttackType": "none",
-    "TextureName": "slashblade:model/bamboo.png",
-    "baseAttackModifier": 1.0,
-    "StandbyRenderType": 0,
-    "ComboRootAir": "standby_inair"
+    "key": "slashblade",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "",
+          "TextureName": "slashblade:model/blade.png",
+          "baseAttackModifier": 4.0,
+          "MaxDamage": 40,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1
+        },
+        "minecraft:max_damage": 40
+      }
+    }
   },
   {
-    "isSealed": 0,
-    "isNoScabbard": 0,
-    "translationKey": "item.slashblade.simple.iron",
-    "isDestructable": 0,
-    "SummonedSwordColor": -13421569,
-    "currentCombo": "arts_rapid_slash",
-    "RepairCounter": 0,
-    "Damage": 0.0,
-    "rarityType": 1,
-    "ComboRoot": "standby",
-    "lastPosHash": "",
-    "RangeAttackType": "none",
-    "isDefaultBewitched": 0,
-    "SpecialAttackType": "none",
-    "TextureName": "slashblade:model/blade.png",
-    "ModelName": "slashblade:model/named/yamato.obj",
-    "baseAttackModifier": 4.0,
-    "StandbyRenderType": 0,
-    "ComboRootAir": "standby_inair"
+    "key": "slashblade_wood",
+    "stack": {
+      "id": "slashblade:slashblade_wood",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "",
+          "TextureName": "slashblade:model/wood.png",
+          "baseAttackModifier": 2.0,
+          "MaxDamage": 60,
+          "isDestructable": 1,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1
+        },
+        "minecraft:max_damage": 60
+      }
+    }
   },
   {
-    "isSealed": 1,
-    "isNoScabbard": 0,
-    "translationKey": "item.slashblade.simple.silverbamboo",
-    "isDestructable": 0,
-    "SummonedSwordColor": -13421569,
-    "currentCombo": "arts_rapid_slash",
-    "RepairCounter": 0,
-    "Damage": 0.0,
-    "rarityType": 1,
-    "ComboRoot": "standby",
-    "lastPosHash": "",
-    "RangeAttackType": "none",
-    "isDefaultBewitched": 0,
-    "SpecialAttackType": "none",
-    "TextureName": "slashblade:model/silverbamboo.png",
-    "baseAttackModifier": 1.5,
-    "StandbyRenderType": 0,
-    "ComboRootAir": "standby_inair"
+    "key": "slashblade_bamboo",
+    "stack": {
+      "id": "slashblade:slashblade_bamboo",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "",
+          "TextureName": "slashblade:model/bamboo.png",
+          "baseAttackModifier": 3.0,
+          "MaxDamage": 70,
+          "isDestructable": 1,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1
+        },
+        "minecraft:max_damage": 70
+      }
+    }
   },
   {
-    "isSealed": 0,
-    "isNoScabbard": 0,
-    "translationKey": "item.slashblade.simple.white",
-    "isDestructable": 0,
-    "SummonedSwordColor": -13421569,
-    "currentCombo": "arts_rapid_slash",
-    "RepairCounter": 0,
-    "Damage": 0.0,
-    "rarityType": 0,
-    "ComboRoot": "standby",
-    "lastPosHash": "",
-    "RangeAttackType": "none",
-    "isDefaultBewitched": 0,
-    "SpecialAttackType": "none",
-    "TextureName": "slashblade:model/white.png",
-    "baseAttackModifier": 2.0,
-    "StandbyRenderType": 0,
-    "ComboRootAir": "standby_inair"
+    "key": "slashblade_silverbamboo",
+    "stack": {
+      "id": "slashblade:slashblade_silverbamboo",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "",
+          "TextureName": "slashblade:model/silverbamboo.png",
+          "baseAttackModifier": 3.0,
+          "MaxDamage": 40,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1
+        },
+        "minecraft:max_damage": 40
+      }
+    }
   },
   {
-    "translationKey": "item.slashblade.simple.wood",
-    "TextureName": "slashblade:model/wood.png",
-    "baseAttackModifier": -0.5,
-    "isSealed": 1,
-    "isNoScabbard": 0,
-    "isDestructable": 1,
-    "SummonedSwordColor": -13421569,
-    "RepairCounter": 0,
-    "rarityType": 0,
-    "ComboRoot": "standby",
-    "RangeAttackType": "none",
-    "isDefaultBewitched": 0,
-    "SpecialAttackType": "none",
-    "SummonedSwordColorInverse": 0,
-    "isBroken": 0,
-    "StandbyRenderType": 0,
-    "ComboRootAir": "standby_inair"
+    "key": "slashblade_white",
+    "stack": {
+      "id": "slashblade:slashblade_white",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "",
+          "TextureName": "slashblade:model/white.png",
+          "baseAttackModifier": 4.0,
+          "MaxDamage": 70,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1
+        },
+        "minecraft:max_damage": 70
+      }
+    }
   },
   {
-    "translationKey": "item.slashblade.yamato",
-    "TextureName": "slashblade:model/named/yamato.png",
-    "ModelName": "slashblade:model/named/yamato.obj",
-    "baseAttackModifier": 9.0,
-    "isSealed": 0,
-    "isNoScabbard": 0,
-    "isDestructable": 0,
-    "SummonedSwordColor": -13421569,
-    "RepairCounter": 0,
-    "rarityType": 3,
-    "ComboRoot": "standby",
-    "RangeAttackType": "none",
-    "isDefaultBewitched": 0,
-    "SpecialAttackType": "none",
-    "SummonedSwordColorInverse": 0,
-    "isBroken": 0,
-    "StandbyRenderType": 0,
-    "ComboRootAir": "standby_inair"
+    "key": "agito",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.agito",
+          "TextureName": "slashblade:model/named/agito_false.png",
+          "baseAttackModifier": 5.0,
+          "MaxDamage": 60,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0,
+          "ModelName": "slashblade:model/named/agito.obj"
+        },
+        "minecraft:max_damage": 60,
+        "minecraft:custom_data": {
+          "resharped_definition": "agito",
+          "resharped_slash_art": "slashblade:wave_edge",
+          "resharped_special_effects": []
+        }
+      }
+    }
   },
   {
-    "isSealed": 0,
-    "isNoScabbard": 0,
-    "translationKey": "item.slashblade.ex.fox.black",
-    "isDestructable": 0,
-    "SummonedSwordColor": 1118481,
-    "currentCombo": "arts_rapid_slash",
-    "RepairCounter": 0,
-    "Damage": 0.0,
-    "rarityType": 3,
-    "ComboRoot": "standby",
-    "lastPosHash": "",
-    "RangeAttackType": "none",
-    "isDefaultBewitched": 0,
-    "SpecialAttackType": "none",
-    "TextureName": "slashblade:model/named/sange/black.png",
-    "ModelName": "slashblade:model/named/sange/sange.obj",
-    "baseAttackModifier": 7.0,
-    "StandbyRenderType": 0,
-    "ComboRootAir": "standby_inair"
+    "key": "agito_rust",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.agito_rust",
+          "TextureName": "slashblade:model/named/agito_rust.png",
+          "baseAttackModifier": 3.0,
+          "MaxDamage": 60,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 1,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0,
+          "ModelName": "slashblade:model/named/agito.obj"
+        },
+        "minecraft:max_damage": 60,
+        "minecraft:custom_data": {
+          "resharped_definition": "agito_rust",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
   },
   {
-    "isSealed": 0,
-    "isNoScabbard": 0,
-    "translationKey": "item.slashblade.ex.fox.white",
-    "isDestructable": 0,
-    "SummonedSwordColor": 15658734,
-    "currentCombo": "arts_rapid_slash",
-    "RepairCounter": 0,
-    "Damage": 0.0,
-    "rarityType": 3,
-    "ComboRoot": "standby",
-    "lastPosHash": "",
-    "RangeAttackType": "none",
-    "isDefaultBewitched": 0,
-    "SpecialAttackType": "none",
-    "TextureName": "slashblade:model/named/sange/white.png",
-    "ModelName": "slashblade:model/named/sange/sange.obj",
-    "baseAttackModifier": 7.0,
-    "StandbyRenderType": 0,
-    "ComboRootAir": "standby_inair"
+    "key": "doutanuki",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.doutanuki",
+          "TextureName": "slashblade:model/named/muramasa/doutanuki.png",
+          "baseAttackModifier": 5.0,
+          "MaxDamage": 60,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 1,
+          "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
+        },
+        "minecraft:max_damage": 60,
+        "minecraft:custom_data": {
+          "resharped_definition": "doutanuki",
+          "resharped_slash_art": "slashblade:circle_slash",
+          "resharped_special_effects": []
+        }
+      }
+    }
   },
   {
-    "isSealed": 0,
-    "isNoScabbard": 0,
-    "translationKey": "item.slashblade.ex.muramasa",
-    "isDestructable": 0,
-    "SummonedSwordColor": 15658734,
-    "currentCombo": "arts_rapid_slash",
-    "RepairCounter": 0,
-    "Damage": 0.0,
-    "rarityType": 3,
-    "ComboRoot": "standby",
-    "lastPosHash": "",
-    "RangeAttackType": "none",
-    "isDefaultBewitched": 0,
-    "SpecialAttackType": "none",
-    "TextureName": "slashblade:model/named/muramasa/muramasa.png",
-    "ModelName": "slashblade:model/named/muramasa/muramasa.obj",
-    "baseAttackModifier": 8.0,
-    "StandbyRenderType": 0,
-    "ComboRootAir": "standby_inair"
+    "key": "fox_black",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.fox_black",
+          "TextureName": "slashblade:model/named/sange/black.png",
+          "baseAttackModifier": 5.0,
+          "MaxDamage": 70,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 1,
+          "ModelName": "slashblade:model/named/sange/sange.obj"
+        },
+        "minecraft:max_damage": 70,
+        "minecraft:enchantments": {
+          "minecraft:smite": 4,
+          "minecraft:knockback": 2,
+          "minecraft:fire_aspect": 2
+        },
+        "minecraft:custom_data": {
+          "resharped_definition": "fox_black",
+          "resharped_slash_art": "slashblade:piercing",
+          "resharped_special_effects": []
+        }
+      }
+    }
   },
   {
-    "isSealed": 0,
-    "isNoScabbard": 0,
-    "translationKey": "item.slashblade.ex.ruby",
-    "isDestructable": 0,
-    "SummonedSwordColor": 14684511,
-    "currentCombo": "arts_rapid_slash",
-    "RepairCounter": 0,
-    "Damage": 0.0,
-    "rarityType": 2,
-    "ComboRoot": "standby",
-    "lastPosHash": "",
-    "RangeAttackType": "none",
-    "isDefaultBewitched": 0,
-    "SpecialAttackType": "none",
-    "TextureName": "slashblade:model/ruby.png",
-    "ModelName": "slashblade:model/named/yamato.obj",
-    "baseAttackModifier": 6.0,
-    "StandbyRenderType": 0,
-    "ComboRootAir": "standby_inair"
+    "key": "fox_white",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.fox_white",
+          "TextureName": "slashblade:model/named/sange/white.png",
+          "baseAttackModifier": 5.0,
+          "MaxDamage": 70,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 1,
+          "ModelName": "slashblade:model/named/sange/sange.obj"
+        },
+        "minecraft:max_damage": 70,
+        "minecraft:enchantments": {
+          "minecraft:knockback": 2,
+          "minecraft:bane_of_arthropods": 2,
+          "minecraft:unbreaking": 3,
+          "minecraft:fire_aspect": 2,
+          "minecraft:looting": 3
+        },
+        "minecraft:custom_data": {
+          "resharped_definition": "fox_white",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
   },
   {
-    "isSealed": 0,
-    "isNoScabbard": 0,
-    "translationKey": "item.slashblade.ex.tukumo",
-    "isDestructable": 0,
-    "SummonedSwordColor": 16165059,
-    "currentCombo": "arts_rapid_slash",
-    "RepairCounter": 0,
-    "Damage": 0.0,
-    "rarityType": 3,
-    "ComboRoot": "standby",
-    "lastPosHash": "",
-    "RangeAttackType": "none",
-    "isDefaultBewitched": 0,
-    "SpecialAttackType": "none",
-    "TextureName": "slashblade:model/named/a_tukumo.png",
-    "ModelName": "slashblade:model/named/agito.obj",
-    "baseAttackModifier": 6.0,
-    "StandbyRenderType": 0,
-    "ComboRootAir": "standby_inair"
+    "key": "koseki",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.koseki",
+          "TextureName": "slashblade:model/named/dios/koseki.png",
+          "baseAttackModifier": 5.0,
+          "MaxDamage": 70,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 3,
+          "SummonedSwordColor": 3158064,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 1,
+          "ModelName": "slashblade:model/named/dios/dios.obj"
+        },
+        "minecraft:max_damage": 70,
+        "minecraft:enchantments": {
+          "minecraft:power": 2
+        },
+        "minecraft:custom_data": {
+          "resharped_definition": "koseki",
+          "resharped_slash_art": "slashblade:drive_vertical",
+          "resharped_special_effects": [
+            "slashblade:wither_edge"
+          ]
+        }
+      }
+    }
   },
   {
-    "isSealed": 1,
-    "isNoScabbard": 0,
-    "translationKey": "item.slashblade.ex.sabigatana",
-    "isDestructable": 0,
-    "SummonedSwordColor": 15658734,
-    "currentCombo": "arts_rapid_slash",
-    "RepairCounter": 0,
-    "Damage": 0.0,
-    "rarityType": 0,
-    "ComboRoot": "standby",
-    "lastPosHash": "",
-    "RangeAttackType": "none",
-    "isDefaultBewitched": 0,
-    "SpecialAttackType": "none",
-    "TextureName": "slashblade:model/named/muramasa/sabigatana.png",
-    "ModelName": "slashblade:model/named/muramasa/muramasa.obj",
-    "baseAttackModifier": 3.0,
-    "StandbyRenderType": 0,
-    "ComboRootAir": "standby_inair",
-    "isBroken": 0
+    "key": "muramasa",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.muramasa",
+          "TextureName": "slashblade:model/named/muramasa/muramasa.png",
+          "baseAttackModifier": 7.0,
+          "MaxDamage": 50,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0,
+          "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
+        },
+        "minecraft:max_damage": 50,
+        "minecraft:custom_data": {
+          "resharped_definition": "muramasa",
+          "resharped_slash_art": "slashblade:drive_vertical",
+          "resharped_special_effects": []
+        }
+      }
+    }
   },
   {
-    "isSealed": 0,
-    "isNoScabbard": 0,
-    "translationKey": "item.slashblade.ex.doutanuki",
-    "isDestructable": 0,
-    "SummonedSwordColor": 15658734,
-    "currentCombo": "arts_rapid_slash",
-    "RepairCounter": 0,
-    "Damage": 0.0,
-    "rarityType": 2,
-    "ComboRoot": "standby",
-    "lastPosHash": "",
-    "RangeAttackType": "none",
-    "isDefaultBewitched": 0,
-    "SpecialAttackType": "none",
-    "TextureName": "slashblade:model/named/muramasa/doutanuki.png",
-    "ModelName": "slashblade:model/named/muramasa/muramasa.obj",
-    "baseAttackModifier": 5.0,
-    "StandbyRenderType": 0,
-    "ComboRootAir": "standby_inair",
-    "isBroken": 0
+    "key": "orotiagito",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.orotiagito",
+          "TextureName": "slashblade:model/named/orotiagito.png",
+          "baseAttackModifier": 7.0,
+          "MaxDamage": 60,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 1,
+          "ModelName": "slashblade:model/named/agito.obj"
+        },
+        "minecraft:max_damage": 60,
+        "minecraft:custom_data": {
+          "resharped_definition": "orotiagito",
+          "resharped_slash_art": "slashblade:wave_edge",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "orotiagito_rust",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.orotiagito_rust",
+          "TextureName": "slashblade:model/named/agito_rust_true.png",
+          "baseAttackModifier": 3.0,
+          "MaxDamage": 60,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 1,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0,
+          "ModelName": "slashblade:model/named/agito.obj"
+        },
+        "minecraft:max_damage": 60,
+        "minecraft:custom_data": {
+          "resharped_definition": "orotiagito_rust",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "orotiagito_sealed",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.orotiagito_sealed",
+          "TextureName": "slashblade:model/named/agito_true.png",
+          "baseAttackModifier": 5.0,
+          "MaxDamage": 60,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0,
+          "ModelName": "slashblade:model/named/agito.obj"
+        },
+        "minecraft:max_damage": 60,
+        "minecraft:custom_data": {
+          "resharped_definition": "orotiagito_sealed",
+          "resharped_slash_art": "slashblade:wave_edge",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "rodai_diamond",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.rodai_diamond",
+          "TextureName": "slashblade:model/rodai_diamond.png",
+          "baseAttackModifier": 7.0,
+          "MaxDamage": 1561,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0
+        },
+        "minecraft:max_damage": 1561,
+        "minecraft:custom_data": {
+          "resharped_definition": "rodai_diamond",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "rodai_golden",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.rodai_golden",
+          "TextureName": "slashblade:model/rodai_golden.png",
+          "baseAttackModifier": 2.0,
+          "MaxDamage": 33,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0
+        },
+        "minecraft:max_damage": 33,
+        "minecraft:custom_data": {
+          "resharped_definition": "rodai_golden",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "rodai_iron",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.rodai_iron",
+          "TextureName": "slashblade:model/rodai_iron.png",
+          "baseAttackModifier": 4.0,
+          "MaxDamage": 250,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0
+        },
+        "minecraft:max_damage": 250,
+        "minecraft:custom_data": {
+          "resharped_definition": "rodai_iron",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "rodai_netherite",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.rodai_netherite",
+          "TextureName": "slashblade:model/rodai_netherite.png",
+          "baseAttackModifier": 8.0,
+          "MaxDamage": 2031,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0
+        },
+        "minecraft:max_damage": 2031,
+        "minecraft:custom_data": {
+          "resharped_definition": "rodai_netherite",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "rodai_stone",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.rodai_stone",
+          "TextureName": "slashblade:model/rodai_stone.png",
+          "baseAttackModifier": 3.0,
+          "MaxDamage": 132,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0
+        },
+        "minecraft:max_damage": 132,
+        "minecraft:custom_data": {
+          "resharped_definition": "rodai_stone",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "rodai_wooden",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.rodai_wooden",
+          "TextureName": "slashblade:model/rodai_wooden.png",
+          "baseAttackModifier": 2.0,
+          "MaxDamage": 60,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0
+        },
+        "minecraft:max_damage": 60,
+        "minecraft:custom_data": {
+          "resharped_definition": "rodai_wooden",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "ruby",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.ruby",
+          "TextureName": "slashblade:model/ruby.png",
+          "baseAttackModifier": 5.0,
+          "MaxDamage": 45,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0
+        },
+        "minecraft:max_damage": 45,
+        "minecraft:custom_data": {
+          "resharped_definition": "ruby",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "sabigatana",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.sabigatana",
+          "TextureName": "slashblade:model/named/muramasa/sabigatana.png",
+          "baseAttackModifier": 3.0,
+          "MaxDamage": 40,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0,
+          "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
+        },
+        "minecraft:max_damage": 40,
+        "minecraft:custom_data": {
+          "resharped_definition": "sabigatana",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "sabigatana_broken",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.sabigatana",
+          "TextureName": "slashblade:model/named/muramasa/sabigatana.png",
+          "baseAttackModifier": 3.0,
+          "MaxDamage": 40,
+          "isDestructable": 0,
+          "isBroken": 1,
+          "isSealed": 1,
+          "Damage": 1.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0,
+          "ModelName": "slashblade:model/named/muramasa/muramasa.obj"
+        },
+        "minecraft:max_damage": 40,
+        "minecraft:custom_data": {
+          "resharped_definition": "sabigatana_broken",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "sange",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.sange",
+          "TextureName": "slashblade:model/named/sange/sange.png",
+          "baseAttackModifier": 6.0,
+          "MaxDamage": 70,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 1,
+          "ModelName": "slashblade:model/named/sange/sange.obj"
+        },
+        "minecraft:max_damage": 70,
+        "minecraft:custom_data": {
+          "resharped_definition": "sange",
+          "resharped_slash_art": "slashblade:void_slash",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "tagayasan",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.tagayasan",
+          "TextureName": "slashblade:model/named/tagayasan.png",
+          "baseAttackModifier": 5.0,
+          "MaxDamage": 70,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 4,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 1
+        },
+        "minecraft:max_damage": 70,
+        "minecraft:enchantments": {
+          "minecraft:smite": 3,
+          "minecraft:unbreaking": 3
+        },
+        "minecraft:custom_data": {
+          "resharped_definition": "tagayasan",
+          "resharped_slash_art": "slashblade:drive_vertical",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "yamato",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.yamato",
+          "TextureName": "slashblade:model/named/yamato.png",
+          "baseAttackModifier": 7.0,
+          "MaxDamage": 40,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 1,
+          "ModelName": "slashblade:model/named/yamato.obj"
+        },
+        "minecraft:max_damage": 40,
+        "minecraft:enchantments": {
+          "minecraft:soul_speed": 2,
+          "minecraft:power": 5,
+          "minecraft:feather_falling": 4
+        },
+        "minecraft:custom_data": {
+          "resharped_definition": "yamato",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "yamato_broken",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.yamato",
+          "TextureName": "slashblade:model/named/yamato.png",
+          "baseAttackModifier": 7.0,
+          "MaxDamage": 40,
+          "isDestructable": 0,
+          "isBroken": 1,
+          "isSealed": 1,
+          "Damage": 1.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0,
+          "ModelName": "slashblade:model/named/yamato.obj"
+        },
+        "minecraft:max_damage": 40,
+        "minecraft:custom_data": {
+          "resharped_definition": "yamato_broken",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "yasha",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.yasha",
+          "TextureName": "slashblade:model/named/yasha/yasha.png",
+          "baseAttackModifier": 6.0,
+          "MaxDamage": 70,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0,
+          "ModelName": "slashblade:model/named/yasha/yasha.obj"
+        },
+        "minecraft:max_damage": 70,
+        "minecraft:custom_data": {
+          "resharped_definition": "yasha",
+          "resharped_slash_art": "slashblade:sakura_end",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "yasha_true",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.yasha_true",
+          "TextureName": "slashblade:model/named/yasha/yasha.png",
+          "baseAttackModifier": 6.0,
+          "MaxDamage": 70,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 1,
+          "ModelName": "slashblade:model/named/yasha/yasha_true.obj"
+        },
+        "minecraft:max_damage": 70,
+        "minecraft:custom_data": {
+          "resharped_definition": "yasha_true",
+          "resharped_slash_art": "slashblade:circle_slash",
+          "resharped_special_effects": []
+        }
+      }
+    }
+  },
+  {
+    "key": "yuzukitukumo",
+    "stack": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.yuzukitukumo",
+          "TextureName": "slashblade:model/named/a_tukumo.png",
+          "baseAttackModifier": 6.0,
+          "MaxDamage": 40,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 1,
+          "ModelName": "slashblade:model/named/agito.obj"
+        },
+        "minecraft:max_damage": 40,
+        "minecraft:enchantments": {
+          "minecraft:fire_aspect": 1,
+          "minecraft:sharpness": 4,
+          "minecraft:unbreaking": 3
+        },
+        "minecraft:custom_data": {
+          "resharped_definition": "yuzukitukumo",
+          "resharped_slash_art": "slashblade:drive_horizontal",
+          "resharped_special_effects": []
+        }
+      }
+    }
   }
 ]

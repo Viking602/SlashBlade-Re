@@ -1,0 +1,83 @@
+{
+  "type": "slashblade:blade_upgrade",
+  "category": "equipment",
+  "pattern": [
+    "  P",
+    " B ",
+    "WS "
+  ],
+  "key": {
+    "B": {
+      "neoforge:ingredient_type": "slashblade:blade_requirement",
+      "item": "slashblade:slashblade_silverbamboo",
+      "name": "",
+      "kills": 100,
+      "refine": 0,
+      "proud_soul": 0,
+      "broken": true,
+      "sealed": false,
+      "enchantments": {},
+      "display": {
+        "id": "slashblade:slashblade_silverbamboo",
+        "count": 1,
+        "components": {
+          "slashblade:blade_state": {
+            "translationKey": "",
+            "TextureName": "slashblade:model/silverbamboo.png",
+            "baseAttackModifier": 3.0,
+            "MaxDamage": 40,
+            "isDestructable": 0,
+            "isBroken": 1,
+            "isSealed": 0,
+            "Damage": 1.0,
+            "ProudSoul": 0,
+            "killCount": 100,
+            "RepairCounter": 0,
+            "SpecialAttackType": "judgement_cut",
+            "ComboRoot": "standby",
+            "ComboRootAir": "standby_inair",
+            "StandbyRenderType": 2,
+            "SummonedSwordColor": -13421569,
+            "TargetEntity": -1
+          },
+          "minecraft:max_damage": 40
+        }
+      }
+    },
+    "P": "slashblade:proudsoul_crystal",
+    "S": "#c:strings",
+    "W": "minecraft:wooden_sword"
+  },
+  "result": {
+    "id": "slashblade:slashblade",
+    "count": 1,
+    "components": {
+      "slashblade:blade_state": {
+        "translationKey": "item.slashblade.rodai_wooden",
+        "TextureName": "slashblade:model/rodai_wooden.png",
+        "baseAttackModifier": 2.0,
+        "MaxDamage": 60,
+        "isDestructable": 0,
+        "isBroken": 0,
+        "isSealed": 0,
+        "Damage": 0.0,
+        "ProudSoul": 0,
+        "killCount": 0,
+        "RepairCounter": 0,
+        "SpecialAttackType": "judgement_cut",
+        "ComboRoot": "standby",
+        "ComboRootAir": "standby_inair",
+        "StandbyRenderType": 2,
+        "SummonedSwordColor": -13421569,
+        "TargetEntity": -1,
+        "isDefaultBewitched": 0
+      },
+      "minecraft:max_damage": 60,
+      "minecraft:custom_data": {
+        "resharped_definition": "rodai_wooden",
+        "resharped_slash_art": "slashblade:judgement_cut",
+        "resharped_special_effects": []
+      }
+    }
+  }
+}

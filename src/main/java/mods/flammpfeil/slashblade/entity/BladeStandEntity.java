@@ -158,6 +158,18 @@ public class BladeStandEntity extends ItemFrame implements IEntityWithComplexSpa
         return result;
     }
 
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level,net.minecraft.world.damagesource.DamageSource source,float amount) {
+        if(source.getEntity() instanceof net.minecraft.world.entity.boss.wither.WitherBoss && source.is(net.minecraft.tags.DamageTypeTags.IS_EXPLOSION)) {
+            var blade=getItem();
+            if(blade.getItem() instanceof ItemSlashBlade && mods.flammpfeil.slashblade.init.BladeCatalog.baseItemIdentity(blade).equals("slashblade:slashblade")
+                && mods.flammpfeil.slashblade.init.BladeCatalog.canonicalName(mods.flammpfeil.slashblade.compat.SBData.get(blade,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new).getTranslationKey()).isEmpty()) {
+                setItem(mods.flammpfeil.slashblade.init.BladeCatalog.blade("koseki"));return true;
+            }
+        }
+        return super.hurtServer(level,source,amount);
+    }
+
     protected ItemStack getFrameItemStack() {
         return new ItemStack(currentType);
     }

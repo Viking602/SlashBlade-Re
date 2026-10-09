@@ -20,8 +20,8 @@ public final class BladeRecipeGameTests {
     public static void add(Map<String,Consumer<GameTestHelper>> tests) {
         tests.put("catalog_has_distinct_named_blades", h -> {
             var catalog=BladeCatalog.items();
-            h.assertValueEqual(catalog.size(),13,"named variants");
-            h.assertValueEqual(catalog.stream().map(s -> state(s).getTranslationKey()).distinct().count(),13L,"distinct names");
+            h.assertValueEqual(catalog.size(),31,"named variants");
+            h.assertValueEqual(catalog.stream().map(s -> net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(s.getItem())+":"+state(s).getTranslationKey()+":"+state(s).isBroken()+":"+state(s).isSealed()).distinct().count(),31L,"distinct names");
         });
         tests.put("real_recipes_have_visible_materials", h -> {
             var context=SlotDisplayContext.fromLevel(h.getLevel());
@@ -41,10 +41,11 @@ public final class BladeRecipeGameTests {
                 upgrades++;
                 var inputs=new ArrayList<ItemStack>();
                 for (var ingredient:recipe.getIngredients()) inputs.add(ingredient.map(i -> i.display().resolveForFirstStack(context)).orElse(ItemStack.EMPTY));
-                var base=inputs.stream().filter(s -> s.getItem() instanceof ItemSlashBlade).findFirst().orElseThrow();
+                var base=inputs.stream().filter(s -> s.getItem() instanceof ItemSlashBlade).findFirst().orElse(ItemStack.EMPTY);
+                if(base.isEmpty()) { h.assertTrue(recipe.matches(CraftingInput.of(recipe.getWidth(),recipe.getHeight(),inputs),h.getLevel()),"wooden starter recipe");continue; }
                 var owner=UUID.randomUUID(); var unique=state(base).getUniqueId();
                 int kills=state(base).getKillCount()+173;
-                state(base).setKillCount(kills); state(base).setRefine(31); state(base).setOwner(owner);
+                state(base).setProudSoulCount(12000); state(base).setKillCount(kills); state(base).setRefine(31); state(base).setOwner(owner);
                 base.set(DataComponents.CUSTOM_NAME,Component.literal("My blade"));
                 var unbreaking=h.getLevel().registryAccess().getOrThrow(Enchantments.UNBREAKING);
                 base.enchant(unbreaking,3);
@@ -53,6 +54,7 @@ public final class BladeRecipeGameTests {
                 h.assertTrue(recipe.matches(input,h.getLevel()),"valid input rejected: "+holder.id());
                 var output=recipe.assemble(input);
                 h.assertFalse(output.isEmpty(),"empty crafted blade: "+holder.id());
+                h.assertValueEqual(state(output).getProudSoulCount(),12000,"ProudSoul retained");
                 h.assertValueEqual(state(output).getKillCount(),kills,"kills retained");
                 h.assertValueEqual(state(output).getRefine(),31,"refine retained");
                 h.assertValueEqual(state(output).getOwner(),owner,"owner retained");
@@ -69,7 +71,7 @@ public final class BladeRecipeGameTests {
                     h.assertValueEqual(state(decoded.assemble(input)).getTranslationKey(),state(output).getTranslationKey(),"network output identity");
                 } finally { buffer.release(); }
             }
-            h.assertValueEqual(upgrades,13,"tested direct upgrades");
+            h.assertValueEqual(upgrades,23,"tested direct upgrades");
         });
         tests.put("blade_requirements_reject_wrong_progress", h -> {
             var base=BladeCatalog.items().getFirst();var name=state(base).getTranslationKey();

@@ -1,0 +1,90 @@
+{
+  "type": "slashblade:blade_upgrade",
+  "category": "equipment",
+  "pattern": [
+    "PSP",
+    "SBS",
+    "PSP"
+  ],
+  "key": {
+    "B": {
+      "neoforge:ingredient_type": "slashblade:blade_requirement",
+      "item": "slashblade:slashblade",
+      "name": "item.slashblade.orotiagito_sealed",
+      "kills": 1000,
+      "refine": 10,
+      "proud_soul": 1000,
+      "broken": false,
+      "sealed": false,
+      "enchantments": {},
+      "display": {
+        "id": "slashblade:slashblade",
+        "count": 1,
+        "components": {
+          "slashblade:blade_state": {
+            "translationKey": "item.slashblade.orotiagito_sealed",
+            "TextureName": "slashblade:model/named/agito_true.png",
+            "baseAttackModifier": 5.0,
+            "MaxDamage": 60,
+            "isDestructable": 0,
+            "isBroken": 0,
+            "isSealed": 0,
+            "Damage": 0.0,
+            "ProudSoul": 1000,
+            "killCount": 1000,
+            "RepairCounter": 10,
+            "SpecialAttackType": "judgement_cut",
+            "ComboRoot": "standby",
+            "ComboRootAir": "standby_inair",
+            "StandbyRenderType": 2,
+            "SummonedSwordColor": -13421569,
+            "TargetEntity": -1,
+            "isDefaultBewitched": 0,
+            "ModelName": "slashblade:model/named/agito.obj"
+          },
+          "minecraft:max_damage": 60,
+          "minecraft:custom_data": {
+            "resharped_definition": "orotiagito_sealed",
+            "resharped_slash_art": "slashblade:wave_edge",
+            "resharped_special_effects": []
+          }
+        }
+      }
+    },
+    "P": "slashblade:proudsoul",
+    "S": "slashblade:proudsoul_sphere"
+  },
+  "result": {
+    "id": "slashblade:slashblade",
+    "count": 1,
+    "components": {
+      "slashblade:blade_state": {
+        "translationKey": "item.slashblade.orotiagito",
+        "TextureName": "slashblade:model/named/orotiagito.png",
+        "baseAttackModifier": 7.0,
+        "MaxDamage": 60,
+        "isDestructable": 0,
+        "isBroken": 0,
+        "isSealed": 0,
+        "Damage": 0.0,
+        "ProudSoul": 0,
+        "killCount": 0,
+        "RepairCounter": 0,
+        "SpecialAttackType": "judgement_cut",
+        "ComboRoot": "standby",
+        "ComboRootAir": "standby_inair",
+        "StandbyRenderType": 2,
+        "SummonedSwordColor": -13421569,
+        "TargetEntity": -1,
+        "isDefaultBewitched": 1,
+        "ModelName": "slashblade:model/named/agito.obj"
+      },
+      "minecraft:max_damage": 60,
+      "minecraft:custom_data": {
+        "resharped_definition": "orotiagito",
+        "resharped_slash_art": "slashblade:wave_edge",
+        "resharped_special_effects": []
+      }
+    }
+  }
+}

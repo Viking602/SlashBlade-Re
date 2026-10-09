@@ -36,6 +36,9 @@ public enum SwordType{
 
                 if(s.isSealed())
                     types.add(Cursed);
+                if(s.isSealed()) types.add(Sealed);
+                if(s.getKillCount()>=1000) types.add(FiercerEdge);
+                if(s.getProudSoulCount()>=10000) types.add(SoulEeater);
 
                 if(!s.isSealed() && itemStackIn.isEnchanted() && (itemStackIn.has(net.minecraft.core.component.DataComponents.CUSTOM_NAME) || s.isDefaultBewitched()))
                     types.add(Bewitched);

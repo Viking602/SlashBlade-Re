@@ -1,83 +1,64 @@
 {
+  "parent": "slashblade:blade/broken_imitation",
   "display": {
-    "title": {
-      "translate": "item.slashblade.ex.ruby"
-    },
-    "description": {
-      "translate": "item.slashblade.ex.ruby.desc"
-    },
     "icon": {
       "id": "slashblade:slashblade",
+      "count": 1,
       "components": {
         "slashblade:blade_state": {
-          "isSealed": 1,
-          "isNoScabbard": 0,
-          "translationKey": "item.slashblade.ex.ruby",
-          "isDestructable": 0,
-          "HasShield": 0,
-          "SummonedSwordColor": -3355647,
-          "lastActionTime": 0,
-          "_onClick": 0,
-          "fallDecreaseRate": 0.0,
-          "currentCombo": "arts_rapid_slash",
-          "killCount": 0,
-          "isCharged": 0,
-          "RepairCounter": 0,
-          "Damage": 0.0,
-          "rarityType": 0,
-          "ComboRoot": "standby",
-          "adjustXYZ": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "lastPosHash": "",
-          "RangeAttackType": "none",
-          "isDefaultBewitched": 0,
-          "AttackAmplifier": 0.0,
-          "TargetEntity": -1,
-          "SpecialAttackType": "none",
+          "translationKey": "item.slashblade.ruby",
           "TextureName": "slashblade:model/ruby.png",
-          "ModelName": "slashblade:model/named/yamato.obj",
-          "SummonedSwordColorInverse": 0,
+          "baseAttackModifier": 5.0,
+          "MaxDamage": 45,
+          "isDestructable": 0,
           "isBroken": 0,
-          "baseAttackModifier": 2.0,
-          "StandbyRenderType": 0,
-          "ComboRootAir": "standby_inair"
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0
         },
-        "minecraft:rarity": "common",
+        "minecraft:max_damage": 45,
         "minecraft:custom_data": {
-          "Crafting": "slashblade:ex/ruby"
+          "resharped_definition": "ruby",
+          "resharped_slash_art": "slashblade:judgement_cut",
+          "resharped_special_effects": [],
+          "Crafting": "slashblade:upgrades/ruby"
         }
       }
     },
+    "title": {
+      "translate": "item.slashblade.ruby"
+    },
+    "description": {
+      "translate": "slashblade.route.ruby"
+    },
     "frame": "task"
   },
-  "parent": "slashblade:blade/broken_imitation",
   "criteria": {
-    "crafting": {
+    "blade": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": [
-              "slashblade:slashblade"
-            ],
+            "items": "slashblade:slashblade",
             "predicates": {
               "slashblade:blade": {
-                "translationKey": "item.slashblade.ex.ruby",
-                "isBroken": 0
+                "translationKey": "item.slashblade.ruby",
+                "isBroken": 0,
+                "isSealed": 0
               }
             }
           }
         ]
       }
     }
-  },
-  "rewards": {
-    "recipes": [
-      "slashblade:ex/fox_black",
-      "slashblade:ex/fox_white"
-    ]
   }
 }

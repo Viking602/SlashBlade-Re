@@ -1,0 +1,65 @@
+{
+  "parent": "slashblade:blade/resharped/agito_rust",
+  "display": {
+    "icon": {
+      "id": "slashblade:slashblade",
+      "count": 1,
+      "components": {
+        "slashblade:blade_state": {
+          "translationKey": "item.slashblade.agito",
+          "TextureName": "slashblade:model/named/agito_false.png",
+          "baseAttackModifier": 5.0,
+          "MaxDamage": 60,
+          "isDestructable": 0,
+          "isBroken": 0,
+          "isSealed": 0,
+          "Damage": 0.0,
+          "ProudSoul": 0,
+          "killCount": 0,
+          "RepairCounter": 0,
+          "SpecialAttackType": "judgement_cut",
+          "ComboRoot": "standby",
+          "ComboRootAir": "standby_inair",
+          "StandbyRenderType": 2,
+          "SummonedSwordColor": -13421569,
+          "TargetEntity": -1,
+          "isDefaultBewitched": 0,
+          "ModelName": "slashblade:model/named/agito.obj"
+        },
+        "minecraft:max_damage": 60,
+        "minecraft:custom_data": {
+          "resharped_definition": "agito",
+          "resharped_slash_art": "slashblade:wave_edge",
+          "resharped_special_effects": [],
+          "Crafting": "slashblade:upgrades/agito"
+        }
+      }
+    },
+    "title": {
+      "translate": "item.slashblade.agito"
+    },
+    "description": {
+      "translate": "slashblade.route.agito"
+    },
+    "frame": "task"
+  },
+  "criteria": {
+    "blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "slashblade:slashblade",
+            "predicates": {
+              "slashblade:blade": {
+                "translationKey": "item.slashblade.agito",
+                "isBroken": 0,
+                "isSealed": 0
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

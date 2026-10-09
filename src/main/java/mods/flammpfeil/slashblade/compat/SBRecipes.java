@@ -16,6 +16,8 @@ public final class SBRecipes {
     private static final DeferredRegister<net.minecraft.world.item.crafting.RecipeSerializer<?>> SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, "slashblade");
     public static final Supplier<net.minecraft.world.item.crafting.RecipeSerializer<BladeUpgradeRecipe>> BLADE_UPGRADE = SERIALIZERS.register("blade_upgrade", () -> new net.minecraft.world.item.crafting.RecipeSerializer<>(BladeUpgradeRecipe.CODEC, BladeUpgradeRecipe.STREAM_CODEC));
     private static final DeferredRegister<DataComponentPredicate.Type<?>> PREDICATES = DeferredRegister.create(Registries.DATA_COMPONENT_PREDICATE_TYPE, "slashblade");
+    public static final Supplier<net.minecraft.world.item.crafting.RecipeSerializer<ProudSoulRecipe>> PROUD_SOUL = SERIALIZERS.register("proudsoul", () -> new net.minecraft.world.item.crafting.RecipeSerializer<>(ProudSoulRecipe.CODEC,ProudSoulRecipe.STREAM_CODEC));
+    public static final Supplier<net.minecraft.world.item.crafting.RecipeSerializer<BladeSmithingRecipe>> BLADE_SMITHING = SERIALIZERS.register("blade_smithing", () -> new net.minecraft.world.item.crafting.RecipeSerializer<>(BladeSmithingRecipe.CODEC,BladeSmithingRecipe.STREAM_CODEC));
     public static final Supplier<DataComponentPredicate.Type<BladePredicate>> BLADE_PREDICATE = PREDICATES.register("blade", () -> new DataComponentPredicate.ConcreteType<>(BladePredicate.CODEC));
     public static void register(IEventBus bus) {
         INGREDIENTS.register(bus); PREDICATES.register(bus); SERIALIZERS.register(bus);
