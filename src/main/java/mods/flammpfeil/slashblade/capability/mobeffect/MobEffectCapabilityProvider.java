@@ -1,29 +1,27 @@
 package mods.flammpfeil.slashblade.capability.mobeffect;
 
+import mods.flammpfeil.slashblade.compat.StateKey;
 import mods.flammpfeil.slashblade.util.NBTHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.Tag;
-import net.minecraftforge.common.capabilities.*;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import mods.flammpfeil.slashblade.compat.LazyOptional;
 
-public class MobEffectCapabilityProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-    public static final Capability<IMobEffectState> MOB_EFFECT = CapabilityManager.get(new CapabilityToken<>(){});
+public class MobEffectCapabilityProvider {
+
+    public static final StateKey<IMobEffectState> MOB_EFFECT = StateKey.of(IMobEffectState.class);
+
+    public MobEffectCapabilityProvider() {}
+
+    public MobEffectCapabilityProvider(IMobEffectState instance) { this.state = LazyOptional.of(() -> instance); }
+    public IMobEffectState getState() { return state.orElseThrow(() -> new IllegalStateException("Missing state")); }
 
     protected LazyOptional<IMobEffectState> state = LazyOptional.of(()->new MobEffectState());
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        return MOB_EFFECT.orEmpty(cap, state);
-    }
-
-    @Override
     public CompoundTag serializeNBT() {
         CompoundTag baseTag = new CompoundTag();
 
@@ -33,7 +31,6 @@ public class MobEffectCapabilityProvider implements ICapabilityProvider, INBTSer
         return baseTag;
     }
 
-    @Override
     public void deserializeNBT(CompoundTag nbt) {
         state.ifPresent(instance ->
                 NBTHelper.getNBTCoupler(nbt)

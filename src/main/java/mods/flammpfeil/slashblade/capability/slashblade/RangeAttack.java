@@ -2,15 +2,15 @@ package mods.flammpfeil.slashblade.capability.slashblade;
 
 import com.google.common.collect.Maps;
 import mods.flammpfeil.slashblade.util.RegistryBase;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Map;
 
 public class RangeAttack extends RegistryBase<RangeAttack> {
-    static Map<ResourceLocation, RangeAttack> registry = Maps.newHashMap();
+    static Map<Identifier, RangeAttack> registry = Maps.newHashMap();
 
     @Override
-    public Map<ResourceLocation, RangeAttack> getRegistry() {
+    public Map<Identifier, RangeAttack> getRegistry() {
         return RangeAttack.registry;
     }
 

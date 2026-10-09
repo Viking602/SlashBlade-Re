@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.client.renderer;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mods.flammpfeil.slashblade.capability.inputstate.CapabilityInputState;
 import mods.flammpfeil.slashblade.client.renderer.model.BladeModelManager;
@@ -15,20 +16,18 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.entity.PartEntity;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.RenderLivingEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.entity.PartEntity;
+import net.neoforged.bus.api.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.CallbackI;
 
@@ -48,29 +47,33 @@ public class LockonCircleRender {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
 
-    static final ResourceLocation modelLoc = new ResourceLocation("slashblade","model/util/lockon.obj");
-    static final ResourceLocation textureLoc = new ResourceLocation("slashblade","model/util/lockon.png");
+    static final Identifier modelLoc = Identifier.fromNamespaceAndPath("slashblade", "model/util/lockon.obj");
+    static final Identifier textureLoc = Identifier.fromNamespaceAndPath("slashblade", "model/util/lockon.png");
 
+    public static final net.minecraft.util.context.ContextKey<mods.flammpfeil.slashblade.client.renderer.util.GeometryBuffer> RING = new net.minecraft.util.context.ContextKey<>(mods.flammpfeil.slashblade.SlashBlade.id("lockon_ring"));
     @SubscribeEvent
-    public void onRenderLiving(RenderLivingEvent event){
+    public void onRenderLiving(RenderLivingEvent.Pre<?, ?, ?> event) {
+        var geometry = event.getRenderState().getRenderData(RING);
+        if (geometry != null) geometry.submit(event.getPoseStack(), event.getSubmitNodeCollector());
+    }
+    public static void extract(LivingEntity livingEntity, net.minecraft.client.renderer.entity.state.LivingEntityRenderState renderState) {
         Player player = Minecraft.getInstance().player;
         if(player == null) return;
-        if(!player.getCapability(CapabilityInputState.INPUT_STATE).filter(input->input.getCommands().contains(InputCommand.SNEAK)).isPresent()) return;
+        if(!SBData.get(player, CapabilityInputState.INPUT_STATE).filter(input->input.getCommands().contains(InputCommand.SNEAK)).isPresent()) return;
 
         ItemStack stack = player.getMainHandItem();
 
-        Optional<Color> effectColor = stack.getCapability(ItemSlashBlade.BLADESTATE)
-                .filter(s->event.getEntity().equals(s.getTargetEntity(player.level())))
+        Optional<Color> effectColor = SBData.get(stack, ItemSlashBlade.BLADESTATE)
+                .filter(s->livingEntity.equals(s.getTargetEntity(player.level())))
                 .map(s->s.getEffectColor());
 
         if(effectColor.isEmpty()) return;
 
-        LivingEntityRenderer renderer = event.getRenderer();
-        LivingEntity livingEntity = event.getEntity();
+
 
 
 
@@ -81,29 +84,29 @@ public class LockonCircleRender {
         Color col = new Color(effectColor.get().getRGB() & 0xFFFFFF | 0xAA000000, true);
 
 
-        PoseStack poseStack = event.getPoseStack();
+        PoseStack poseStack = new PoseStack();
 
         float f = livingEntity.getBbHeight() * 0.5f;
-        float partialTicks = event.getPartialTick();
+        float partialTicks = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true);
 
         poseStack.pushPose();
         poseStack.translate(0.0D, (double)f, 0.0D);
 
-        Vec3 offset = renderer.entityRenderDispatcher.camera.getPosition()
+        Vec3 offset = Minecraft.getInstance().gameRenderer.getMainCamera().position()
                 .subtract(livingEntity.getPosition(partialTicks).add(0,f,0));
         offset = offset.scale(0.5f);
         poseStack.translate(offset.x(), offset.y(), offset.z());
 
-        poseStack.mulPose(renderer.entityRenderDispatcher.cameraOrientation());
+        poseStack.mulPose(Minecraft.getInstance().gameRenderer.getMainCamera().rotation());
         //poseStack.scale(-0.025F, -0.025F, 0.025F);
 
         float scale = 0.0025f;
         poseStack.scale(scale, -scale, scale);
 
         WavefrontObject model = BladeModelManager.getInstance().getModel(modelLoc);
-        ResourceLocation resourceTexture = textureLoc;
+        Identifier resourceTexture = textureLoc;
 
-        MultiBufferSource buffer = event.getMultiBufferSource();
+        var buffer = new mods.flammpfeil.slashblade.client.renderer.util.GeometryBuffer();
 
         final String base = "lockonBase";
         final String mask = "lockonHealthMask";
@@ -122,5 +125,6 @@ public class LockonCircleRender {
         BladeRenderState.renderOverridedLuminousDepthWrite(ItemStack.EMPTY, model, value, resourceTexture, poseStack, buffer, BladeRenderState.MAX_LIGHT );
 
         poseStack.popPose();
+        renderState.setRenderData(RING, buffer);
     }
 }

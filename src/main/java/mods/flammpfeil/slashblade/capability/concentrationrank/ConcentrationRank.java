@@ -6,7 +6,7 @@ import com.google.common.collect.RangeMap;
 import mods.flammpfeil.slashblade.capability.slashblade.ComboState;
 import net.minecraft.world.damagesource.DamageSource;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 public class ConcentrationRank implements IConcentrationRank{
 

@@ -26,12 +26,12 @@ import mods.flammpfeil.slashblade.util.NBTHelper;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
 
-import javax.annotation.Nonnull;
+import mods.flammpfeil.slashblade.compat.LazyOptional;
+
+import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,9 +44,12 @@ import java.util.UUID;
  */
 public class SlashBladeState implements ISlashBladeState{
 
+    private Runnable changeListener = () -> {};
+    public void setChangeListener(Runnable listener) { changeListener = listener; }
+
     //action state
     protected long lastActionTime; //lastActionTime
-    protected int targetEntityId; //TargetEntity
+    protected int targetEntityId = -1; //TargetEntity; a fresh blade has no lock-on target.
     protected boolean _onClick; //_onClick
     protected float fallDecreaseRate;
     protected boolean isCharged; //isCharged
@@ -92,8 +95,8 @@ public class SlashBladeState implements ISlashBladeState{
     protected boolean effectColorInverse;//SummonedSwordColorInverse
     protected Optional<Vec3> adjust = Optional.empty();//adjustXYZ
 
-    protected Optional<ResourceLocation> texture = Optional.empty(); //TextureName
-    protected Optional<ResourceLocation> model = Optional.empty();//ModelName
+    protected Optional<Identifier> texture = Optional.empty(); //TextureName
+    protected Optional<Identifier> model = Optional.empty();//ModelName
 
     private CompoundTag shareTag = null;
 
@@ -110,6 +113,7 @@ public class SlashBladeState implements ISlashBladeState{
         this.lastActionTime = lastActionTime;
 
         setHasChangedActiveState(true);
+        changeListener.run();
     }
 
     @Override
@@ -122,6 +126,7 @@ public class SlashBladeState implements ISlashBladeState{
         this._onClick = onClick;
 
         setHasChangedActiveState(true);
+        changeListener.run();
     }
 
     @Override
@@ -134,6 +139,7 @@ public class SlashBladeState implements ISlashBladeState{
         this.fallDecreaseRate = fallDecreaseRate;
 
         setHasChangedActiveState(true);
+        changeListener.run();
     }
 
     @Override
@@ -146,6 +152,7 @@ public class SlashBladeState implements ISlashBladeState{
         isCharged = charged;
 
         setHasChangedActiveState(true);
+        changeListener.run();
     }
 
     @Override
@@ -158,10 +165,11 @@ public class SlashBladeState implements ISlashBladeState{
         this.attackAmplifier = attackAmplifier;
 
         setHasChangedActiveState(true);
+        changeListener.run();
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public ComboState getComboSeq() {
         return ComboState.NONE.orNone(comboSeq);
     }
@@ -171,6 +179,7 @@ public class SlashBladeState implements ISlashBladeState{
         this.comboSeq = comboSeq;
 
         setHasChangedActiveState(true);
+        changeListener.run();
     }
 
     @Override
@@ -183,6 +192,7 @@ public class SlashBladeState implements ISlashBladeState{
         this.lastPosHash = lastPosHash;
 
         setHasChangedActiveState(true);
+        changeListener.run();
     }
 
     @Override
@@ -195,6 +205,7 @@ public class SlashBladeState implements ISlashBladeState{
         this._hasShield = hasShield;
 
         setHasChangedActiveState(true);
+        changeListener.run();
     }
 
     @Override
@@ -206,6 +217,7 @@ public class SlashBladeState implements ISlashBladeState{
     public void setBroken(boolean broken) {
         isBroken = broken;
         setHasChangedActiveState(true);
+        changeListener.run();
     }
 
     @Override
@@ -216,6 +228,7 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setNoScabbard(boolean noScabbard) {
         isNoScabbard = noScabbard;
+        changeListener.run();
     }
 
     @Override
@@ -226,6 +239,7 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setSealed(boolean sealed) {
         isSealed = sealed;
+        changeListener.run();
     }
 
     @Override
@@ -236,6 +250,7 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setBaseAttackModifier(float baseAttackModifier) {
         this.baseAttackModifier = baseAttackModifier;
+        changeListener.run();
     }
 
     @Override
@@ -248,6 +263,7 @@ public class SlashBladeState implements ISlashBladeState{
         this.killCount = killCount;
 
         setHasChangedActiveState(true);
+        changeListener.run();
     }
 
     @Override
@@ -258,6 +274,7 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setRefine(int refine) {
         this.refine = refine;
+        changeListener.run();
     }
 
     @Override
@@ -268,10 +285,11 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setOwner(UUID owner) {
         this.owner = owner;
+        changeListener.run();
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public RangeAttack getRangeAttackType() {
         return RangeAttack.NONE.orNone(rangeAttackType);
     }
@@ -279,6 +297,7 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setRangeAttackType(RangeAttack rangeAttackType) {
         this.rangeAttackType = rangeAttackType;
+        changeListener.run();
     }
 
     @Override
@@ -289,6 +308,7 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setSlashArtsKey(String key) {
         this.slashArtsKey = key;
+        changeListener.run();
     }
 
     @Override
@@ -299,6 +319,7 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setDestructable(boolean destructable) {
         isDestructable = destructable;
+        changeListener.run();
     }
 
     @Override
@@ -309,10 +330,11 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setDefaultBewitched(boolean defaultBewitched) {
         isDefaultBewitched = defaultBewitched;
+        changeListener.run();
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public Rarity getRarity() {
         return rarity.orElse(Rarity.COMMON);
     }
@@ -320,6 +342,7 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setRarity(Rarity rarity) {
         this.rarity = Optional.ofNullable(rarity);
+        changeListener.run();
     }
 
     @Override
@@ -330,10 +353,11 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setTranslationKey(String translationKey) {
         this.translationKey = Optional.ofNullable(translationKey).orElse("");
+        changeListener.run();
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public CarryType getCarryType() {
         return carryType.orElse(CarryType.NONE);
     }
@@ -341,6 +365,7 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setCarryType(CarryType carryType) {
         this.carryType = Optional.ofNullable(carryType);
+        changeListener.run();
     }
 
     @Override
@@ -351,6 +376,7 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setEffectColor(Color effectColor) {
         this.effectColor = Optional.ofNullable(effectColor);
+        changeListener.run();
     }
 
     @Override
@@ -361,6 +387,7 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setEffectColorInverse(boolean effectColorInverse) {
         this.effectColorInverse = effectColorInverse;
+        changeListener.run();
     }
 
     @Override
@@ -371,26 +398,29 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setAdjust(Vec3 adjust) {
         this.adjust = Optional.ofNullable(adjust);
+        changeListener.run();
     }
 
     @Override
-    public Optional<ResourceLocation> getTexture() {
+    public Optional<Identifier> getTexture() {
         return texture;
     }
 
     @Override
-    public void setTexture(ResourceLocation texture) {
+    public void setTexture(Identifier texture) {
         this.texture = Optional.ofNullable(texture);
+        changeListener.run();
     }
 
     @Override
-    public Optional<ResourceLocation> getModel() {
+    public Optional<Identifier> getModel() {
         return model;
     }
 
     @Override
-    public void setModel(ResourceLocation model) {
+    public void setModel(Identifier model) {
         this.model = Optional.ofNullable(model);
+        changeListener.run();
     }
 
     @Override
@@ -403,6 +433,7 @@ public class SlashBladeState implements ISlashBladeState{
         targetEntityId = id;
 
         setHasChangedActiveState(true);
+        changeListener.run();
     }
 
     LazyOptional<ComboState> rootCombo = instantiateRootComboHolder();
@@ -415,6 +446,7 @@ public class SlashBladeState implements ISlashBladeState{
     public void setComboRootName(String comboRootName) {
         this.comboRootName = comboRootName;
         this.rootCombo = instantiateRootComboHolder();
+        changeListener.run();
     }
 
     private LazyOptional<ComboState> instantiateRootComboHolder(){
@@ -435,14 +467,15 @@ public class SlashBladeState implements ISlashBladeState{
 
     @Override
     public void setComboRootAirName(String comboRootName) {
-        this.comboRootName = comboRootName;
+        this.comboRootAirName = comboRootName;
         this.rootComboAir = instantiateRootComboAirHolder();
+        changeListener.run();
     }
 
     private LazyOptional<ComboState> instantiateRootComboAirHolder(){
         return LazyOptional.of(()->{
-            if(ComboState.NONE.valueOf(getComboRootName()) == null){
-                return Extra.STANDBY_EX;
+            if(ComboState.NONE.valueOf(getComboRootAirName()) == null){
+                return Extra.STANDBY_INAIR;
             }else{
                 return ComboState.NONE.valueOf(getComboRootAirName());
             }
@@ -474,6 +507,7 @@ public class SlashBladeState implements ISlashBladeState{
         this.damage = Math.max(0.0f,Math.min(damage,1.0f));
 
         setHasChangedActiveState(true);
+        changeListener.run();
     }
 
     boolean isChangedActiveState = false;
@@ -495,5 +529,6 @@ public class SlashBladeState implements ISlashBladeState{
     @Override
     public void setUniqueId(UUID uniqueId) {
         this.uniqueId = uniqueId;
+        changeListener.run();
     }
 }

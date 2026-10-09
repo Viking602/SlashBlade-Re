@@ -9,9 +9,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 import java.util.Optional;
 
@@ -25,7 +25,7 @@ public class PlacePreviewEntryPoint {
     }
     private PlacePreviewEntryPoint(){}
     public void register(){
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
@@ -38,7 +38,7 @@ public class PlacePreviewEntryPoint {
         if(stack.isEmpty()) return;
         if(stack.getItem() != SBItems.proudsoul) return;
 
-        Level worldIn = trueSource.getCommandSenderWorld();
+        Level worldIn = trueSource.level();
 
         /*
         PlacePreviewEntity ss = new PlacePreviewEntity(SlashBlade.RegistryEvents.PlacePreview, worldIn);

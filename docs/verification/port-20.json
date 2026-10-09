@@ -1,0 +1,32 @@
+{
+  "version": "SlashBlade-26.1.2-0.1.2-26.1.2-port.20.jar",
+  "verificationDate": "2026-10-09",
+  "testedArtifactSha256": "e39422b71b88e7879ad468085f32c23949b0a766b9d89d7eabec17a8039514d0",
+  "gameTests": 91,
+  "client": {
+    "mods": 73,
+    "checks": {
+      "0": "passed",
+      "1": "passed",
+      "world": "passed",
+      "combat": "passed"
+    },
+    "passed": true
+  },
+  "perspectiveParity": {
+    "worst": "",
+    "samples": 4828,
+    "maxSocketPositionErrorBlocks": 0.0,
+    "maxSocketAngleErrorDegrees": 7.636384e-06,
+    "differentSamples": 0,
+    "status": "passed"
+  },
+  "registeredPerspectiveParity": {
+    "status": "passed",
+    "samples": 1704,
+    "verticesCompared": 4247456,
+    "maxVertexErrorBlocks": 2.9802322e-07,
+    "scope": "actual AvatarRenderer.submit versus registered RenderHandEvent; every supported clip; left/right; standing/crouching/walking/airborne; skin vertices, normals, blade and saya, same camera and frame"
+  },
+  "scope": "Built-in blades and default animations. Local fixture results; raw fixture and logs are not included in this repository."
+}

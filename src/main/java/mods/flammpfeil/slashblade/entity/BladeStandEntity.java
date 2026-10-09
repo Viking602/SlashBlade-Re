@@ -19,21 +19,19 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
-import net.minecraftforge.entity.IEntityAdditionalSpawnData;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.network.PlayMessages;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
+import net.minecraft.core.registries.BuiltInRegistries;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.ItemLike;
 
-public class BladeStandEntity extends ItemFrame implements IEntityAdditionalSpawnData {
+public class BladeStandEntity extends ItemFrame implements IEntityWithComplexSpawn {
 
     public Item currentType = null;
     public ItemStack currentTypeStack = ItemStack.EMPTY;
@@ -43,16 +41,22 @@ public class BladeStandEntity extends ItemFrame implements IEntityAdditionalSpaw
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket(net.minecraft.server.level.ServerEntity entity) {
+        return super.getAddEntityPacket(entity);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        CompoundTag compound = new CompoundTag();
+        writeBladeData(compound);
+        output.store("slashblade:blade_stand_entity", CompoundTag.CODEC, compound);
+    }
+    private void writeBladeData(CompoundTag compound) {
+
         String standTypeStr;
         if(this.currentType != null){
-            standTypeStr = ForgeRegistries.ITEMS.getKey(this.currentType).toString();
+            standTypeStr = BuiltInRegistries.ITEM.getKey(this.currentType).toString();
         }else{
             standTypeStr = "";
         }
@@ -62,56 +66,60 @@ public class BladeStandEntity extends ItemFrame implements IEntityAdditionalSpaw
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
-        this.currentType = ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString("StandType")));
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput input) {
+        super.readAdditionalSaveData(input);
+        readBladeData(input.read("slashblade:blade_stand_entity", CompoundTag.CODEC).orElseGet(CompoundTag::new));
+    }
+    private void readBladeData(CompoundTag compound) {
 
-        this.setPose(Pose.values()[compound.getByte("Pose") % Pose.values().length]);
+        this.currentType = BuiltInRegistries.ITEM.getValue(Identifier.parse(compound.getStringOr("StandType", "")));
+
+        this.setPose(Pose.values()[compound.getByteOr("Pose", (byte)0) % Pose.values().length]);
     }
 
     @Override
-    public void writeSpawnData(FriendlyByteBuf buffer) {
+    public void writeSpawnData(net.minecraft.network.RegistryFriendlyByteBuf buffer) {
         CompoundTag tag = new CompoundTag();
-        this.addAdditionalSaveData(tag);
+        this.writeBladeData(tag);
         buffer.writeNbt(tag);
     }
 
     @Override
-    public void readSpawnData(FriendlyByteBuf additionalData) {
+    public void readSpawnData(net.minecraft.network.RegistryFriendlyByteBuf additionalData) {
         CompoundTag tag = additionalData.readNbt();
-        this.readAdditionalSaveData(tag);
+        this.readBladeData(tag);
     }
 
     public static BladeStandEntity createInstanceFromPos(Level worldIn, BlockPos placePos, Direction dir, Item type) {
         BladeStandEntity e = new BladeStandEntity(SlashBlade.RegistryEvents.BladeStand, worldIn);
 
-        e.pos = placePos;
+        e.setPos(placePos.getCenter());
         e.setDirection(dir);
         e.currentType = type;
 
         return e;
     }
 
-    public static BladeStandEntity createInstance(PlayMessages.SpawnEntity spawnEntity, Level world) {
+    public static BladeStandEntity createInstance(net.minecraft.network.protocol.game.ClientboundAddEntityPacket spawnEntity, Level world) {
         return new BladeStandEntity(SlashBlade.RegistryEvents.BladeStand, world);
     }
 
     @Nullable
     @Override
-    public ItemEntity spawnAtLocation(ItemLike iip) {
+    public ItemEntity spawnAtLocation(net.minecraft.server.level.ServerLevel level, ItemLike iip) {
         if(iip == Items.ITEM_FRAME){
             if(this.currentType == null || this.currentType == Items.AIR)
                 return null;
 
             iip = this.currentType;
         }
-        return super.spawnAtLocation(iip);
+        return super.spawnAtLocation(level, iip);
     }
 
     @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
+    public InteractionResult interact(Player player, InteractionHand hand, net.minecraft.world.phys.Vec3 location) {
         InteractionResult result = InteractionResult.PASS;
-        if(!this.level().isClientSide && hand == InteractionHand.MAIN_HAND){
+        if(!this.level().isClientSide() && hand == InteractionHand.MAIN_HAND){
             ItemStack itemstack = player.getItemInHand(hand);
             if(player.isShiftKeyDown() && !this.getItem().isEmpty()){
                 Pose current = this.getPose();

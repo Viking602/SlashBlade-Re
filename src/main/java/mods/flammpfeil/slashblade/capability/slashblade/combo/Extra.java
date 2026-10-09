@@ -1,5 +1,7 @@
 package mods.flammpfeil.slashblade.capability.slashblade.combo;
 
+import mods.flammpfeil.slashblade.compat.SBData;
+import mods.flammpfeil.slashblade.compat.StateKey;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.ability.StunManager;
 import mods.flammpfeil.slashblade.capability.inputstate.IInputState;
@@ -11,7 +13,7 @@ import mods.flammpfeil.slashblade.init.DefaultResources;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.specialattack.JudgementCut;
 import mods.flammpfeil.slashblade.util.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
@@ -23,11 +25,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -38,7 +36,7 @@ import net.minecraft.world.entity.Entity.RemovalReason;
 
 public class Extra {
 
-    public static final Capability<IInputState> INPUT_STATE = CapabilityManager.get(new CapabilityToken<>(){});
+    public static final StateKey<IInputState> INPUT_STATE = StateKey.of(IInputState.class);
 
     static List<Map.Entry<EnumSet<InputCommand>, Supplier<ComboState>>> ex_standbyMap =
             new HashMap<EnumSet<InputCommand>, Supplier<ComboState>>(){{
@@ -60,21 +58,21 @@ public class Extra {
                     .collect(Collectors.toList());
 
 
-    static public final ResourceLocation ADVANCEMENT_COMBO_A = new ResourceLocation(SlashBlade.modid, "arts/combo_a");
-    static public final ResourceLocation ADVANCEMENT_COMBO_A_EX = new ResourceLocation(SlashBlade.modid, "arts/combo_a_ex");
-    static public final ResourceLocation ADVANCEMENT_COMBO_B = new ResourceLocation(SlashBlade.modid, "arts/combo_b");
-    static public final ResourceLocation ADVANCEMENT_COMBO_B_MAX = new ResourceLocation(SlashBlade.modid, "arts/combo_b_max");
-    static public final ResourceLocation ADVANCEMENT_COMBO_C = new ResourceLocation(SlashBlade.modid, "arts/combo_c");
-    static public final ResourceLocation ADVANCEMENT_AERIAL_A = new ResourceLocation(SlashBlade.modid, "arts/aerial_a");
-    static public final ResourceLocation ADVANCEMENT_AERIAL_B = new ResourceLocation(SlashBlade.modid, "arts/aerial_b");
-    static public final ResourceLocation ADVANCEMENT_UPPERSLASH = new ResourceLocation(SlashBlade.modid, "arts/upperslash");
-    static public final ResourceLocation ADVANCEMENT_UPPERSLASH_JUMP = new ResourceLocation(SlashBlade.modid, "arts/upperslash_jump");
-    static public final ResourceLocation ADVANCEMENT_AERIAL_CLEAVE = new ResourceLocation(SlashBlade.modid, "arts/aerial_cleave");
-    static public final ResourceLocation ADVANCEMENT_RISING_STAR = new ResourceLocation(SlashBlade.modid, "arts/rising_star");
-    static public final ResourceLocation ADVANCEMENT_RAPID_SLASH = new ResourceLocation(SlashBlade.modid, "arts/rapid_slash");
-    static public final ResourceLocation ADVANCEMENT_JUDGEMENT_CUT = new ResourceLocation(SlashBlade.modid, "arts/judgement_cut");
-    static public final ResourceLocation ADVANCEMENT_JUDGEMENT_CUT_JUST = new ResourceLocation(SlashBlade.modid, "arts/judgement_cut_just");
-    static public final ResourceLocation ADVANCEMENT_QUICK_CHARGE = new ResourceLocation(SlashBlade.modid, "arts/quick_charge");
+    static public final Identifier ADVANCEMENT_COMBO_A = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/combo_a");
+    static public final Identifier ADVANCEMENT_COMBO_A_EX = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/combo_a_ex");
+    static public final Identifier ADVANCEMENT_COMBO_B = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/combo_b");
+    static public final Identifier ADVANCEMENT_COMBO_B_MAX = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/combo_b_max");
+    static public final Identifier ADVANCEMENT_COMBO_C = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/combo_c");
+    static public final Identifier ADVANCEMENT_AERIAL_A = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/aerial_a");
+    static public final Identifier ADVANCEMENT_AERIAL_B = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/aerial_b");
+    static public final Identifier ADVANCEMENT_UPPERSLASH = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/upperslash");
+    static public final Identifier ADVANCEMENT_UPPERSLASH_JUMP = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/upperslash_jump");
+    static public final Identifier ADVANCEMENT_AERIAL_CLEAVE = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/aerial_cleave");
+    static public final Identifier ADVANCEMENT_RISING_STAR = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/rising_star");
+    static public final Identifier ADVANCEMENT_RAPID_SLASH = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/rapid_slash");
+    static public final Identifier ADVANCEMENT_JUDGEMENT_CUT = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/judgement_cut");
+    static public final Identifier ADVANCEMENT_JUDGEMENT_CUT_JUST = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/judgement_cut_just");
+    static public final Identifier ADVANCEMENT_QUICK_CHARGE = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/quick_charge");
     //=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=-+-=
 
     public static void playQuickSheathSoundAction(LivingEntity e) {
@@ -86,7 +84,7 @@ public class Extra {
             ExMotionLocation, (a)-> {
 
                     EnumSet<InputCommand> commands =
-                            a.getCapability(ComboState.INPUT_STATE).map((state)->state.getCommands(a)).orElseGet(()-> EnumSet.noneOf(InputCommand.class));
+                            SBData.get(a, ComboState.INPUT_STATE).map((state)->state.getCommands(a)).orElseGet(()-> EnumSet.noneOf(InputCommand.class));
 
                     return ex_standbyMap.stream()
                             .filter((entry)->commands.containsAll(entry.getKey()))
@@ -150,7 +148,7 @@ public class Extra {
 
     public static final ComboState EX_COMBO_A3 = new ComboState("ex_combo_a3",100,
             ()->200,()->218,()->1.0f,()->false,()->0,
-            ExMotionLocation, ComboState.TimeoutNext.buildFromFrame(9,(a)-> (a.hasEffect(MobEffects.DAMAGE_BOOST) || a.hasEffect(MobEffects.HUNGER)) ? Extra.EX_COMBO_A4EX : Extra.EX_COMBO_A4) , ()-> Extra.EX_COMBO_A3_END)
+            ExMotionLocation, ComboState.TimeoutNext.buildFromFrame(9,(a)-> (a.hasEffect(MobEffects.STRENGTH) || a.hasEffect(MobEffects.HUNGER)) ? Extra.EX_COMBO_A4EX : Extra.EX_COMBO_A4) , ()-> Extra.EX_COMBO_A3_END)
             .addTickAction(ComboState.TimeLineTickAction.getBuilder()
                     .put(2, (entityIn)->AttackManager.doSlash(entityIn,  -61))
                     .put(6, (entityIn)->AttackManager.doSlash(entityIn,  180-42))
@@ -548,11 +546,11 @@ public class Extra {
                 if(fireTime != elapsed) return;
 
                 EnumSet<InputCommand> commands =
-                        player.getCapability(INPUT_STATE).map((state)->state.getCommands(player)).orElseGet(()-> EnumSet.noneOf(InputCommand.class));
+                        SBData.get(player, INPUT_STATE).map((state)->state.getCommands(player)).orElseGet(()-> EnumSet.noneOf(InputCommand.class));
 
                 if (!commands.containsAll(ex_upperslash_command)) return;
 
-                player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state)->{
+                SBData.get(player.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state)->{
                     state.updateComboSeq(player, Extra.EX_UPPERSLASH_JUMP);
                     AdvancementHelper.grantCriterion(player,ADVANCEMENT_UPPERSLASH_JUMP);
                 });
@@ -578,7 +576,7 @@ public class Extra {
                 entityIn.setDeltaMovement(motion.x, 0.6f, motion.z);
 
                 entityIn.setOnGround(false);
-                entityIn.hasImpulse = true;
+                entityIn.hurtMarked = true;
             })
             .addTickAction(ComboState.TimeLineTickAction.getBuilder()
                     .put(0, (entityIn)->UserPoseOverrider.setRot(entityIn, 90, true))
@@ -628,14 +626,14 @@ public class Extra {
 
                 if(e.onGround()){
                     AttackManager.doSlash(e,  55,Vec3.ZERO, true, true, 1.0, KnockBacks.meteor);
-                    e.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state)->{
+                    SBData.get(e.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state)->{
                         state.updateComboSeq(e,Extra.EX_AERIAL_CLEAVE_LANDING);
                         FallHandler.spawnLandingParticle(e, 20);
                     });
                 }
 
                 if(elapsed == 1){
-                    e.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state)->{
+                    SBData.get(e.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state)->{
                         if(state.getComboSeq() == Extra.EX_AERIAL_CLEAVE){
                             state.updateComboSeq(e,Extra.EX_AERIAL_CLEAVE_LOOP);
                         }
@@ -666,7 +664,7 @@ public class Extra {
 
                 if(e.onGround()){
                     AttackManager.doSlash(e,  55, Vec3.ZERO, true, true, 1.0, KnockBacks.meteor);
-                    e.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state)->{
+                    SBData.get(e.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state)->{
                         state.updateComboSeq(e,Extra.EX_AERIAL_CLEAVE_LANDING);
                         FallHandler.spawnLandingParticle(e, 20);
                     });
@@ -692,18 +690,18 @@ public class Extra {
 
     public static final ComboState EX_RAPID_SLASH = new ComboState("ex_rapid_slash",70,
             ()->2000, ()->2019, ()->1.0f, ()->false,()->0,
-            ExMotionLocation, (a)-> (a.hasEffect(MobEffects.DAMAGE_BOOST) || a.hasEffect(MobEffects.HUNGER)) ? Extra.EX_RAPID_SLASH_QUICK : Extra.EX_RAPID_SLASH, ()-> Extra.EX_RAPID_SLASH_END)
+            ExMotionLocation, (a)-> (a.hasEffect(MobEffects.STRENGTH) || a.hasEffect(MobEffects.HUNGER)) ? Extra.EX_RAPID_SLASH_QUICK : Extra.EX_RAPID_SLASH, ()-> Extra.EX_RAPID_SLASH_END)
             .addHoldAction((e)->{
-                AttributeModifier am = new AttributeModifier("SweepingDamageRatio", -3, AttributeModifier.Operation.ADDITION);
-                AttributeInstance mai = e.getAttribute(ForgeMod.ENTITY_REACH.get());
+                AttributeModifier am = new AttributeModifier(mods.flammpfeil.slashblade.SlashBlade.id("sweeping_damage_ratio"), -3, AttributeModifier.Operation.ADD_VALUE);
+                AttributeInstance mai = e.getAttribute(Attributes.ENTITY_INTERACTION_RANGE);
                 mai.addTransientModifier(am);
                 AttackManager.areaAttack(e, (t)->{
-                        boolean isRightDown = e.getCapability(INPUT_STATE)
+                        boolean isRightDown = SBData.get(e, INPUT_STATE)
                                 .map((state)->state.getCommands().contains(InputCommand.R_DOWN))
                                 .orElse(false);
 
                         if(isRightDown) {
-                            e.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+                            SBData.get(e.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
                                 if (state.getComboSeq() == Extra.EX_RAPID_SLASH) {
                                     List<Entity> hits = AttackManager.areaAttack(e, KnockBacks.toss.action,0.01f,true,true,true);
 
@@ -735,7 +733,7 @@ public class Extra {
                     if(elapsed % 2 == 0)
                         roll += 180;
 
-                    boolean critical = e.hasEffect(MobEffects.DAMAGE_BOOST);
+                    boolean critical = e.hasEffect(MobEffects.STRENGTH);
 
                     AttackManager.doSlash(e,  roll, genRushOffset(e), false, critical, rushDamageBase);
                 }
@@ -773,7 +771,7 @@ public class Extra {
             .setClickAction((entityIn)->{
                 entityIn.setDeltaMovement(0, 0.6, 0);
                 entityIn.setOnGround(false);
-                entityIn.hasImpulse = true;
+                entityIn.hurtMarked = true;
                 AttackManager.doSlash(entityIn,  -57,Vec3.ZERO, false, false, 1.0, KnockBacks.toss);
             })
             .addTickAction(ComboState.TimeLineTickAction.getBuilder()
@@ -804,7 +802,7 @@ public class Extra {
                                 yMotion = 0.6;
 
                                 entityIn.setOnGround(false);
-                                entityIn.hasImpulse = true;
+                                entityIn.hurtMarked = true;
                             }
 
                             entityIn.setDeltaMovement(0, yMotion, 0);
@@ -823,6 +821,12 @@ public class Extra {
 
     //------------------------------------------------------------------------
 
+    public static final ComboState EX_SUPER_SA = new ComboState("ex_super_sa",40,
+            ()->1900,()->1945,()->1.0f,()->false,()->0,
+            ExMotionLocation, a->Extra.EX_SUPER_SA, ()->Extra.EX_JUDGEMENT_CUT_SHEATH)
+            .addTickAction(FallHandler::fallResist)
+            .addTickAction(UserPoseOverrider::resetRot);
+
     public static final ComboState EX_JUDGEMENT_CUT = new ComboState("ex_judgement_cut",50,
             ()->1900,()->1923,()->1.0f,()->false,()->0,
             ExMotionLocation, (a)-> Extra.EX_JUDGEMENT_CUT, ()->Extra.EX_JUDGEMENT_CUT_SLASH)
@@ -831,7 +835,7 @@ public class Extra {
                 long elapsed = ComboState.getElapsed(e);
 
                 if(elapsed == 0){
-                    e.playSound(SoundEvents.TRIDENT_THROW, 0.80F, 0.625F + 0.1f * e.getRandom().nextFloat());
+                    e.playSound(SoundEvents.TRIDENT_THROW.value(), 0.80F, 0.625F + 0.1f * e.getRandom().nextFloat());
                     AdvancementHelper.grantCriterion(e,ADVANCEMENT_JUDGEMENT_CUT);
                 }
 
@@ -919,7 +923,7 @@ public class Extra {
             .addTickAction(ComboState.TimeLineTickAction.getBuilder().put(0,Extra::playQuickSheathSoundAction).build())
             .setReleaseAction(ComboState::releaseActionQuickCharge);
 
-    public static final ComboState EX_JUDGEMENT_CUT_SLASH_JUST = new ComboState("ex_judgement_cut_slash_just2",45,
+    public static final ComboState EX_JUDGEMENT_CUT_SLASH_JUST = new ComboState("ex_judgement_cut_slash_just",45,
             ()->1923,()->1928,()->1.0f,()->false,()->0,
             ExMotionLocation, (a)-> Extra.EX_JUDGEMENT_CUT_SLASH_JUST, ()->Extra.EX_JUDGEMENT_CUT_SLASH_JUST2)
             .addTickAction(ComboState.TimeLineTickAction.getBuilder().put(0, JudgementCut::doJudgementCutJust).build())
@@ -948,7 +952,7 @@ public class Extra {
             ()->2200,()->2277,()->1.0f,()->false,()->0,
             ExMotionLocation, (a)-> Extra.EX_VOID_SLASH, ()->Extra.EX_VOID_SLASH_SHEATH)
             .addTickAction(ComboState.TimeLineTickAction.getBuilder().put(28, (living)->{
-                if(living.level().isClientSide){
+                if(living.level().isClientSide()){
                     Vec3 pos = living.position()
                             .add(0.0D, (double)living.getEyeHeight() * 0.75D, 0.0D)
                             .add(living.getLookAngle().scale(0.3f));
@@ -957,7 +961,7 @@ public class Extra {
                         @Override
                         protected void tryDespawn() {
                             if(this.getShooter() != null){
-                                long timeout = this.getShooter().getPersistentData().getLong(ItemSlashBlade.BREAK_ACTION_TIMEOUT);
+                                long timeout = this.getShooter().getPersistentData().getLongOr(ItemSlashBlade.BREAK_ACTION_TIMEOUT, 0L);
                                 if(timeout <= this.level().getGameTime() || timeout == 0){
                                     this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 0.80F, 0.625F + 0.1f * this.random.nextFloat());
 
@@ -974,7 +978,7 @@ public class Extra {
                     jc.setYRot(living.getYRot());
                     jc.setXRot(0);
 
-                    int colorCode = living.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE)
+                    int colorCode = SBData.get(living.getMainHandItem(), ItemSlashBlade.BLADESTATE)
                             .map(state->state.getColorCode())
                             .orElseGet(()->0xFFFFFF);
                     jc.setColor(colorCode);

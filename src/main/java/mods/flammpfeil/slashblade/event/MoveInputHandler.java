@@ -1,5 +1,9 @@
 package mods.flammpfeil.slashblade.event;
 
+import mods.flammpfeil.slashblade.compat.SBItemData;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import mods.flammpfeil.slashblade.compat.SBData;
+import mods.flammpfeil.slashblade.compat.StateKey;
 import com.google.gson.*;
 import mods.flammpfeil.slashblade.capability.inputstate.IInputState;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
@@ -11,22 +15,19 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.settings.KeyConflictContext;
-import net.minecraftforge.client.settings.KeyModifier;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.settings.KeyConflictContext;
+import net.neoforged.neoforge.client.settings.KeyModifier;
+
+import net.neoforged.bus.api.SubscribeEvent;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 import java.util.EnumSet;
 
 public class MoveInputHandler {
 
-    public static final Capability<IInputState> INPUT_STATE = CapabilityManager.get(new CapabilityToken<>(){});
+    public static final StateKey<IInputState> INPUT_STATE = StateKey.of(IInputState.class);
 
     public static final String LAST_CHANGE_TIME = "SB_LAST_CHANGE_TIME";
 
@@ -35,27 +36,29 @@ public class MoveInputHandler {
     }
 
 
-    @OnlyIn(Dist.CLIENT)
     @SubscribeEvent()
-    static public void onPlayerPostTick(TickEvent.PlayerTickEvent event){
-        if(event.phase != TickEvent.Phase.END) return;
+    static public void onPlayerPostTick(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event){
 
-        if(!(event.player instanceof LocalPlayer)) return;
+        if(!(event.getEntity() instanceof LocalPlayer)) return;
 
-        LocalPlayer player = (LocalPlayer)event.player;
+        LocalPlayer player = (LocalPlayer)event.getEntity();
+
+        for (ItemStack held : player.getInventory()) {
+            if (held.getItem() instanceof ItemSlashBlade blade) blade.tickInventory(held, player.level(), player, held == player.getMainHandItem());
+        }
 
         EnumSet<InputCommand> commands = EnumSet.noneOf(InputCommand.class);
 
-        if(player.input.up)
+        if(player.input.keyPresses.forward())
             commands.add(InputCommand.FORWARD);
-        if(player.input.down)
+        if(player.input.keyPresses.backward())
             commands.add(InputCommand.BACK);
-        if(player.input.left)
+        if(player.input.keyPresses.left())
             commands.add(InputCommand.LEFT);
-        if(player.input.right)
+        if(player.input.keyPresses.right())
             commands.add(InputCommand.RIGHT);
 
-        if(player.input.shiftKeyDown)
+        if(player.input.keyPresses.shift())
             commands.add(InputCommand.SNEAK);
 
         if(Minecraft.getInstance().options.keySprint.isDown())
@@ -86,20 +89,23 @@ public class MoveInputHandler {
         if(Minecraft.getInstance().options.keyPickItem.isDown())
             commands.add(InputCommand.M_DOWN);
 
+        if (mods.flammpfeil.slashblade.client.SlashBladeKeys.SUPER_SA.isDown())
+            commands.add(InputCommand.STYLE);
+
 
         if(Minecraft.getInstance().options.keySaveHotbarActivator.isDown())
             commands.add(InputCommand.SAVE_TOOLBAR);
 
-        EnumSet<InputCommand> old = player.getCapability(INPUT_STATE)
+        EnumSet<InputCommand> old = SBData.get(player, INPUT_STATE)
                 .map((state)->state.getCommands())
                 .orElseGet(()->EnumSet.noneOf(InputCommand.class));
 
-        Level worldIn = player.getCommandSenderWorld();
+        Level worldIn = player.level();
 
         /*
-        if(player.movementInput.forwardKeyDown &&  (0 < (player.getPersistentData().getInt(KEY) & MoveCommandMessage.SNEAK)))
+        if(player.movementInput.forwardKeyDown &&  (0 < (player.getPersistentData().getIntOr(KEY, 0) & MoveCommandMessage.SNEAK)))
             player.getPersistentData().putLong("SB.MCS.F",currentTime);
-        if(player.movementInput.backKeyDown &&  (0 < (player.getPersistentData().getInt(KEY) & MoveCommandMessage.SNEAK)))
+        if(player.movementInput.backKeyDown &&  (0 < (player.getPersistentData().getIntOr(KEY, 0) & MoveCommandMessage.SNEAK)))
             player.getPersistentData().putLong("SB.MCS.B",currentTime);
         */
 
@@ -115,62 +121,24 @@ public class MoveInputHandler {
                 str = AdvancementBuilder.getAdvancementJsonStr(stack);
             }else{
 
-                ret.addProperty("item", ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
-                if (stack.getCount() != 1)
-                    ret.addProperty("count", stack.getCount());
-
-                CompoundTag tag = new CompoundTag();
-                stack.save(tag);
-
-                CompoundTag nbt = stack.getOrCreateTag().copy();
-                if(tag.contains("ForgeCaps"))
-                    nbt.put("ForgeCaps", tag.get("ForgeCaps"));
-
-                if(KeyModifier.ALT.isActive(KeyConflictContext.UNIVERSAL)){
-                    //add anvilcrafting recipe template
-                    AnvilCraftingRecipe acr = new AnvilCraftingRecipe();
-
-                    ItemStack result = player.getOffhandItem();
-                    acr.setResult(result);
-
-                    nbt.put("RequiredBlade",acr.writeNBT());
+                ItemStack exported = stack.copy();
+                if (KeyModifier.ALT.isActive(KeyConflictContext.UNIVERSAL)) {
+                    AnvilCraftingRecipe recipe = new AnvilCraftingRecipe();
+                    recipe.setResult(player.getOffhandItem());
+                    SBItemData.put(exported, "RequiredBlade", recipe.writeNBT());
                 }
-
-                if(KeyModifier.CONTROL.isActive(KeyConflictContext.UNIVERSAL)){
-                    //add anvilcrafting recipe template
-                    ItemStack result = player.getMainHandItem();
-
-                    CompoundTag iconNbt = result.save(new CompoundTag());
-
-                    ret.addProperty("iconStr_nbt",iconNbt.toString());
-
-
-                    JsonObject criteriaitem = new JsonObject();
-                    criteriaitem.addProperty("item", ForgeRegistries.ITEMS.getKey(result.getItem()).toString());
-
-                    CompoundTag checktarget = new CompoundTag();
-                    {
-                        NBTHelper.NBTCoupler nbtc = NBTHelper.getNBTCoupler(checktarget)
-                                .getChild("ForgeCaps")
-                                .getChild("slashblade:bladestate")
-                                .getChild("State");
-
-                        result.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(s->{
-                            if(s.isBroken())
-                                nbtc.put("isBroken",s.isBroken());
-                            if(s.getTranslationKey() != null || !s.getTranslationKey().isEmpty())
-                                nbtc.put("translationKey",s.getTranslationKey());
-                        });
-                    }
-                    criteriaitem.addProperty("nbt",checktarget.toString());
-                    ret.add("CriteriaItem", criteriaitem);
+                ret = SBItemData.toJson(exported);
+                if (KeyModifier.CONTROL.isActive(KeyConflictContext.UNIVERSAL)) {
+                    JsonObject expected = new JsonObject();
+                    SBData.get(stack, ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+                        expected.addProperty("translationKey", state.getTranslationKey());
+                        if (state.isBroken()) expected.addProperty("isBroken", 1);
+                    });
+                    JsonObject predicates = new JsonObject(); predicates.add("slashblade:blade", expected);
+                    JsonObject item = new JsonObject();
+                    item.addProperty("items", BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
+                    item.add("predicates", predicates); ret.add("CriteriaItem", item);
                 }
-
-                JsonElement element = null;
-                element = (new JsonParser()).parse(JSONUtil.NBTtoJsonString(nbt));
-
-                if (stack.getTag() != null && element != null)
-                    ret.add("nbt", element);
 
                 Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
                 str = GSON.toJson(ret);
@@ -183,7 +151,7 @@ public class MoveInputHandler {
         boolean doSend = !old.equals(commands);
 
         if(doSend){
-            player.getCapability(INPUT_STATE)
+            SBData.get(player, INPUT_STATE)
                     .ifPresent((state)->{
                         commands.forEach(c->{
                             if(!old.contains(c))
@@ -195,7 +163,7 @@ public class MoveInputHandler {
                     });
             MoveCommandMessage msg = new MoveCommandMessage();
             msg.command = EnumSetConverter.convertToInt(commands);
-            NetworkManager.INSTANCE.sendToServer(msg);
+            ClientPacketDistributor.sendToServer(msg);
         }
     }
 }

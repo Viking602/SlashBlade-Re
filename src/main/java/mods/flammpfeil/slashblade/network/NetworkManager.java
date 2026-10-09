@@ -1,50 +1,16 @@
 package mods.flammpfeil.slashblade.network;
 
-import mods.flammpfeil.slashblade.SlashBlade;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 public class NetworkManager {
 
-    private static final String PROTOCOL_VERSION = "1";
-
-    public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(SlashBlade.modid, "main"),
-            () -> PROTOCOL_VERSION,
-            PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals
-    );
-
-    public static void register(){
-        int id = 0;
-        INSTANCE.registerMessage(id++,
-                MoveCommandMessage.class,
-                MoveCommandMessage::encode,
-                MoveCommandMessage::decode,
-                MoveCommandMessage::handle
-        );
-
-        INSTANCE.registerMessage(id++,
-                ActiveStateSyncMessage.class,
-                ActiveStateSyncMessage::encode,
-                ActiveStateSyncMessage::decode,
-                ActiveStateSyncMessage::handle
-        );
-
-        INSTANCE.registerMessage(id++,
-                RankSyncMessage.class,
-                RankSyncMessage::encode,
-                RankSyncMessage::decode,
-                RankSyncMessage::handle
-        );
-
-        INSTANCE.registerMessage(id++,
-                MotionBroadcastMessage.class,
-                MotionBroadcastMessage::encode,
-                MotionBroadcastMessage::decode,
-                MotionBroadcastMessage::handle
-        );
+    public static void register(RegisterPayloadHandlersEvent event){
+        var registrar = event.registrar("26.1.2-2");
+        registrar.playToServer(BladeAttackMessage.TYPE,BladeAttackMessage.STREAM_CODEC,BladeAttackMessage::handle);
+        registrar.playToServer(MoveCommandMessage.TYPE, MoveCommandMessage.STREAM_CODEC, MoveCommandMessage::handle);
+        registrar.playToClient(ActiveStateSyncMessage.TYPE, ActiveStateSyncMessage.STREAM_CODEC);
+        registrar.playToClient(RankSyncMessage.TYPE, RankSyncMessage.STREAM_CODEC);
+        registrar.playToClient(MotionBroadcastMessage.TYPE, MotionBroadcastMessage.STREAM_CODEC);
     }
 
 }

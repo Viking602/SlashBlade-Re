@@ -1,0 +1,78 @@
+{
+  "display": {
+    "title": {
+      "translate": "item.slashblade.ex.muramasa"
+    },
+    "description": {
+      "translate": "item.slashblade.ex.muramasa.desc"
+    },
+    "icon": {
+      "id": "slashblade:slashblade",
+      "components": {
+        "slashblade:blade_state": {
+          "isSealed": 1,
+          "isNoScabbard": 0,
+          "translationKey": "item.slashblade.ex.muramasa",
+          "isDestructable": 0,
+          "HasShield": 0,
+          "SummonedSwordColor": -3355647,
+          "lastActionTime": 0,
+          "_onClick": 0,
+          "fallDecreaseRate": 0.0,
+          "currentCombo": "arts_rapid_slash",
+          "killCount": 0,
+          "isCharged": 0,
+          "RepairCounter": 0,
+          "Damage": 0.0,
+          "rarityType": 0,
+          "ComboRoot": "standby",
+          "adjustXYZ": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "lastPosHash": "",
+          "RangeAttackType": "none",
+          "isDefaultBewitched": 0,
+          "AttackAmplifier": 0.0,
+          "TargetEntity": -1,
+          "SpecialAttackType": "none",
+          "TextureName": "slashblade:model/named/muramasa/muramasa.png",
+          "ModelName": "slashblade:model/named/muramasa/muramasa.obj",
+          "SummonedSwordColorInverse": 0,
+          "isBroken": 0,
+          "baseAttackModifier": 2.0,
+          "StandbyRenderType": 0,
+          "ComboRootAir": "standby_inair"
+        },
+        "minecraft:rarity": "common",
+        "minecraft:custom_data": {
+          "Crafting": "slashblade:ex/muramasa"
+        }
+      }
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "parent": "slashblade:blade/s_iron",
+  "criteria": {
+    "crafting": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "slashblade:slashblade"
+            ],
+            "predicates": {
+              "slashblade:blade": {
+                "translationKey": "item.slashblade.ex.muramasa",
+                "isBroken": 0
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

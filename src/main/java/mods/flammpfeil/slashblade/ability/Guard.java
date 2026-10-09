@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.ability;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
 import mods.flammpfeil.slashblade.capability.concentrationrank.IConcentrationRank;
@@ -12,7 +13,7 @@ import mods.flammpfeil.slashblade.capability.slashblade.combo.Extra;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.util.AdvancementHelper;
 import mods.flammpfeil.slashblade.util.InputCommand;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -24,10 +25,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import mods.flammpfeil.slashblade.compat.LazyOptional;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 import java.util.EnumSet;
 
@@ -44,29 +45,29 @@ public class Guard {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
-    static public final ResourceLocation ADVANCEMENT_GUARD = new ResourceLocation(SlashBlade.modid, "abilities/guard");
-    static public final ResourceLocation ADVANCEMENT_GUARD_JUST = new ResourceLocation(SlashBlade.modid, "abilities/guard_just");
+    static public final Identifier ADVANCEMENT_GUARD = Identifier.fromNamespaceAndPath(SlashBlade.modid, "abilities/guard");
+    static public final Identifier ADVANCEMENT_GUARD_JUST = Identifier.fromNamespaceAndPath(SlashBlade.modid, "abilities/guard_just");
 
     final static EnumSet<InputCommand> move = EnumSet.of(InputCommand.FORWARD, InputCommand.BACK, InputCommand.LEFT, InputCommand.RIGHT);
 
     @SubscribeEvent
-    public void onLivingAttack(LivingAttackEvent event){
+    public void onLivingAttack(LivingIncomingDamageEvent event){
         LivingEntity victim = event.getEntity();
         DamageSource source = event.getSource();
 
         //begin executable check -----------------
         //item check
         ItemStack stack = victim.getMainHandItem();
-        LazyOptional<ISlashBladeState> slashBlade = stack.getCapability(CapabilitySlashBlade.BLADESTATE);
+        LazyOptional<ISlashBladeState> slashBlade = SBData.get(stack, CapabilitySlashBlade.BLADESTATE);
         if(!slashBlade.isPresent()) return;
         if(slashBlade.filter(b->b.isBroken()).isPresent()) return;
 
         //user check
         if(!victim.onGround()) return;
-        LazyOptional<IInputState> input = victim.getCapability(CapabilityInputState.INPUT_STATE);
+        LazyOptional<IInputState> input = SBData.get(victim, CapabilityInputState.INPUT_STATE);
         if(!input.isPresent()) return;
 
         //commanc check
@@ -95,7 +96,7 @@ public class Guard {
         }).get();
         long timeCurrent = victim.level().getGameTime();
 
-        int soulSpeedLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.SOUL_SPEED,victim);
+        int soulSpeedLevel = mods.flammpfeil.slashblade.compat.SBEnchantments.livingLevel(Enchantments.SOUL_SPEED,victim);
         int justAcceptancePeriod = 3 + soulSpeedLevel;
 
         boolean isJust = false;
@@ -106,7 +107,7 @@ public class Guard {
 
         //rank check
         boolean isHighRank = false;
-        LazyOptional<IConcentrationRank> rank = victim.getCapability(CapabilityConcentrationRank.RANK_POINT);
+        LazyOptional<IConcentrationRank> rank = SBData.get(victim, CapabilityConcentrationRank.RANK_POINT);
         if(rank.filter(r-> IConcentrationRank.ConcentrationRanks.S.level <= r.getRank(timeCurrent).level).isPresent())
             isHighRank = true;
 
@@ -160,7 +161,7 @@ public class Guard {
 
         //play sound
         if(victim instanceof Player){
-            victim.playSound(SoundEvents.TRIDENT_HIT_GROUND, 1.0F, 1.0F + victim.level().random.nextFloat() * 0.4F);
+            victim.playSound(SoundEvents.TRIDENT_HIT_GROUND, 1.0F, 1.0F + victim.level().getRandom().nextFloat() * 0.4F);
         }
 
         //advancement

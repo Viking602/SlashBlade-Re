@@ -1,14 +1,15 @@
 package mods.flammpfeil.slashblade.event;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.client.renderer.model.BladeModelManager;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class KillCounter {
     private static final class SingletonHolder {
@@ -19,7 +20,7 @@ public class KillCounter {
     }
     private KillCounter(){}
     public void register(){
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -32,7 +33,7 @@ public class KillCounter {
         if(stack.isEmpty()) return;
         if(!(stack.getItem() instanceof ItemSlashBlade)) return;
 
-        stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state->{
+        SBData.get(stack, ItemSlashBlade.BLADESTATE).ifPresent(state->{
             state.setKillCount(state.getKillCount() + 1);
         });
     }

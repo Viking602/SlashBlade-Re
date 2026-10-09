@@ -23,3 +23,7 @@ run
 
 # Files from Forge MDK
 forge*changelog.txt
+
+# Python port/bootstrap helper caches
+__pycache__/
+*.pyc

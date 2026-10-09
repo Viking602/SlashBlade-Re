@@ -1,0 +1,72 @@
+{
+  "display": {
+    "title": {
+      "translate": "adv.slashblade.imitation_broken"
+    },
+    "description": {
+      "translate": "adv.slashblade.imitation_broken.desc"
+    },
+    "icon": {
+      "id": "slashblade:slashblade",
+      "components": {
+        "slashblade:blade_state": {
+          "isSealed": 1,
+          "isNoScabbard": 0,
+          "translationKey": "item.slashblade.simple.silverbamboo",
+          "isDestructable": 0,
+          "HasShield": 0,
+          "SummonedSwordColor": -3355647,
+          "lastActionTime": 0,
+          "_onClick": 0,
+          "fallDecreaseRate": 0.0,
+          "currentCombo": "arts_rapid_slash",
+          "killCount": 0,
+          "isCharged": 0,
+          "RepairCounter": 0,
+          "Damage": 1.0,
+          "rarityType": 0,
+          "ComboRoot": "standby",
+          "adjustXYZ": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "lastPosHash": "",
+          "RangeAttackType": "none",
+          "isDefaultBewitched": 0,
+          "AttackAmplifier": 0.0,
+          "TargetEntity": -1,
+          "SpecialAttackType": "none",
+          "TextureName": "slashblade:model/silverbamboo.png",
+          "SummonedSwordColorInverse": 0,
+          "isBroken": 1,
+          "baseAttackModifier": 2.0,
+          "StandbyRenderType": 0,
+          "ComboRootAir": "standby_inair"
+        },
+        "minecraft:rarity": "common"
+      }
+    },
+    "frame": "task",
+    "hidden": true
+  },
+  "parent": "slashblade:blade/s_silverbamboo",
+  "criteria": {
+    "broken_edge": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "items": [
+            "slashblade:slashblade"
+          ],
+          "nbt": "{ShareTag:{translationKey:\"item.slashblade.simple.silverbamboo\"}}"
+        }
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "slashblade:ex/ruby"
+    ]
+  }
+}

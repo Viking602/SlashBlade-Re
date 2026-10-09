@@ -41,6 +41,7 @@ package jp.nyatla.nymmd.types;
 
 public class BoneKeyFrame
 {
+	public final int[] interpolation = {20,20,20,20,20,20,20,20,107,107,107,107,107,107,107,107};
 	public float fFrameNo;		// フレーム番号
 	public final MmdVector3	vec3Position=new MmdVector3();	// 位置
 	public final MmdVector4	vec4Rotate=new MmdVector4();	// 回転(クォータニオン)

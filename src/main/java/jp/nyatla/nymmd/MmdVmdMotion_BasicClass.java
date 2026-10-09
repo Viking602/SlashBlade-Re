@@ -308,6 +308,7 @@ public class MmdVmdMotion_BasicClass
 					pKeyFrame.fFrameNo     = (float)tmp_vmd_motion[i].ulFrameNo;
 					pKeyFrame.vec3Position.setValue(tmp_vmd_motion[i].vec3Position);
 					pKeyFrame.vec4Rotate.QuaternionNormalize(tmp_vmd_motion[i].vec4Rotate);
+					System.arraycopy(tmp_vmd_motion[i].cInterpolation1, 0, pKeyFrame.interpolation, 0, 16);
 
 					pMotTemp.ulNumKeyFrames++;
 

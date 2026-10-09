@@ -1,9 +1,9 @@
 package mods.flammpfeil.slashblade.init;
 
 import mods.flammpfeil.slashblade.SlashBlade;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface DefaultResources{
-    ResourceLocation BaseMotionLocation = new ResourceLocation(SlashBlade.modid, "combostate/old_motion.vmd");
-    ResourceLocation ExMotionLocation = new ResourceLocation(SlashBlade.modid, "combostate/motion.vmd");
+    Identifier BaseMotionLocation = Identifier.fromNamespaceAndPath(SlashBlade.modid, "combostate/old_motion.vmd");
+    Identifier ExMotionLocation = Identifier.fromNamespaceAndPath(SlashBlade.modid, "combostate/motion.vmd");
 }

@@ -6,12 +6,12 @@ import mods.flammpfeil.slashblade.network.MotionBroadcastMessage;
 import mods.flammpfeil.slashblade.network.NetworkManager;
 import mods.flammpfeil.slashblade.network.RankSyncMessage;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class BladeMotionEventBroadcaster {
 
@@ -23,7 +23,7 @@ public class BladeMotionEventBroadcaster {
     }
     private BladeMotionEventBroadcaster(){}
     public void register(){
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
@@ -38,7 +38,7 @@ public class BladeMotionEventBroadcaster {
 
         //if(msg.combo == Extra.EX_JUDGEMENT_CUT.getName())
         {
-            NetworkManager.INSTANCE.send(PacketDistributor.NEAR.with(()->new PacketDistributor.TargetPoint(sp.getX(), sp.getY(),sp.getZ(), 20, sp.serverLevel().dimension())), msg);
+            PacketDistributor.sendToPlayersNear(sp.level(), null, sp.getX(), sp.getY(), sp.getZ(), 20, msg);
         }
 
     }

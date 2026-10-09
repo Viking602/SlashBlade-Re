@@ -16,7 +16,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PlayMessages;
 
 import java.util.List;
 
@@ -30,10 +29,10 @@ public class EntityStormSwords extends EntityAbstractSummonedSword{
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
 
-        this.entityData.define(IT_FIRED, false);
+        builder.define(IT_FIRED, false);
     }
 
     public void doFire(){
@@ -43,7 +42,7 @@ public class EntityStormSwords extends EntityAbstractSummonedSword{
         return this.getEntityData().get(IT_FIRED);
     }
 
-    public static EntityStormSwords createInstance(PlayMessages.SpawnEntity packet, Level worldIn){
+    public static EntityStormSwords createInstance(net.minecraft.network.protocol.game.ClientboundAddEntityPacket packet, Level worldIn){
         return new EntityStormSwords(SlashBlade.RegistryEvents.StormSwords, worldIn);
     }
 
@@ -51,8 +50,8 @@ public class EntityStormSwords extends EntityAbstractSummonedSword{
     public void rideTick(){
         if(itFired()){
             faceEntityStandby();
-            Entity target = getVehicle();
-            this.stopRiding();
+            Entity target = getFormationHost();
+            this.stopFormation();
 
             this.tickCount = 0;
             Vec3 dir = this.getViewVector(1.0f);
@@ -65,11 +64,11 @@ public class EntityStormSwords extends EntityAbstractSummonedSword{
 
         //this.startRiding()
         this.setDeltaMovement(Vec3.ZERO);
-        if (canUpdate())
+        if (!isRemoved())
             this.baseTick();
 
         faceEntityStandby();
-        //this.getVehicle().positionRider(this);
+        //this.getFormationHost().positionRider(this);
 
         //todo: add lifetime
         if(20 <= this.tickCount)
@@ -100,10 +99,10 @@ public class EntityStormSwords extends EntityAbstractSummonedSword{
             }
         }
 
-        if (raytraceresult != null && raytraceresult.getType() == HitResult.Type.ENTITY && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
+        if (raytraceresult != null && raytraceresult.getType() == HitResult.Type.ENTITY && !net.neoforged.neoforge.event.EventHooks.onProjectileImpact(this, raytraceresult)) {
             this.onHit(raytraceresult);
             this.resetAlreadyHits();
-            this.hasImpulse = true;
+            this.hurtMarked = true;
         }
     }
 
@@ -111,7 +110,7 @@ public class EntityStormSwords extends EntityAbstractSummonedSword{
 
         long cycle = 5 + this.tickCount;
         long tickOffset = 0;
-        if(this.level().isClientSide)
+        if(this.level().isClientSide())
             tickOffset = 1;
 
         //int ticks = (int)((this.level().getGameTime() + tickOffset) % cycle);
@@ -135,9 +134,9 @@ public class EntityStormSwords extends EntityAbstractSummonedSword{
         dir = dir.yRot((float)-yaw);
         dir = dir.normalize().scale(4);
 
-        if (this.getVehicle() != null) {
-            dir = dir.add(this.getVehicle().position());
-            dir = dir.add(0, this.getVehicle().getEyeHeight() / 2.0, 0);
+        if (this.getFormationHost() != null) {
+            dir = dir.add(this.getFormationHost().position());
+            dir = dir.add(0, this.getFormationHost().getEyeHeight() / 2.0, 0);
         }
 
         this.xRotO = this.getXRot();

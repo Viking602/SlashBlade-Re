@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.ability;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
 import mods.flammpfeil.slashblade.capability.concentrationrank.IConcentrationRank;
@@ -9,11 +10,11 @@ import mods.flammpfeil.slashblade.entity.*;
 import mods.flammpfeil.slashblade.event.InputCommandEvent;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.util.*;
-import net.minecraft.client.player.Input;
+import net.minecraft.client.player.ClientInput;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
 import net.minecraft.network.protocol.game.VecDeltaCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -22,15 +23,15 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.level.timers.TimerCallback;
-import net.minecraft.world.level.timers.TimerQueue;
+import mods.flammpfeil.slashblade.event.Scheduler.Callback;
+import mods.flammpfeil.slashblade.event.Scheduler;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.SubscribeEvent;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -50,15 +51,15 @@ public class SummonedSwordArts {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
 
-    static public final ResourceLocation ADVANCEMENT_SUMMONEDSWORDS = new ResourceLocation(SlashBlade.modid, "arts/shooting/summonedswords");
-    static public final ResourceLocation ADVANCEMENT_SPIRAL_SWORDS = new ResourceLocation(SlashBlade.modid, "arts/shooting/spiral_swords");
-    static public final ResourceLocation ADVANCEMENT_STORM_SWORDS = new ResourceLocation(SlashBlade.modid, "arts/shooting/storm_swords");
-    static public final ResourceLocation ADVANCEMENT_BLISTERING_SWORDS = new ResourceLocation(SlashBlade.modid, "arts/shooting/blistering_swords");
-    static public final ResourceLocation ADVANCEMENT_HEAVY_RAIN_SWORDS = new ResourceLocation(SlashBlade.modid, "arts/shooting/heavy_rain_swords");
+    static public final Identifier ADVANCEMENT_SUMMONEDSWORDS = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/shooting/summonedswords");
+    static public final Identifier ADVANCEMENT_SPIRAL_SWORDS = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/shooting/spiral_swords");
+    static public final Identifier ADVANCEMENT_STORM_SWORDS = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/shooting/storm_swords");
+    static public final Identifier ADVANCEMENT_BLISTERING_SWORDS = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/shooting/blistering_swords");
+    static public final Identifier ADVANCEMENT_HEAVY_RAIN_SWORDS = Identifier.fromNamespaceAndPath(SlashBlade.modid, "arts/shooting/heavy_rain_swords");
 
     @SubscribeEvent
     public void onInputChange(InputCommandEvent event) {
@@ -78,17 +79,17 @@ public class SummonedSwordArts {
         //basic summoned swords
         if(onDown){
 
-            sender.getCapability(CapabilityInputState.INPUT_STATE).ifPresent(input-> {
+            SBData.get(sender, CapabilityInputState.INPUT_STATE).ifPresent(input-> {
                 //SpiralSwords command
-                input.getScheduler().schedule("SpiralSwords", pressTime + 10, new TimerCallback<LivingEntity>() {
+                input.getScheduler().schedule("SpiralSwords", pressTime + 10, new Callback<LivingEntity>() {
 
                     @Override
-                    public void handle(LivingEntity rawEntity, TimerQueue<LivingEntity> queue, long now) {
+                    public void handle(LivingEntity rawEntity, Scheduler queue, long now) {
                         if (!(rawEntity instanceof ServerPlayer)) return;
                         ServerPlayer entity = (ServerPlayer) rawEntity;
 
                         InputCommand targetCommnad = InputCommand.M_DOWN;
-                        boolean inputSucceed = entity.getCapability(CapabilityInputState.INPUT_STATE).filter(input ->
+                        boolean inputSucceed = SBData.get(entity, CapabilityInputState.INPUT_STATE).filter(input ->
                                 input.getCommands().contains(targetCommnad)
                                         && (!InputCommand.anyMatch(input.getCommands(), InputCommand.move) || !input.getCommands().contains(InputCommand.SNEAK))
                                         && input.getLastPressTime(targetCommnad) == pressTime).isPresent();
@@ -96,18 +97,18 @@ public class SummonedSwordArts {
 
 
                         //spiralSwords
-                        boolean alreadySummoned = entity.getPassengers().stream().anyMatch(e -> e instanceof EntitySpiralSwords);
+                        boolean alreadySummoned = EntityAbstractSummonedSword.formationSwords(entity).stream().anyMatch(e -> e instanceof EntitySpiralSwords);
 
                         if (alreadySummoned) {
                             //fire
-                            List<Entity> list = entity.getPassengers().stream().filter(e -> e instanceof EntitySpiralSwords).toList();
+                            List<EntityAbstractSummonedSword> list = EntityAbstractSummonedSword.formationSwords(entity).stream().filter(e -> e instanceof EntitySpiralSwords).toList();
 
                             list.stream().forEach(e -> {
                                 ((EntitySpiralSwords) e).doFire();
                             });
                         } else {
                             //summon
-                            entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+                            SBData.get(entity.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
 
                                 if (entity.experienceLevel <= 0) return;
 
@@ -118,7 +119,7 @@ public class SummonedSwordArts {
 
                                 Level worldIn = entity.level();
 
-                                int rank = entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
+                                int rank = SBData.get(entity, CapabilityConcentrationRank.RANK_POINT)
                                         .map(r->r.getRank(worldIn.getGameTime()).level)
                                         .orElse(0);
 
@@ -138,11 +139,11 @@ public class SummonedSwordArts {
                                     ss.setRoll(0);
 
                                     //force riding
-                                    ss.startRiding(entity, true);
+                                    ss.startFormation(entity);
 
                                     ss.setDelay(360 / count * i);
 
-                                    entity.playNotifySound(SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.2F, 1.45F);
+                                    mods.flammpfeil.slashblade.compat.SBEffects.notifySound(entity, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.2F, 1.45F);
                                 }
                             });
                         }
@@ -151,15 +152,15 @@ public class SummonedSwordArts {
 
 
                 //StormSwords command
-                input.getScheduler().schedule("StormSwords", pressTime + 10, new TimerCallback<LivingEntity>() {
+                input.getScheduler().schedule("StormSwords", pressTime + 10, new Callback<LivingEntity>() {
 
                     @Override
-                    public void handle(LivingEntity rawEntity, TimerQueue<LivingEntity> queue, long now) {
+                    public void handle(LivingEntity rawEntity, Scheduler queue, long now) {
                         if (!(rawEntity instanceof ServerPlayer)) return;
                         ServerPlayer entity = (ServerPlayer) rawEntity;
 
                         InputCommand targetCommnad = InputCommand.M_DOWN;
-                        boolean inputSucceed = entity.getCapability(CapabilityInputState.INPUT_STATE).filter(input ->
+                        boolean inputSucceed = SBData.get(entity, CapabilityInputState.INPUT_STATE).filter(input ->
                                 input.getCommands().contains(targetCommnad)
                                         && input.getCommands().contains(InputCommand.SNEAK)
                                         && input.getCommands().contains(InputCommand.BACK)
@@ -169,7 +170,7 @@ public class SummonedSwordArts {
 
 
                         //summon
-                        entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+                        SBData.get(entity.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
 
                             Level worldIn = entity.level();
                             Entity target = state.getTargetEntity(worldIn);
@@ -182,7 +183,7 @@ public class SummonedSwordArts {
 
                             AdvancementHelper.grantCriterion(entity, ADVANCEMENT_STORM_SWORDS);
 
-                            int rank = entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
+                            int rank = SBData.get(entity, CapabilityConcentrationRank.RANK_POINT)
                                     .map(r->r.getRank(worldIn.getGameTime()).level)
                                     .orElse(0);
 
@@ -202,26 +203,26 @@ public class SummonedSwordArts {
                                 ss.setRoll(0);
 
                                 //force riding
-                                ss.startRiding(target, true);
+                                ss.startFormation(target);
 
                                 ss.setDelay(360 / count * i);
 
-                                entity.playNotifySound(SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.2F, 1.45F);
+                                mods.flammpfeil.slashblade.compat.SBEffects.notifySound(entity, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.2F, 1.45F);
                             }
                         });
                     }
                 });
 
                 //BlisteringSwords command
-                input.getScheduler().schedule("BlisteringSwords", pressTime + 10, new TimerCallback<LivingEntity>() {
+                input.getScheduler().schedule("BlisteringSwords", pressTime + 10, new Callback<LivingEntity>() {
 
                     @Override
-                    public void handle(LivingEntity rawEntity, TimerQueue<LivingEntity> queue, long now) {
+                    public void handle(LivingEntity rawEntity, Scheduler queue, long now) {
                         if (!(rawEntity instanceof ServerPlayer)) return;
                         ServerPlayer entity = (ServerPlayer) rawEntity;
 
                         InputCommand targetCommnad = InputCommand.M_DOWN;
-                        boolean inputSucceed = entity.getCapability(CapabilityInputState.INPUT_STATE).filter(input ->
+                        boolean inputSucceed = SBData.get(entity, CapabilityInputState.INPUT_STATE).filter(input ->
                                 input.getCommands().contains(targetCommnad)
                                         && input.getCommands().contains(InputCommand.SNEAK)
                                         && input.getCommands().contains(InputCommand.FORWARD)
@@ -231,7 +232,7 @@ public class SummonedSwordArts {
 
 
                         //summon
-                        entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+                        SBData.get(entity.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
 
                             Level worldIn = entity.level();
 
@@ -241,7 +242,7 @@ public class SummonedSwordArts {
 
                             AdvancementHelper.grantCriterion(entity, ADVANCEMENT_BLISTERING_SWORDS);
 
-                            int rank = entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
+                            int rank = SBData.get(entity, CapabilityConcentrationRank.RANK_POINT)
                                     .map(r->r.getRank(worldIn.getGameTime()).level)
                                     .orElse(0);
 
@@ -261,26 +262,26 @@ public class SummonedSwordArts {
                                 ss.setRoll(0);
 
                                 //force riding
-                                ss.startRiding(entity, true);
+                                ss.startFormation(entity);
 
                                 ss.setDelay(i);
 
-                                entity.playNotifySound(SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.2F, 1.45F);
+                                mods.flammpfeil.slashblade.compat.SBEffects.notifySound(entity, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.2F, 1.45F);
                             }
                         });
                     }
                 });
 
                 //BlisteringSwords command
-                input.getScheduler().schedule("HeavyRainSwords", pressTime + 10, new TimerCallback<LivingEntity>() {
+                input.getScheduler().schedule("HeavyRainSwords", pressTime + 10, new Callback<LivingEntity>() {
 
                     @Override
-                    public void handle(LivingEntity rawEntity, TimerQueue<LivingEntity> queue, long now) {
+                    public void handle(LivingEntity rawEntity, Scheduler queue, long now) {
                         if (!(rawEntity instanceof ServerPlayer)) return;
                         ServerPlayer entity = (ServerPlayer) rawEntity;
 
                         InputCommand targetCommnad = InputCommand.M_DOWN;
-                        boolean inputSucceed = entity.getCapability(CapabilityInputState.INPUT_STATE).filter(input ->
+                        boolean inputSucceed = SBData.get(entity, CapabilityInputState.INPUT_STATE).filter(input ->
                                 input.getCommands().contains(targetCommnad)
                                         && input.getCommands().contains(InputCommand.SNEAK)
                                         && input.getCommands().contains(InputCommand.FORWARD)
@@ -290,7 +291,7 @@ public class SummonedSwordArts {
 
 
                         //summon
-                        entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+                        SBData.get(entity.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
 
                             Level worldIn = entity.level();
                             Entity target = state.getTargetEntity(worldIn);
@@ -301,7 +302,7 @@ public class SummonedSwordArts {
 
                             AdvancementHelper.grantCriterion(entity, ADVANCEMENT_HEAVY_RAIN_SWORDS);
 
-                            int rank = entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
+                            int rank = SBData.get(entity, CapabilityConcentrationRank.RANK_POINT)
                                     .map(r->r.getRank(worldIn.getGameTime()).level)
                                     .orElse(0);
 
@@ -329,7 +330,7 @@ public class SummonedSwordArts {
                                 ss.setRoll(0);
 
                                 //force riding
-                                ss.startRiding(entity, true);
+                                ss.startFormation(entity);
 
                                 ss.setDelay(0);
 
@@ -352,7 +353,7 @@ public class SummonedSwordArts {
                                 ss.setRoll(0);
 
                                 //force riding
-                                ss.startRiding(entity, true);
+                                ss.startFormation(entity);
 
                                 ss.setDelay(i);
 
@@ -360,7 +361,7 @@ public class SummonedSwordArts {
 
                                 ss.setXRot(-90);
 
-                                entity.playNotifySound(SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.2F, 1.45F);
+                                mods.flammpfeil.slashblade.compat.SBEffects.notifySound(entity, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.2F, 1.45F);
                             }
                         });
                     }
@@ -368,7 +369,7 @@ public class SummonedSwordArts {
 
             });
 
-            sender.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state)->{
+            SBData.get(sender.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state)->{
                 if(sender.experienceLevel <= 0)
                     return;
 
@@ -385,7 +386,7 @@ public class SummonedSwordArts {
 
                                         boolean isMatch = true;
                                         if(target instanceof LivingEntity)
-                                            isMatch = TargetSelector.lockon_focus.test(sender, (LivingEntity)target);
+                                            isMatch = TargetSelector.lockon_focus.test((net.minecraft.server.level.ServerLevel)sender.level(), sender, (LivingEntity)target);
 
                                         if(target instanceof IShootable)
                                             isMatch = ((IShootable) target).getShooter() != sender;
@@ -425,7 +426,7 @@ public class SummonedSwordArts {
                 ss.setColor(state.getColorCode());
                 ss.setRoll(sender.getRandom().nextFloat() * 360.0f);
 
-                sender.playNotifySound(SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.2F, 1.45F);
+                mods.flammpfeil.slashblade.compat.SBEffects.notifySound(sender, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.2F, 1.45F);
             });
         }
     }

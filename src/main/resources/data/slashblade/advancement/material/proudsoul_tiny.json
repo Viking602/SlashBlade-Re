@@ -1,0 +1,34 @@
+{
+  "display": {
+    "title": {
+      "translate": "item.slashblade.proudsoul_tiny"
+    },
+    "description": {
+      "translate": "adv.slashblade.proudsoul_tiny"
+    },
+    "icon": {
+      "id": "slashblade:proudsoul_tiny",
+      "components": {
+        "minecraft:custom_data": {
+          "Crafting": "slashblade:material/tiny"
+        }
+      }
+    },
+    "frame": "task"
+  },
+  "parent": "slashblade:root",
+  "criteria": {
+    "BrokenBlade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "slashblade:proudsoul_tiny"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

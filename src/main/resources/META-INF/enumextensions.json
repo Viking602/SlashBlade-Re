@@ -1,0 +1,13 @@
+{
+  "entries": [
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "SLASHBLADE_VMD",
+      "constructor": "(ZZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": {
+        "class": "mods/flammpfeil/slashblade/client/animation/BladeArmPose",
+        "field": "BLADE"
+      }
+    }
+  ]
+}

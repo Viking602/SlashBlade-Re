@@ -8,9 +8,9 @@ import jp.nyatla.nymmd.MmdVmdMotionMc;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.capability.slashblade.ComboState;
 import mods.flammpfeil.slashblade.init.DefaultResources;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.neoforged.bus.api.SubscribeEvent;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -32,22 +32,14 @@ public class BladeMotionManager {
 
     MmdVmdMotionMc defaultMotion;
 
-    LoadingCache<ResourceLocation, MmdVmdMotionMc> cache;
+    LoadingCache<Identifier, MmdVmdMotionMc> cache;
 
     private BladeMotionManager() {
-        try {
-            defaultMotion = new MmdVmdMotionMc(ExMotionLocation);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (MmdException e) {
-            e.printStackTrace();
-        }
-
         cache = CacheBuilder.newBuilder()
                 .build(
-                CacheLoader.asyncReloading(new CacheLoader<ResourceLocation, MmdVmdMotionMc>() {
+                CacheLoader.asyncReloading(new CacheLoader<Identifier, MmdVmdMotionMc>() {
                     @Override
-                    public MmdVmdMotionMc load(ResourceLocation key) throws Exception {
+                    public MmdVmdMotionMc load(Identifier key) throws Exception {
                         try{
                             return new MmdVmdMotionMc(key);
                         }catch(Exception e){
@@ -60,8 +52,7 @@ public class BladeMotionManager {
         );
     }
 
-    @SubscribeEvent
-    public void reload(TextureStitchEvent.Post event){
+    public void reload(ResourceManager resources){
         cache.invalidateAll();
 
         try {
@@ -73,7 +64,8 @@ public class BladeMotionManager {
         }
     }
 
-    public MmdVmdMotionMc getMotion(ResourceLocation loc) {
+    public MmdVmdMotionMc getMotion(Identifier loc) {
+        if(defaultMotion == null) reload(net.minecraft.client.Minecraft.getInstance().getResourceManager());
         if(loc != null){
             try {
                 return cache.get(loc);

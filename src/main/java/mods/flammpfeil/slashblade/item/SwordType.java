@@ -1,8 +1,9 @@
 package mods.flammpfeil.slashblade.item;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.LazyOptional;
+import mods.flammpfeil.slashblade.compat.LazyOptional;
 
 import java.util.EnumSet;
 
@@ -23,10 +24,10 @@ public enum SwordType{
     static public EnumSet<SwordType> from(ItemStack itemStackIn){
         EnumSet<SwordType> types = EnumSet.noneOf(SwordType.class);
 
-        LazyOptional<ISlashBladeState> state = itemStackIn.getCapability(ItemSlashBlade.BLADESTATE);
+        LazyOptional<ISlashBladeState> state = SBData.get(itemStackIn, ItemSlashBlade.BLADESTATE);
 
         if(state.isPresent()){
-            itemStackIn.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(s->{
+            SBData.get(itemStackIn, ItemSlashBlade.BLADESTATE).ifPresent(s->{
                 if(s.isBroken())
                     types.add(Broken);
 
@@ -36,7 +37,7 @@ public enum SwordType{
                 if(s.isSealed())
                     types.add(Cursed);
 
-                if(!s.isSealed() && itemStackIn.isEnchanted() && (itemStackIn.hasCustomHoverName() || s.isDefaultBewitched()))
+                if(!s.isSealed() && itemStackIn.isEnchanted() && (itemStackIn.has(net.minecraft.core.component.DataComponents.CUSTOM_NAME) || s.isDefaultBewitched()))
                     types.add(Bewitched);
             });
         }else{

@@ -1,0 +1,29 @@
+{
+  "display": {
+    "title": {
+      "translate": "item.slashblade.proudsoul_activated"
+    },
+    "description": {
+      "translate": "adv.slashblade.proudsoul_activated"
+    },
+    "icon": {
+      "id": "slashblade:proudsoul_activated"
+    },
+    "frame": "task"
+  },
+  "parent": "slashblade:material/proudsoul_trapezohedron",
+  "criteria": {
+    "BrokenBlade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "slashblade:proudsoul_activated"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

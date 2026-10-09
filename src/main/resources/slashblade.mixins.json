@@ -1,13 +1,10 @@
 {
   "package": "mods.flammpfeil.slashblade.mixin",
+  "client": ["MixinHumanoidModel", "MixinModelPart", "AvatarRendererAccess"],
   "mixins": [
-    "MixinPacketBuffer","MixinBlockBehaviour"
+    "MixinBlockBehaviour"
   ],
-  "client": [
-    "MixinPlayerRenderer","MixinItemRenderer"
-  ],
-  "refmap": "slashblade.refmap.json",
   "required": true,
   "minVersion": "0.8",
-  "compatibilityLevel": "JAVA_8"
+  "compatibilityLevel": "JAVA_25"
 }

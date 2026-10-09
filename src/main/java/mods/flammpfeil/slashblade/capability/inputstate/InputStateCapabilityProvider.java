@@ -1,31 +1,29 @@
 package mods.flammpfeil.slashblade.capability.inputstate;
 
+import mods.flammpfeil.slashblade.compat.StateKey;
 import mods.flammpfeil.slashblade.util.EnumSetConverter;
 import mods.flammpfeil.slashblade.util.InputCommand;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
-import net.minecraftforge.common.capabilities.*;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import mods.flammpfeil.slashblade.compat.LazyOptional;
 
-public class InputStateCapabilityProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-    public static final Capability<IInputState> INPUT_STATE = CapabilityManager.get(new CapabilityToken<>(){});
+public class InputStateCapabilityProvider {
+
+    public static final StateKey<IInputState> INPUT_STATE = StateKey.of(IInputState.class);
+
+    public InputStateCapabilityProvider() {}
+
+    public InputStateCapabilityProvider(IInputState instance) { this.state = LazyOptional.of(() -> instance); }
+    public IInputState getState() { return state.orElseThrow(() -> new IllegalStateException("Missing state")); }
 
     protected LazyOptional<IInputState> state = LazyOptional.of(()->new InputState());
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        return INPUT_STATE.orEmpty(cap, state);
-    }
-
     static final String KEY = "Command";
 
-    @Override
     public CompoundTag serializeNBT() {
         CompoundTag baseTag = new CompoundTag();
 
@@ -36,11 +34,10 @@ public class InputStateCapabilityProvider implements ICapabilityProvider, INBTSe
         return baseTag;
     }
 
-    @Override
     public void deserializeNBT(CompoundTag baseTag) {
         state.ifPresent(instance ->{
             instance.getCommands().addAll(
-                    EnumSetConverter.convertToEnumSet(InputCommand.class, baseTag.getInt(KEY)));
+                    EnumSetConverter.convertToEnumSet(InputCommand.class, baseTag.getIntOr(KEY, 0)));
         });
     }
 }

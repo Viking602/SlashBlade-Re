@@ -1,5 +1,7 @@
 package mods.flammpfeil.slashblade.event;
 
+import mods.flammpfeil.slashblade.compat.SBItemData;
+import mods.flammpfeil.slashblade.compat.SBData;
 import com.google.common.collect.Maps;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.util.NBTHelper;
@@ -19,7 +21,7 @@ public class AnvilCraftingRecipe {
     boolean broken;
     boolean noScabbard;
     String translationKey;
-    Map<Enchantment, Integer> Enchantments;
+    Map<net.minecraft.core.Holder<Enchantment>, Integer> Enchantments;
 
     ItemStack result;
 
@@ -31,7 +33,7 @@ public class AnvilCraftingRecipe {
         this.refine = 0;
         this.broken = false;
         this.noScabbard = false;
-        this.translationKey = null;
+        this.translationKey = "";
         this.Enchantments = Maps.newHashMap();
         this.result = ItemStack.EMPTY;
         this.overwriteTag = null;
@@ -39,10 +41,10 @@ public class AnvilCraftingRecipe {
 
     static public AnvilCraftingRecipe getRecipe(ItemStack material){
 
-        if(!material.hasTag())
+        if(!SBItemData.hasTag(material))
             return null;
 
-        CompoundTag tag = material.getOrCreateTag();
+        CompoundTag tag = SBItemData.tag(material);
 
 
         if(!tag.contains("RequiredBlade"))
@@ -50,9 +52,9 @@ public class AnvilCraftingRecipe {
 
         AnvilCraftingRecipe recipe = new AnvilCraftingRecipe();
 
-        recipe.readNBT(tag.getCompound("RequiredBlade"));
+        recipe.readNBT(tag.getCompoundOrEmpty("RequiredBlade"));
 
-        recipe.setEnchantments(EnchantmentHelper.getEnchantments(material));
+        recipe.setEnchantments(mods.flammpfeil.slashblade.compat.SBEnchantments.map(material));
 
         return recipe;
     }
@@ -79,7 +81,7 @@ public class AnvilCraftingRecipe {
                 .put("broken", this.isBroken())
                 .put("noScabbard", this.isNoScabbard())
                 .put("translationKey", this.getTranslationKey())
-                .put("result", this.getResult().save(new CompoundTag()))
+                .put("result", SBItemData.save(this.getResult()))
                 .put("overwriteTag", this.getOverwriteTag());
 
         return tag;
@@ -89,7 +91,7 @@ public class AnvilCraftingRecipe {
         if(base.isEmpty()) return false;
 
         if(!this.translationKey.isEmpty()){
-            if(!base.getDescriptionId().equals(this.translationKey))
+            if(!SBItemData.descriptionId(base).equals(this.translationKey))
                 return false;
         }
 
@@ -111,7 +113,7 @@ public class AnvilCraftingRecipe {
              * not((this xor base ) and this)
              */
 
-            boolean stateMatches = base.getCapability(ItemSlashBlade.BLADESTATE).filter(
+            boolean stateMatches = SBData.get(base, ItemSlashBlade.BLADESTATE).filter(
                     (state)->(this.getKillcount() <= state.getKillCount())
                     && (this.getRefine() <= state.getRefine())
                     && (this.isNoScabbard() == state.isNoScabbard())
@@ -123,8 +125,8 @@ public class AnvilCraftingRecipe {
         }
 
         if(!this.getEnchantments().isEmpty()){
-            for (Map.Entry<Enchantment,Integer> entry : this.getEnchantments().entrySet()) {
-                if(EnchantmentHelper.getItemEnchantmentLevel(entry.getKey(), base) < entry.getValue())
+            for (Map.Entry<net.minecraft.core.Holder<Enchantment>,Integer> entry : this.getEnchantments().entrySet()) {
+                if(mods.flammpfeil.slashblade.compat.SBEnchantments.level(entry.getKey(), base) < entry.getValue())
                     return false;
             }
         }
@@ -187,11 +189,11 @@ public class AnvilCraftingRecipe {
         this.translationKey = translationKey;
     }
 
-    public Map<Enchantment, Integer> getEnchantments() {
+    public Map<net.minecraft.core.Holder<Enchantment>, Integer> getEnchantments() {
         return Enchantments;
     }
 
-    public void setEnchantments(Map<Enchantment, Integer> enchantments) {
+    public void setEnchantments(Map<net.minecraft.core.Holder<Enchantment>, Integer> enchantments) {
         Enchantments = enchantments;
     }
 
@@ -206,29 +208,29 @@ public class AnvilCraftingRecipe {
         if(isOnlyTagOverwrite()){
             //refine item
 
-            CompoundTag tag = base.save(new CompoundTag());
+            CompoundTag tag = SBItemData.save(base);
             tag.merge(this.getOverwriteTag().copy());
 
-            result = ItemStack.of(tag);
+            result = SBItemData.load(tag);
 
         }else{
             //reforge item
 
             result = this.getResult();
 
-            base.getCapability(ItemSlashBlade.BLADESTATE).ifPresent((oldState)->{
-                result.getCapability(ItemSlashBlade.BLADESTATE).ifPresent((newState)->{
+            SBData.get(base, ItemSlashBlade.BLADESTATE).ifPresent((oldState)->{
+                SBData.get(result, ItemSlashBlade.BLADESTATE).ifPresent((newState)->{
                     newState.setKillCount(oldState.getKillCount());
                     newState.setRefine(oldState.getRefine());
                 });
             });
 
 
-            Map<Enchantment, Integer> destMap = EnchantmentHelper.getEnchantments(result);
-            Map<Enchantment, Integer> srcMap = EnchantmentHelper.getEnchantments(base);
+            Map<net.minecraft.core.Holder<Enchantment>, Integer> destMap = mods.flammpfeil.slashblade.compat.SBEnchantments.map(result);
+            Map<net.minecraft.core.Holder<Enchantment>, Integer> srcMap = mods.flammpfeil.slashblade.compat.SBEnchantments.map(base);
 
-            for (Map.Entry<Enchantment, Integer> srcEntry : srcMap.entrySet()) {
-                Enchantment key = srcEntry.getKey();
+            for (Map.Entry<net.minecraft.core.Holder<Enchantment>, Integer> srcEntry : srcMap.entrySet()) {
+                net.minecraft.core.Holder<Enchantment> key = srcEntry.getKey();
                 int srcLevel = srcEntry.getValue();
 
                 if(destMap.containsKey(key)){
@@ -241,11 +243,11 @@ public class AnvilCraftingRecipe {
                 }
             }
 
-            EnchantmentHelper.setEnchantments(destMap, result);
+            mods.flammpfeil.slashblade.compat.SBEnchantments.set(destMap, result);
         }
 
         //update tag state
-        result.getShareTag();
+        SBItemData.tag(result);
 
         return result;
     }
@@ -254,7 +256,7 @@ public class AnvilCraftingRecipe {
         this.result = result;
     }
     public void setResultWithNBT(CompoundTag tag){
-        this.setResult(ItemStack.of(tag));
+        this.setResult(SBItemData.load(tag));
     }
 
     public boolean isOnlyTagOverwrite() {

@@ -38,7 +38,7 @@
 package jp.nyatla.nymmd;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +49,7 @@ import java.io.InputStream;
  */
 public class MmdPmdModelMc extends MmdPmdModel_BasicClass
 {
-	public MmdPmdModelMc(ResourceLocation loc) throws IOException, MmdException
+	public MmdPmdModelMc(Identifier loc) throws IOException, MmdException
 	{
 		super(Minecraft.getInstance().getResourceManager().open(loc), new FileResourceProvider());
 	}
@@ -60,10 +60,10 @@ public class MmdPmdModelMc extends MmdPmdModel_BasicClass
 	
 	protected static class FileResourceProvider implements IResourceProvider
 	{
-		public ResourceLocation getTextureStream(String i_name) throws MmdException
+		public Identifier getTextureStream(String i_name) throws MmdException
 		{
 			try{
-				return new ResourceLocation(i_name);
+				return Identifier.parse(i_name);
 			}catch(Exception e){
 				throw new MmdException(e);
 			}

@@ -1,0 +1,40 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "#slashblade:namedsoul"
+  ],
+  "result": {
+    "id": "slashblade:slashblade",
+    "components": {
+      "slashblade:blade_state": {
+        "isSealed": 0,
+        "isNoScabbard": 0,
+        "translationKey": "item.slashblade.simple.iron",
+        "isDestructable": 0,
+        "SummonedSwordColor": -13421569,
+        "currentCombo": "arts_rapid_slash",
+        "RepairCounter": 0,
+        "Damage": 0.0,
+        "rarityType": 1,
+        "ComboRoot": "standby",
+        "lastPosHash": "",
+        "RangeAttackType": "none",
+        "isDefaultBewitched": 0,
+        "SpecialAttackType": "none",
+        "TextureName": "slashblade:model/blade.png",
+        "ModelName": "slashblade:model/named/yamato.obj",
+        "baseAttackModifier": 4.0,
+        "StandbyRenderType": 0,
+        "ComboRootAir": "standby_inair"
+      },
+      "minecraft:rarity": "uncommon",
+      "minecraft:custom_data": {
+        "id": "slashblade:slashblade",
+        "Count": 1,
+        "tag": {
+          "Damage": 0
+        }
+      }
+    }
+  }
+}

@@ -49,7 +49,7 @@ public class JSONUtil {
 
     static public String NBTtoJsonString(CompoundTag tag) {
         StringBuilder stringbuilder = new StringBuilder("{");
-        Collection<String> collection = tag.getAllKeys();
+        Collection<String> collection = tag.keySet();
 
         for(String s : collection) {
             if (stringbuilder.length() != 1) {

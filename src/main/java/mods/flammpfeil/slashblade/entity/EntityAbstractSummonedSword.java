@@ -17,7 +17,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -34,21 +34,19 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.item.alchemy.PotionUtils;
+
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.entity.PartEntity;
-import net.minecraftforge.network.PlayMessages;
-import net.minecraftforge.network.NetworkHooks;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import mods.flammpfeil.slashblade.compat.LazyOptional;
+import net.neoforged.neoforge.entity.PartEntity;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -65,6 +63,35 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     private static final EntityDataAccessor<Byte> PIERCE = SynchedEntityData.defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<String> MODEL = SynchedEntityData.defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> DELAY = SynchedEntityData.<Integer>defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> FORMATION_HOST = SynchedEntityData.defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.INT);
+    private UUID formationHostUUID;
+    private Entity formationHost;
+
+    /** Player-bound formations use tracked independent entities: 26.1 disallows riding players. */
+    public boolean startFormation(Entity host) {
+        if (host == null) return false;
+        if (!(host instanceof Player)) { setPos(host.position()); return startRiding(host, true, true); }
+        super.stopRiding();
+        formationHost = host; formationHostUUID = host.getUUID();
+        entityData.set(FORMATION_HOST, host.getId()); setPos(host.position());
+        return true;
+    }
+    public Entity getFormationHost() {
+        if (getVehicle() != null) return getVehicle();
+        if (level().isClientSide()) return level().getEntity(entityData.get(FORMATION_HOST));
+        if (formationHost != null && !formationHost.isRemoved()) return formationHost;
+        if (formationHostUUID != null && level() instanceof net.minecraft.server.level.ServerLevel server) {
+            formationHost = server.getEntity(formationHostUUID);
+            if (formationHost != null) entityData.set(FORMATION_HOST, formationHost.getId());
+        }
+        return formationHost;
+    }
+    public void stopFormation() {
+        formationHost = null; formationHostUUID = null; entityData.set(FORMATION_HOST, -1); super.stopRiding();
+    }
+    public static List<EntityAbstractSummonedSword> formationSwords(Entity host) {
+        return host.level().getEntitiesOfClass(EntityAbstractSummonedSword.class, host.getBoundingBox().inflate(64), sword -> sword.getFormationHost() == host && !sword.isRemoved());
+    }
 
     private int ticksInGround;
     private boolean inGround;
@@ -97,26 +124,34 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
         //this.setGlowing(true);
     }
 
-    public static EntityAbstractSummonedSword createInstance(PlayMessages.SpawnEntity packet, Level worldIn){
+    public static EntityAbstractSummonedSword createInstance(net.minecraft.network.protocol.game.ClientboundAddEntityPacket packet, Level worldIn){
         return new EntityAbstractSummonedSword(SlashBlade.RegistryEvents.SummonedSword, worldIn);
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(COLOR, 0x3333FF);
-        this.entityData.define(FLAGS, 0);
-        this.entityData.define(HIT_ENTITY_ID, -1);
-        this.entityData.define(OFFSET_YAW, 0f);
-        this.entityData.define(ROLL, 0f);
-        this.entityData.define(PIERCE, (byte)0);
-        this.entityData.define(MODEL, "");
-        this.entityData.define(DELAY,10);
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(COLOR, 0x3333FF);
+        builder.define(FLAGS, 0);
+        builder.define(HIT_ENTITY_ID, -1);
+        builder.define(OFFSET_YAW, 0f);
+        builder.define(ROLL, 0f);
+        builder.define(PIERCE, (byte)0);
+        builder.define(MODEL, "");
+        builder.define(DELAY,10);
+        builder.define(FORMATION_HOST, -1);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
+    public void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        CompoundTag compound = new CompoundTag();
+        writeBladeData(compound);
+        output.store("slashblade:entity_abstract_summoned_sword", CompoundTag.CODEC, compound);
+        if (formationHostUUID != null) output.store("slashblade:formation_host", net.minecraft.core.UUIDUtil.CODEC, formationHostUUID);
+    }
+    private void writeBladeData(CompoundTag compound) {
+
 
         NBTHelper.getNBTCoupler(compound)
                 .put("Color", this.getColor())
@@ -132,8 +167,14 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
+    public void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput input) {
+        super.readAdditionalSaveData(input);
+        formationHostUUID = input.read("slashblade:formation_host", net.minecraft.core.UUIDUtil.CODEC).orElse(null);
+        formationHost = null;
+        readBladeData(input.read("slashblade:entity_abstract_summoned_sword", CompoundTag.CODEC).orElseGet(CompoundTag::new));
+    }
+    private void readBladeData(CompoundTag compound) {
+
 
         NBTHelper.getNBTCoupler(compound)
                 .get("Color", this::setColor)
@@ -149,8 +190,8 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket(net.minecraft.server.level.ServerEntity entity) {
+        return super.getAddEntityPacket(entity);
     }
 
     @Override
@@ -167,7 +208,6 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public boolean shouldRenderAtSqrDistance(double distance) {
         double d0 = this.getBoundingBox().getSize() * 10.0D;
         if (Double.isNaN(d0)) {
@@ -178,16 +218,14 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
         return distance < d0 * d0;
     }
 
-    @Override
-    @OnlyIn(Dist.CLIENT)
     public void lerpTo(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport) {
         this.setPos(x, y, z);
         this.setRot(yaw, pitch);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public void lerpMotion(double x, double y, double z) {
+    public void lerpMotion(Vec3 movement) {
+        double x = movement.x, y = movement.y, z = movement.z;
         this.setDeltaMovement(x, y, z);
         if (this.xRotO == 0.0F && this.yRotO == 0.0F) {
             float f = Mth.sqrt((float)(x * x + z * z));
@@ -195,7 +233,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
             this.setYRot((float)(Mth.atan2(x, z) * (double)(180F / (float)Math.PI)));
             this.xRotO = this.getXRot();
             this.yRotO = this.getYRot();
-            this.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
+            this.snapTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
             this.ticksInGround = 0;
         }
 
@@ -219,7 +257,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     }
 
     private void refreshFlags(){
-        if(this.level().isClientSide){
+        if(this.level().isClientSide()){
             int newValue = this.entityData.get(FLAGS).intValue();
             if(intFlags != newValue){
                 intFlags = newValue;
@@ -255,7 +293,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     }
     //disallowedHitBlock
     public boolean isNoClip() {
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide()) {
             return this.noPhysics;
         } else {
             refreshFlags();
@@ -265,6 +303,11 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
 
     @Override
     public void tick() {
+        if (formationHostUUID != null || entityData.get(FORMATION_HOST) >= 0) {
+            if (getFormationHost() != null) rideTick();
+            else if (tickCount > 200) discard();
+            return;
+        }
         super.tick();
 
         if(getHitEntity() != null){
@@ -279,7 +322,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
                 delay--;
                 setDelay(delay);
 
-                if(!this.level().isClientSide && delay < 0)
+                if(!this.level().isClientSide() && delay < 0)
                     this.burst();
             }
 
@@ -310,7 +353,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
             if (this.inBlockState != blockstate && this.level().noCollision(this.getBoundingBox().inflate(0.06D))) {
                 //block breaked
                 this.burst();
-            } else if (!this.level().isClientSide) {
+            } else if (!this.level().isClientSide()) {
                 //onBlock
                 this.tryDespawn();
             }
@@ -350,9 +393,9 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
                     }
                 }
 
-                if (raytraceresult != null && !(disallowedHitBlock && raytraceresult.getType() == HitResult.Type.BLOCK) && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
+                if (raytraceresult != null && !(disallowedHitBlock && raytraceresult.getType() == HitResult.Type.BLOCK) && !net.neoforged.neoforge.event.EventHooks.onProjectileImpact(this, raytraceresult)) {
                     this.onHit(raytraceresult);
-                    this.hasImpulse = true;
+                    this.hurtMarked = true;
                 }
 
                 if (entityraytraceresult == null || this.getPierce() <= 0) {
@@ -414,11 +457,11 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
             }
 
             //this.setPosition(this.getPosX(), this.getPosY(), this.getPosZ());
-            this.checkInsideBlocks();
+            this.applyEffectsFromBlocks(this.position(), this.position());
         }
 
 
-        if(!this.level().isClientSide && ticksInGround <= 0 && 100 < this.tickCount)
+        if(!this.level().isClientSide() && ticksInGround <= 0 && 100 < this.tickCount)
             this.remove(RemovalReason.DISCARDED);
 
     }
@@ -498,12 +541,12 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
 
         int fireTime = targetEntity.getRemainingFireTicks();
         if (this.isOnFire() && !(targetEntity instanceof EnderMan)) {
-            targetEntity.setSecondsOnFire(5);
+            targetEntity.igniteForSeconds(5);
         }
 
         //todo: attack manager
         targetEntity.invulnerableTime = 0;
-        if (targetEntity.hurt(damagesource, (float)i)) {
+        if (targetEntity.hurtOrSimulate(damagesource, (float)i)) {
             Entity hits = targetEntity;
             if(targetEntity instanceof PartEntity){
                 hits = ((PartEntity) targetEntity).getParent();
@@ -514,13 +557,12 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
 
                 StunManager.setStun(targetLivingEntity);
 
-                if (!this.level().isClientSide && this.getPierce() <= 0) {
+                if (!this.level().isClientSide() && this.getPierce() <= 0) {
                     setHitEntity(hits);
                 }
 
-                if (!this.level().isClientSide && shooter instanceof LivingEntity) {
-                    EnchantmentHelper.doPostHurtEffects(targetLivingEntity, shooter);
-                    EnchantmentHelper.doPostDamageEffects((LivingEntity)shooter, targetLivingEntity);
+                if (!this.level().isClientSide() && shooter instanceof LivingEntity) {
+                    EnchantmentHelper.doPostAttackEffects((ServerLevel)this.level(), targetLivingEntity, damagesource);
                 }
 
                 //this.arrowHit(targetLivingEntity);
@@ -528,7 +570,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
                 affectEntity(targetLivingEntity, getPotionEffects(), 1.0f);
 
                 if (shooter != null && targetLivingEntity != shooter && targetLivingEntity instanceof Player && shooter instanceof ServerPlayer) {
-                    ((ServerPlayer) shooter).playNotifySound(this.getHitEntityPlayerSound(), SoundSource.PLAYERS, 0.18F, 0.45F);
+                    mods.flammpfeil.slashblade.compat.SBEffects.notifySound(((ServerPlayer) shooter), this.getHitEntityPlayerSound(), SoundSource.PLAYERS, 0.18F, 0.45F);
                 }
             }
 
@@ -542,7 +584,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
             //this.setYRot(this.getYRot() + 180.0F);
             //this.yRotO += 180.0F;
             this.ticksInAir = 0;
-            if (!this.level().isClientSide && this.getDeltaMovement().lengthSqr() < 1.0E-7D) {
+            if (!this.level().isClientSide() && this.getDeltaMovement().lengthSqr() < 1.0E-7D) {
                 if(getPierce() <= 1)
                     this.burst();
                 else
@@ -592,7 +634,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     }
 
     public List<MobEffectInstance> getPotionEffects(){
-        List<MobEffectInstance> effects = PotionUtils.getAllEffects(this.getPersistentData());
+        List<MobEffectInstance> effects = mods.flammpfeil.slashblade.compat.SBEffects.effects(this.getPersistentData(), this.level().registryAccess());
 
         if(effects.isEmpty())
             effects.add(new MobEffectInstance(MobEffects.POISON, 1, 1));
@@ -603,7 +645,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     public void burst(){
         this.playSound(SoundEvents.GLASS_BREAK, 1.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));
 
-        if(!this.level().isClientSide){
+        if(!this.level().isClientSide()){
             if(this.level() instanceof ServerLevel)
                 ((ServerLevel)this.level()).sendParticles(ParticleTypes.CRIT, this.getX(), this.getY(), this.getZ(), 16, 0.5, 0.5,0.5,0.25f);
 
@@ -641,9 +683,9 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
 
     public void affectEntity(LivingEntity focusEntity, List<MobEffectInstance> effects, double factor){
         for(MobEffectInstance effectinstance : getPotionEffects()) {
-            MobEffect effect = effectinstance.getEffect();
-            if (effect.isInstantenous()) {
-                effect.applyInstantenousEffect(this, this.getShooter(), focusEntity, effectinstance.getAmplifier(), factor);
+            var effect = effectinstance.getEffect();
+            if (effect.value().isInstantenous()) {
+                effect.value().applyInstantenousEffect((net.minecraft.server.level.ServerLevel)this.level(), this, this.getShooter(), focusEntity, effectinstance.getAmplifier(), factor);
             } else {
                 int duration = (int)(factor * (double)effectinstance.getDuration() + 0.5D);
                 if (duration > 0) {
@@ -714,15 +756,15 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
         return name;
     }
 
-    private static final ResourceLocation defaultModel =  new ResourceLocation(defaultModelName + ".obj");
-    public LazyOptional<ResourceLocation> modelLoc = LazyOptional.of(() -> new ResourceLocation(getModelName() + ".obj"));
-    private static final ResourceLocation defaultTexture =  new ResourceLocation(defaultModelName + ".png");
-    public LazyOptional<ResourceLocation> textureLoc = LazyOptional.of(() -> new ResourceLocation(getModelName() + ".png"));
+    private static final Identifier defaultModel =  Identifier.parse(defaultModelName + ".obj");
+    public LazyOptional<Identifier> modelLoc = LazyOptional.of(() -> Identifier.parse(getModelName() + ".obj"));
+    private static final Identifier defaultTexture =  Identifier.parse(defaultModelName + ".png");
+    public LazyOptional<Identifier> textureLoc = LazyOptional.of(() -> Identifier.parse(getModelName() + ".png"));
 
-    public ResourceLocation getModelLoc() {
+    public Identifier getModelLoc() {
         return modelLoc.orElse(defaultModel);
     }
-    public ResourceLocation getTextureLoc() {
+    public Identifier getTextureLoc() {
         return textureLoc.orElse(defaultTexture);
     }
 

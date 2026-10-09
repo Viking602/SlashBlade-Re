@@ -1,0 +1,58 @@
+{
+  "type": "minecraft:smithing_transform",
+  "template": "minecraft:barrier",
+  "base": {
+    "item": "slashblade:slashblade",
+    "display": {
+      "id": "slashblade:slashblade",
+      "components": {
+        "minecraft:custom_data": {
+          "isDummy": 1
+        }
+      }
+    },
+    "custom": {
+      "isDummy": 1
+    },
+    "neoforge:ingredient_type": "slashblade:blade_ingredient"
+  },
+  "addition": "#slashblade:proudsouls",
+  "result": {
+    "id": "slashblade:slashblade",
+    "components": {
+      "slashblade:blade_state": {
+        "isSealed": 1,
+        "isNoScabbard": 0,
+        "isDestructable": 0,
+        "HasShield": 0,
+        "SummonedSwordColor": -3355647,
+        "lastActionTime": 0,
+        "_onClick": 0,
+        "fallDecreaseRate": 0.0,
+        "currentCombo": "arts_rapid_slash",
+        "killCount": 0,
+        "isCharged": 0,
+        "RepairCounter": 1,
+        "Damage": 0.0,
+        "rarityType": 0,
+        "ComboRoot": "standby",
+        "adjustXYZ": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lastPosHash": "",
+        "RangeAttackType": "none",
+        "isDefaultBewitched": 0,
+        "AttackAmplifier": 0.0,
+        "TargetEntity": -1,
+        "SpecialAttackType": "none",
+        "SummonedSwordColorInverse": 0,
+        "isBroken": 0,
+        "StandbyRenderType": 0,
+        "ComboRootAir": "standby_inair"
+      },
+      "minecraft:rarity": "common"
+    }
+  }
+}

@@ -1,5 +1,7 @@
 package mods.flammpfeil.slashblade.client.renderer.entity;
 
+import mods.flammpfeil.slashblade.compat.SBItemData;
+import mods.flammpfeil.slashblade.compat.SBData;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mods.flammpfeil.slashblade.client.renderer.model.BladeModelManager;
 import mods.flammpfeil.slashblade.client.renderer.model.obj.WavefrontObject;
@@ -11,25 +13,23 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemEntityRenderer;
+
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import com.mojang.math.Axis;
 
 import java.util.EnumSet;
 
-public class BladeItemEntityRenderer extends ItemEntityRenderer {
+public class BladeItemEntityRenderer extends BladeEntityRenderer<ItemEntity> {
     public BladeItemEntityRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
 
-    @Override
     public boolean shouldSpreadItems() {
         return false;
     }
 
-    @Override
     public boolean shouldBob() {
         return false;
     }
@@ -42,7 +42,7 @@ public class BladeItemEntityRenderer extends ItemEntityRenderer {
             renderBlade(itemIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
         }else{
             partialTicks = (float)(itemIn.bobOffs * 20.0 - (double)itemIn.getAge());
-            super.render(itemIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
+
         }
     }
 
@@ -54,21 +54,21 @@ public class BladeItemEntityRenderer extends ItemEntityRenderer {
             ItemStack current = itemIn.getItem();
 
             EnumSet<SwordType> types = SwordType.from(current);
-            ResourceLocation modelLocation =
-                    current.getCapability(ItemSlashBlade.BLADESTATE)
+            Identifier modelLocation =
+                    SBData.get(current, ItemSlashBlade.BLADESTATE)
                             .map((state) -> state.getModel().orElseGet(() -> BladeModelManager.resourceDefaultModel))
                             .orElseGet(()->{
-                                if(current.hasTag() && current.getTag().contains("Model"))
-                                    return new ResourceLocation(current.getTag().getString("Model"));
+                                if(SBItemData.hasTag(current) && SBItemData.tag(current).contains("Model"))
+                                    return Identifier.parse(SBItemData.tag(current).getStringOr("Model", ""));
                                 else
                                     return  BladeModelManager.resourceDefaultModel;
                             });
-            ResourceLocation textureLocation =
-                    current.getCapability(ItemSlashBlade.BLADESTATE)
+            Identifier textureLocation =
+                    SBData.get(current, ItemSlashBlade.BLADESTATE)
                             .map((state) -> state.getTexture().orElseGet(() -> BladeModelManager.resourceDefaultTexture))
                             .orElseGet(()->{
-                                if(current.hasTag() && current.getTag().contains("Texture"))
-                                    return new ResourceLocation(current.getTag().getString("Texture"));
+                                if(SBItemData.hasTag(current) && SBItemData.tag(current).contains("Texture"))
+                                    return Identifier.parse(SBItemData.tag(current).getStringOr("Texture", ""));
                                 else
                                     return  BladeModelManager.resourceDefaultTexture;
                             });

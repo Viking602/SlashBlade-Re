@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.capability.slashblade;
 
+import mods.flammpfeil.slashblade.compat.StateKey;
 import mods.flammpfeil.slashblade.capability.slashblade.combo.Extra;
 import mods.flammpfeil.slashblade.client.renderer.CarryType;
 import mods.flammpfeil.slashblade.util.EnumSetConverter;
@@ -7,25 +8,27 @@ import mods.flammpfeil.slashblade.util.NBTHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Rarity;
-import net.minecraftforge.common.capabilities.*;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.EnergyStorage;
-import net.minecraftforge.energy.IEnergyStorage;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import mods.flammpfeil.slashblade.compat.LazyOptional;
+import net.neoforged.neoforge.energy.EnergyStorage;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
 /**
  * Created by Furia on 2017/01/10.
  */
-public class BladeStateCapabilityProvider implements ICapabilityProvider, INBTSerializable<Tag> {
+public class BladeStateCapabilityProvider {
 
-    public static final Capability<ISlashBladeState> CAP = CapabilityManager.get(new CapabilityToken<>(){});
+    public static final StateKey<ISlashBladeState> CAP = StateKey.of(ISlashBladeState.class);
+
+    public BladeStateCapabilityProvider(ISlashBladeState instance) { this.state = LazyOptional.of(() -> instance); }
+    public ISlashBladeState getState() { return state.orElseThrow(() -> new IllegalStateException("Missing state")); }
 
     protected LazyOptional<ISlashBladeState> state = LazyOptional.of(SlashBladeState::new);
 
@@ -33,13 +36,6 @@ public class BladeStateCapabilityProvider implements ICapabilityProvider, INBTSe
     public BladeStateCapabilityProvider(){
     }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        return CAP.orEmpty(cap, state);
-    }
-
-    @Override
     public Tag serializeNBT() {
         CompoundTag tag = new CompoundTag();
         state.ifPresent(instance -> {
@@ -69,11 +65,11 @@ public class BladeStateCapabilityProvider implements ICapabilityProvider, INBTSe
 
             UUID id = instance.getOwner();
             if(id != null)
-                tag.putUUID("Owner", id);
+                tag.store("Owner", net.minecraft.core.UUIDUtil.CODEC, id);
 
 
             UUID bladeId = instance.getUniqueId();
-            tag.putUUID("BladeUniqueId", bladeId);
+            tag.store("BladeUniqueId", net.minecraft.core.UUIDUtil.CODEC, bladeId);
 
 
             //performance setting
@@ -97,7 +93,7 @@ public class BladeStateCapabilityProvider implements ICapabilityProvider, INBTSe
                     .ifPresent(loc ->  tag.putString("ModelName", loc.toString()));
 
             tag.putString("ComboRoot", Optional.ofNullable(instance.getComboRoot()).map((c)->c.getName()).orElseGet(()-> Extra.STANDBY_EX.getName()));
-            tag.putString("ComboRootAir", Optional.ofNullable(instance.getComboRoot()).map((c)->c.getName()).orElseGet(()-> Extra.STANDBY_INAIR.getName()));
+            tag.putString("ComboRootAir", Optional.ofNullable(instance.getComboRootAir()).map((c)->c.getName()).orElseGet(()-> Extra.STANDBY_INAIR.getName()));
         });
 
         return tag;
@@ -107,7 +103,6 @@ public class BladeStateCapabilityProvider implements ICapabilityProvider, INBTSe
     @Deprecated
     private final String tagState = "State";
 
-    @Override
     public void deserializeNBT(Tag inTag) {
 
         Tag baseTag;
@@ -122,65 +117,65 @@ public class BladeStateCapabilityProvider implements ICapabilityProvider, INBTSe
             CompoundTag tag = (CompoundTag)baseTag;
 
             //action state
-            instance.setLastActionTime(tag.getLong("lastActionTime"));
-            instance.setTargetEntityId(tag.getInt("TargetEntity"));
-            instance.setOnClick(tag.getBoolean("_onClick"));
-            instance.setFallDecreaseRate(tag.getFloat("fallDecreaseRate"));
-            instance.setCharged(tag.getBoolean("isCharged"));
-            instance.setAttackAmplifier(tag.getFloat("AttackAmplifier"));
-            instance.setComboSeq(ComboState.NONE.valueOf(tag.getString("currentCombo")));
-            instance.setLastPosHash(tag.getString("lastPosHash"));
-            instance.setHasShield(tag.getBoolean("HasShield"));
+            instance.setLastActionTime(tag.getLongOr("lastActionTime", 0L));
+            instance.setTargetEntityId(tag.getIntOr("TargetEntity", -1));
+            instance.setOnClick(tag.getBooleanOr("_onClick", false));
+            instance.setFallDecreaseRate(tag.getFloatOr("fallDecreaseRate", 0.0F));
+            instance.setCharged(tag.getBooleanOr("isCharged", false));
+            instance.setAttackAmplifier(tag.getFloatOr("AttackAmplifier", 0.0F));
+            instance.setComboSeq(ComboState.NONE.valueOf(tag.getStringOr("currentCombo", "")));
+            instance.setLastPosHash(tag.getStringOr("lastPosHash", ""));
+            instance.setHasShield(tag.getBooleanOr("HasShield", false));
 
-            instance.setDamage(tag.getFloat("Damage"));
+            instance.setDamage(tag.getFloatOr("Damage", 0.0F));
 
-            instance.setBroken(tag.getBoolean("isBroken"));
+            instance.setBroken(tag.getBooleanOr("isBroken", false));
 
             instance.setHasChangedActiveState(true);
 
 
             //passive state
-            instance.setNoScabbard(tag.getBoolean("isNoScabbard"));
-            instance.setSealed(tag.getBoolean("isSealed"));
+            instance.setNoScabbard(tag.getBooleanOr("isNoScabbard", false));
+            instance.setSealed(tag.getBooleanOr("isSealed", false));
 
-            instance.setBaseAttackModifier(tag.getFloat("baseAttackModifier"));
+            instance.setBaseAttackModifier(tag.getFloatOr("baseAttackModifier", 0.0F));
 
-            instance.setKillCount(tag.getInt("killCount"));
-            instance.setRefine(tag.getInt("RepairCounter"));
+            instance.setKillCount(tag.getIntOr("killCount", 0));
+            instance.setRefine(tag.getIntOr("RepairCounter", 0));
 
-            instance.setOwner(tag.hasUUID("Owner") ? tag.getUUID("Owner") : null);
+            instance.setOwner(tag.read("Owner", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("Owner", net.minecraft.core.UUIDUtil.CODEC).orElse(new java.util.UUID(0L,0L)) : null);
 
-            instance.setUniqueId(tag.hasUUID("BladeUniqueId") ? tag.getUUID("BladeUniqueId") : UUID.randomUUID());
+            instance.setUniqueId(tag.read("BladeUniqueId", net.minecraft.core.UUIDUtil.CODEC).isPresent() ? tag.read("BladeUniqueId", net.minecraft.core.UUIDUtil.CODEC).orElse(new java.util.UUID(0L,0L)) : UUID.randomUUID());
 
             //performance setting
-            instance.setRangeAttackType(RangeAttack.NONE.valueOf(tag.getString("RangeAttackType")));
+            instance.setRangeAttackType(RangeAttack.NONE.valueOf(tag.getStringOr("RangeAttackType", "")));
 
-            instance.setSlashArtsKey(tag.getString("SpecialAttackType"));
-            instance.setDestructable(tag.getBoolean("isDestructable"));
-            instance.setDefaultBewitched(tag.getBoolean("isDefaultBewitched"));
+            instance.setSlashArtsKey(tag.getStringOr("SpecialAttackType", ""));
+            instance.setDestructable(tag.getBooleanOr("isDestructable", false));
+            instance.setDefaultBewitched(tag.getBooleanOr("isDefaultBewitched", false));
 
-            instance.setRarity(EnumSetConverter.fromOrdinal(Rarity.values(), tag.getByte("rarityType"), Rarity.COMMON));
+            instance.setRarity(EnumSetConverter.fromOrdinal(Rarity.values(), tag.getByteOr("rarityType", (byte)0), Rarity.COMMON));
 
-            instance.setTranslationKey(tag.getString("translationKey"));
+            instance.setTranslationKey(tag.getStringOr("translationKey", ""));
 
             //render info
-            instance.setCarryType(EnumSetConverter.fromOrdinal(CarryType.values(), tag.getByte("StandbyRenderType"), CarryType.DEFAULT));
-            instance.setColorCode(tag.getInt("SummonedSwordColor"));
-            instance.setEffectColorInverse(tag.getBoolean("SummonedSwordColorInverse"));
+            instance.setCarryType(EnumSetConverter.fromOrdinal(CarryType.values(), tag.getByteOr("StandbyRenderType", (byte)0), CarryType.DEFAULT));
+            instance.setColorCode(tag.getIntOr("SummonedSwordColor", 0));
+            instance.setEffectColorInverse(tag.getBooleanOr("SummonedSwordColorInverse", false));
             instance.setAdjust(NBTHelper.getVector3d(tag, "adjustXYZ"));
 
             if(tag.contains("TextureName"))
-                instance.setTexture(new ResourceLocation(tag.getString("TextureName")));
+                instance.setTexture(Identifier.parse(tag.getStringOr("TextureName", "")));
             else
                 instance.setTexture(null);
 
             if(tag.contains("ModelName"))
-                instance.setModel(new ResourceLocation(tag.getString("ModelName")));
+                instance.setModel(Identifier.parse(tag.getStringOr("ModelName", "")));
             else
                 instance.setModel(null);
 
-            instance.setComboRootName(tag.getString("ComboRoot"));
-            instance.setComboRootAirName(tag.getString("ComboRootAir"));
+            instance.setComboRootName(tag.getStringOr("ComboRoot", ""));
+            instance.setComboRootAirName(tag.getStringOr("ComboRootAir", ""));
         });
     }
 }

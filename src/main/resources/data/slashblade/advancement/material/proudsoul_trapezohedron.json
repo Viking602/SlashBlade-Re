@@ -1,0 +1,34 @@
+{
+  "display": {
+    "title": {
+      "translate": "item.slashblade.proudsoul_trapezohedron"
+    },
+    "description": {
+      "translate": "adv.slashblade.proudsoul_trapezohedron"
+    },
+    "icon": {
+      "id": "slashblade:proudsoul_trapezohedron",
+      "components": {
+        "minecraft:custom_data": {
+          "Crafting": "slashblade:material/trapezohedron_smoking"
+        }
+      }
+    },
+    "frame": "task"
+  },
+  "parent": "slashblade:material/proudsoul_crystal",
+  "criteria": {
+    "BrokenBlade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "slashblade:proudsoul_trapezohedron"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

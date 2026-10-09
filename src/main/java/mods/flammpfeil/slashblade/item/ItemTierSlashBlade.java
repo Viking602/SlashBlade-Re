@@ -1,47 +1,11 @@
 package mods.flammpfeil.slashblade.item;
-
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.util.LazyLoadedValue;
-
-import java.util.function.Supplier;
-
-public class ItemTierSlashBlade implements Tier {
-
-
-    private final LazyLoadedValue<Ingredient> repairMaterial;
-
-    public ItemTierSlashBlade(Supplier<Ingredient> repairMaterialIn){
-        repairMaterial = new LazyLoadedValue<>(repairMaterialIn);
-    }
-
-    @Override
-    public int getUses() {
-        return 100;
-    }
-
-    @Override
-    public float getSpeed() {
-        return 0;
-    }
-
-    @Override
-    public float getAttackDamageBonus() {
-        return 0;
-    }
-
-    @Override
-    public int getLevel() {
-        return 3;
-    }
-
-    @Override
-    public int getEnchantmentValue() {
-        return 10;
-    }
-
-    @Override
-    public Ingredient getRepairIngredient() {
-        return repairMaterial.get();
+import net.minecraft.resources.Identifier;
+import net.minecraft.tags.*;
+import net.minecraft.world.item.*;
+/** The upstream blade material: 100 durability, no mining speed, enchantability 10. */
+public final class ItemTierSlashBlade {
+    public ToolMaterial material() {
+        return new ToolMaterial(BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 100, 0, 0, 10,
+            ItemTags.create(Identifier.fromNamespaceAndPath("slashblade", "proudsouls")));
     }
 }

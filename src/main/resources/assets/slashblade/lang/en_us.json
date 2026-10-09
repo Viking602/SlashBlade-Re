@@ -18,6 +18,7 @@
   "slashblade.tooltip.material.noscabbard":"No Scabbard",
   "slashblade.tooltip.material.enchantments":"Enchantments",
   
+  "item.slashblade.yamato": "Yamato",
   "item.slashblade.slashblade": "Anonymity -Nameless-",
   "item.slashblade.slashblade.desc": "Cannibalism maintenance\nA pure vessel.",
   "item.slashblade.simple.wood": "Anonymity -Wood-",
@@ -175,5 +176,8 @@
   "adv.slashblade.exeffect.soul_speed.desc": "The input time limit for just actions will be extended by 1 tick for each soul speed level.",
 
   "adv.slashblade.exeffect.feather_falling": "Slow Fall",
-  "adv.slashblade.exeffect.feather_falling.desc": "Falling speed during aerial actions will be reduced depending on Feather Falling level."
+  "adv.slashblade.exeffect.feather_falling.desc": "Falling speed during aerial actions will be reduced depending on Feather Falling level.",
+  "key.slashblade.super_sa": "Super SA",
+  "slashblade.super_sa.hint": "Super SA: hold %s for 1 second, then release",
+  "slashblade.super_sa.requirements": "Requires 1000 kills and a fully repaired bewitched blade"
 }

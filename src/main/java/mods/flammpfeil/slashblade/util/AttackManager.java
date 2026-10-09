@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.util;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import com.google.common.collect.Lists;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.ability.ArrowReflector;
@@ -48,7 +49,7 @@ public class AttackManager {
     }
     static public EntitySlashEffect doSlash(LivingEntity playerIn, float roll, Vec3 centerOffset, boolean mute, boolean critical, double damage, KnockBacks knockback) {
 
-        int colorCode = playerIn.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE)
+        int colorCode = SBData.get(playerIn.getMainHandItem(), ItemSlashBlade.BLADESTATE)
                 .map(state->state.getColorCode())
                 .orElseGet(()->0xFFFFFF);
 
@@ -56,7 +57,7 @@ public class AttackManager {
     }
     static public EntitySlashEffect doSlash(LivingEntity playerIn, float roll, int colorCode, Vec3 centerOffset, boolean mute, boolean critical, double damage, KnockBacks knockback) {
 
-        if(playerIn.level().isClientSide) return null;
+        if(playerIn.level().isClientSide()) return null;
 
         Vec3 pos = playerIn.position()
                 .add(0.0D, (double)playerIn.getEyeHeight() * 0.75D, 0.0D)
@@ -84,7 +85,7 @@ public class AttackManager {
         jc.setKnockBack(knockback);
 
         if(playerIn != null)
-            playerIn.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
+            SBData.get(playerIn, ConcentrationRankCapabilityProvider.RANK_POINT)
                     .ifPresent(rank->jc.setRank(rank.getRankLevel(playerIn.level().getGameTime())));
 
         playerIn.level().addFreshEntity(jc);
@@ -97,8 +98,8 @@ public class AttackManager {
     }
     static public List<Entity> areaAttack(LivingEntity playerIn, Consumer<LivingEntity> beforeHit, float ratio, boolean forceHit, boolean resetHit , boolean mute, List<Entity> exclude) {
         List<Entity> founds = Lists.newArrayList();
-        float modifiedRatio = (1.0F + EnchantmentHelper.getSweepingDamageRatio(playerIn) * 0.5f) * ratio;
-        AttributeModifier am = new AttributeModifier("SweepingDamageRatio", modifiedRatio, AttributeModifier.Operation.MULTIPLY_BASE);
+        float modifiedRatio = (1.0F + (float)playerIn.getAttributeValue(Attributes.SWEEPING_DAMAGE_RATIO) * 0.5f) * ratio;
+        AttributeModifier am = new AttributeModifier(SlashBlade.id("sweeping_damage_ratio"), modifiedRatio, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 
         if (!playerIn.level().isClientSide()) {
             try {
@@ -184,10 +185,10 @@ public class AttackManager {
     static public void doMeleeAttack(LivingEntity attacker, Entity target, boolean forceHit, boolean resetHit){
         if (attacker instanceof Player) {
             doManagedAttack((t)->{
-                attacker.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+                SBData.get(attacker.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
 
-                    IConcentrationRank.ConcentrationRanks rankBonus = attacker.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
-                            .map(rp->rp.getRank(attacker.getCommandSenderWorld().getGameTime())).orElse(IConcentrationRank.ConcentrationRanks.NONE);
+                    IConcentrationRank.ConcentrationRanks rankBonus = SBData.get(attacker, ConcentrationRankCapabilityProvider.RANK_POINT)
+                            .map(rp->rp.getRank(attacker.level().getGameTime())).orElse(IConcentrationRank.ConcentrationRanks.NONE);
 
                     float modifiedRatio = rankBonus.level / 2.0f;
                     if(attacker instanceof Player && IConcentrationRank.ConcentrationRanks.S.level <= rankBonus.level){
@@ -195,7 +196,7 @@ public class AttackManager {
                         modifiedRatio = Math.max(modifiedRatio, Math.min(level, state.getRefine()));
                     }
 
-                    AttributeModifier am = new AttributeModifier("RankDamageBonus", modifiedRatio, AttributeModifier.Operation.ADDITION);
+                    AttributeModifier am = new AttributeModifier(mods.flammpfeil.slashblade.SlashBlade.id("rank_damage_bonus"), modifiedRatio, AttributeModifier.Operation.ADD_VALUE);
                     try {
                         state.setOnClick(true);
                         attacker.getAttribute(Attributes.ATTACK_DAMAGE).addTransientModifier(am);

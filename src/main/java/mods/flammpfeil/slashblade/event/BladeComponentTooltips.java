@@ -1,5 +1,8 @@
 package mods.flammpfeil.slashblade.event;
 
+import mods.flammpfeil.slashblade.compat.SBItemData;
+
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -7,9 +10,9 @@ import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -23,7 +26,7 @@ public class BladeComponentTooltips {
     }
     private BladeComponentTooltips(){}
     public void register(){
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
@@ -31,6 +34,12 @@ public class BladeComponentTooltips {
         List<Component> tooltip = event.getToolTip();
 
         ItemStack stack = event.getItemStack();
+        if(stack.getItem() instanceof ItemSlashBlade) {
+            tooltip.add(Component.translatable("slashblade.super_sa.hint",
+                    mods.flammpfeil.slashblade.client.SlashBladeKeys.SUPER_SA.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_AQUA));
+            tooltip.add(Component.translatable("slashblade.super_sa.requirements").withStyle(
+                    mods.flammpfeil.slashblade.ability.SuperSlashArts.eligible(stack)?ChatFormatting.GREEN:ChatFormatting.GRAY));
+        }
 
         AnvilCraftingRecipe recipe = AnvilCraftingRecipe.getRecipe(stack);
 
@@ -55,29 +64,29 @@ public class BladeComponentTooltips {
                 ,hasAnvil));
 
         tooltip.add(getRequirements(recipe.getTranslationKey()
-                ,recipe.getTranslationKey().equals(blade.getDescriptionId())));
+                ,recipe.getTranslationKey().equals(SBItemData.descriptionId(blade))));
 
         if(0 < recipe.getKillcount())
             tooltip.add(getRequirements(
                     "slashblade.tooltip.material.killcount"
-                    ,blade.getCapability(ItemSlashBlade.BLADESTATE).filter(s->recipe.getKillcount() <= s.getKillCount()).isPresent()
+                    ,SBData.get(blade, ItemSlashBlade.BLADESTATE).filter(s->recipe.getKillcount() <= s.getKillCount()).isPresent()
                     ,recipe.getKillcount()));
 
         if(0 < recipe.getRefine())
             tooltip.add(getRequirements(
                     "slashblade.tooltip.material.refine"
-                    ,blade.getCapability(ItemSlashBlade.BLADESTATE).filter(s->recipe.getRefine() <= s.getRefine()).isPresent()
+                    ,SBData.get(blade, ItemSlashBlade.BLADESTATE).filter(s->recipe.getRefine() <= s.getRefine()).isPresent()
                     ,recipe.getRefine()));
 
         if(recipe.isBroken())
             tooltip.add(getRequirements(
                     "slashblade.tooltip.material.broken"
-                    ,blade.getCapability(ItemSlashBlade.BLADESTATE).filter(s->s.isBroken()).isPresent()));
+                    ,SBData.get(blade, ItemSlashBlade.BLADESTATE).filter(s->s.isBroken()).isPresent()));
 
         if(recipe.isNoScabbard())
             tooltip.add(getRequirements(
                     "slashblade.tooltip.material.noscabbard"
-                    ,blade.getCapability(ItemSlashBlade.BLADESTATE).filter(s->s.isNoScabbard()).isPresent()));
+                    ,SBData.get(blade, ItemSlashBlade.BLADESTATE).filter(s->s.isNoScabbard()).isPresent()));
 
 
         if(0 < recipe.getEnchantments().size())
@@ -93,12 +102,12 @@ public class BladeComponentTooltips {
                     ,recipe.getLevel()));
     }
 
-    private boolean checkEnchantments(Map<Enchantment, Integer> requirements, ItemStack stack) {
+    private boolean checkEnchantments(Map<net.minecraft.core.Holder<Enchantment>, Integer> requirements, ItemStack stack) {
         if(stack.isEmpty()) return false;
         if(!stack.isEnchanted()) return false;
 
-        for(Map.Entry<Enchantment, Integer> entry : requirements.entrySet()){
-            if(entry.getValue() > EnchantmentHelper.getItemEnchantmentLevel(entry.getKey(), stack)){
+        for(Map.Entry<net.minecraft.core.Holder<Enchantment>, Integer> entry : requirements.entrySet()){
+            if(entry.getValue() > mods.flammpfeil.slashblade.compat.SBEnchantments.level(entry.getKey(), stack)){
                 return false;
             }
         }

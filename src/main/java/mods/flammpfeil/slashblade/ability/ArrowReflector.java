@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.ability;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.capability.slashblade.ComboState;
 import mods.flammpfeil.slashblade.entity.IShootable;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
@@ -7,7 +8,7 @@ import mods.flammpfeil.slashblade.util.TargetSelector;
 import mods.flammpfeil.slashblade.util.TimeValueHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -31,18 +32,18 @@ public class ArrowReflector {
             Vec3 dir = attacker.getLookAngle();
 
             do{
-                if(attacker instanceof LivingEntity) break;
+                if(!(attacker instanceof LivingEntity)) break;
 
                 ItemStack stack = ((LivingEntity) attacker).getMainHandItem();
 
                 if(stack.isEmpty()) break;
                 if(!(stack.getItem() instanceof ItemSlashBlade)) break;
 
-                Entity target = stack.getCapability(ItemSlashBlade.BLADESTATE).map(s->s.getTargetEntity(attacker.level())).orElse(null);
+                Entity target = SBData.get(stack, ItemSlashBlade.BLADESTATE).map(s->s.getTargetEntity(attacker.level())).orElse(null);
                 if(target != null){
-                    dir = arrow.position().subtract(target.getEyePosition(1.0f)).normalize();
+                    dir = target.getEyePosition(1.0f).subtract(arrow.position()).normalize();
                 }else{
-                    dir = arrow.position().subtract(attacker.getLookAngle().scale(10).add(attacker.getEyePosition(1.0f))).normalize();
+                    dir = attacker.getLookAngle().scale(10).add(attacker.getEyePosition(1.0f)).subtract(arrow.position()).normalize();
                 }
 
             }while(false);
@@ -67,7 +68,7 @@ public class ArrowReflector {
         if(stack.isEmpty()) return;
         if(!(stack.getItem() instanceof ItemSlashBlade)) return;
 
-        stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(s->{
+        SBData.get(stack, ItemSlashBlade.BLADESTATE).ifPresent(s->{
             int ticks = attacker.getTicksUsingItem();
 
             if(ticks == 0) return;

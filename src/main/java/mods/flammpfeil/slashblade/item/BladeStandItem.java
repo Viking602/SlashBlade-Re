@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.item;
 
+import mods.flammpfeil.slashblade.compat.SBItemData;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.entity.BladeStandEntity;
 import net.minecraft.world.entity.EntityType;
@@ -41,19 +42,16 @@ public class BladeStandItem extends HangingEntityItem {
             Level world = context.getLevel();
             HangingEntity hangingentity = BladeStandEntity.createInstanceFromPos(world, blockpos1, direction, this);
 
-            CompoundTag compoundnbt = itemstack.getTag();
-            if (compoundnbt != null) {
-                EntityType.updateCustomEntityTag(world, playerentity, hangingentity, compoundnbt);
-            }
+            EntityType.<HangingEntity>createDefaultStackConfig(world, itemstack, playerentity).accept(hangingentity);
 
             if (hangingentity.survives()) {
-                if (!world.isClientSide) {
+                if (!world.isClientSide()) {
                     hangingentity.playPlacementSound();
                     world.addFreshEntity(hangingentity);
                 }
 
                 itemstack.shrink(1);
-                return InteractionResult.sidedSuccess(world.isClientSide);
+                return InteractionResult.SUCCESS;
             } else {
                 return InteractionResult.CONSUME;
             }

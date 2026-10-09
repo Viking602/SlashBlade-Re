@@ -1,0 +1,7 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "slashblade:item/bladestand_v"
+  },
+  "hand_animation_on_swap": false
+}

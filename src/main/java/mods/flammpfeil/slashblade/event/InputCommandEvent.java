@@ -3,8 +3,8 @@ package mods.flammpfeil.slashblade.event;
 import mods.flammpfeil.slashblade.capability.inputstate.IInputState;
 import mods.flammpfeil.slashblade.util.InputCommand;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.Event;
 
 import java.util.EnumSet;
 
@@ -39,7 +39,7 @@ public class InputCommandEvent extends Event {
     public static InputCommandEvent onInputChange(ServerPlayer player, IInputState state, EnumSet<InputCommand> old, EnumSet<InputCommand> current)
     {
         InputCommandEvent event = new InputCommandEvent(player, state, old, current);
-        MinecraftForge.EVENT_BUS.post(event);
+        NeoForge.EVENT_BUS.post(event);
         return event;
     }
 }

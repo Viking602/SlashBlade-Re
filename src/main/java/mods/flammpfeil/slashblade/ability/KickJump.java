@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.ability;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.capability.slashblade.ComboState;
 import mods.flammpfeil.slashblade.event.InputCommandEvent;
@@ -11,7 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -25,9 +26,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+
+import net.neoforged.bus.api.SubscribeEvent;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -45,14 +46,14 @@ public class KickJump {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     static final TargetingConditions tc = new TargetingConditions(false)
             .ignoreLineOfSight()
             .ignoreInvisibilityTesting();
 
-    static public final ResourceLocation ADVANCEMENT_KICK_JUMP = new ResourceLocation(SlashBlade.modid, "abilities/kick_jump");
+    static public final Identifier ADVANCEMENT_KICK_JUMP = Identifier.fromNamespaceAndPath(SlashBlade.modid, "abilities/kick_jump");
 
     static public final String KEY_KICKJUMP = "sb.kickjump";
 
@@ -68,7 +69,7 @@ public class KickJump {
         if(old.contains(InputCommand.JUMP)) return;
         if(!current.contains(InputCommand.JUMP)) return;
 
-        if(0 != sender.getPersistentData().getInt(KEY_KICKJUMP)) return;
+        if(0 != sender.getPersistentData().getIntOr(KEY_KICKJUMP, 0)) return;
 
         Iterable<VoxelShape> list = worldIn.getBlockCollisions(sender, sender.getBoundingBox().inflate(0.5,0,1));
         if(!list.iterator().hasNext()) return;
@@ -87,9 +88,9 @@ public class KickJump {
         sender.connection.send(new ClientboundSetEntityMotionPacket(sender.getId(), motion.scale(0.75f)));
 
         AdvancementHelper.grantCriterion(sender,ADVANCEMENT_KICK_JUMP);
-        sender.playNotifySound(SoundEvents.PLAYER_SMALL_FALL, SoundSource.PLAYERS, 0.5f, 1.2f);
+        mods.flammpfeil.slashblade.compat.SBEffects.notifySound(sender, SoundEvents.PLAYER_SMALL_FALL, SoundSource.PLAYERS, 0.5f, 1.2f);
 
-        sender.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(s->{
+        SBData.get(sender.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent(s->{
             s.updateComboSeq(sender, ComboState.NONE);
         });
 
@@ -99,24 +100,22 @@ public class KickJump {
 
     }
     @SubscribeEvent
-    public void onTick(TickEvent.PlayerTickEvent event) {
-        switch (event.phase) {
-            case START -> {
-                LivingEntity player = event.player;
+    public void onTickPre(net.neoforged.neoforge.event.tick.PlayerTickEvent.Pre event) {
+                LivingEntity player = event.getEntity();
 
                 //cooldown
-                if (event.player.onGround() && 0 < event.player.getPersistentData().getInt(KEY_KICKJUMP)) {
+                if (event.getEntity().onGround() && 0 < event.getEntity().getPersistentData().getIntOr(KEY_KICKJUMP, 0)) {
 
-                    int count = event.player.getPersistentData().getInt(KEY_KICKJUMP);
+                    int count = event.getEntity().getPersistentData().getIntOr(KEY_KICKJUMP, 0);
                     count--;
 
                     if (count <= 0) {
-                        event.player.getPersistentData().remove(KEY_KICKJUMP);
+                        event.getEntity().getPersistentData().remove(KEY_KICKJUMP);
                     } else {
-                        event.player.getPersistentData().putInt(KEY_KICKJUMP, count);
+                        event.getEntity().getPersistentData().putInt(KEY_KICKJUMP, count);
                     }
                 }
-            }
-        }
+
     }
+
 }

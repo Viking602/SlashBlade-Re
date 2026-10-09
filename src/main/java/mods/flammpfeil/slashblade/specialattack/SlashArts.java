@@ -5,7 +5,7 @@ import mods.flammpfeil.slashblade.capability.slashblade.ComboState;
 import mods.flammpfeil.slashblade.capability.slashblade.RangeAttack;
 import mods.flammpfeil.slashblade.capability.slashblade.combo.Extra;
 import mods.flammpfeil.slashblade.util.RegistryBase;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,10 +15,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class SlashArts extends RegistryBase<SlashArts> {
-    static Map<ResourceLocation, SlashArts> registry = Maps.newHashMap();
+    static Map<Identifier, SlashArts> registry = Maps.newHashMap();
 
     @Override
-    public Map<ResourceLocation, SlashArts> getRegistry() {
+    public Map<Identifier, SlashArts> getRegistry() {
         return SlashArts.registry;
     }
 
@@ -27,7 +27,7 @@ public class SlashArts extends RegistryBase<SlashArts> {
     static public final int ChargeJustTicksMax = 5;
 
     static public int getJustReceptionSpan(LivingEntity user){
-        return Math.min(ChargeJustTicksMax , ChargeJustTicks + EnchantmentHelper.getEnchantmentLevel(Enchantments.SOUL_SPEED,user));
+        return Math.min(ChargeJustTicksMax , ChargeJustTicks + mods.flammpfeil.slashblade.compat.SBEnchantments.livingLevel(Enchantments.SOUL_SPEED,user));
     }
 
     public enum ArtsType{

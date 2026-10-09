@@ -17,14 +17,14 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.item.alchemy.PotionUtils;
+
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
@@ -33,8 +33,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraftforge.network.PlayMessages;
-import net.minecraftforge.network.NetworkHooks;
 
 import net.minecraft.world.entity.Entity.RemovalReason;
 
@@ -75,21 +73,27 @@ public class EntityJudgementCut extends Projectile implements IShootable {
         this.seed = this.random.nextInt(360);
     }
 
-    public static EntityJudgementCut createInstance(PlayMessages.SpawnEntity packet, Level worldIn){
+    public static EntityJudgementCut createInstance(net.minecraft.network.protocol.game.ClientboundAddEntityPacket packet, Level worldIn){
         return new EntityJudgementCut(SlashBlade.RegistryEvents.JudgementCut, worldIn);
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(COLOR, 0x3333FF);
-        this.entityData.define(FLAGS, 0);
-        this.entityData.define(RANK, 0.0f);
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(COLOR, 0x3333FF);
+        builder.define(FLAGS, 0);
+        builder.define(RANK, 0.0f);
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
+    protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        CompoundTag compound = new CompoundTag();
+        writeBladeData(compound);
+        output.store("slashblade:entity_judgement_cut", CompoundTag.CODEC, compound);
+    }
+    private void writeBladeData(CompoundTag compound) {
+
 
         NBTHelper.getNBTCoupler(compound)
                 .put("Color", this.getColor())
@@ -101,8 +105,12 @@ public class EntityJudgementCut extends Projectile implements IShootable {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
+    protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput input) {
+        super.readAdditionalSaveData(input);
+        readBladeData(input.read("slashblade:entity_judgement_cut", CompoundTag.CODEC).orElseGet(CompoundTag::new));
+    }
+    private void readBladeData(CompoundTag compound) {
+
 
         NBTHelper.getNBTCoupler(compound)
                 .get("Color", this::setColor)
@@ -114,8 +122,8 @@ public class EntityJudgementCut extends Projectile implements IShootable {
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket(net.minecraft.server.level.ServerEntity entity) {
+        return super.getAddEntityPacket(entity);
     }
 
     @Override
@@ -124,7 +132,6 @@ public class EntityJudgementCut extends Projectile implements IShootable {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public boolean shouldRenderAtSqrDistance(double distance) {
         double d0 = this.getBoundingBox().getSize() * 10.0D;
         if (Double.isNaN(d0)) {
@@ -135,16 +142,14 @@ public class EntityJudgementCut extends Projectile implements IShootable {
         return distance < d0 * d0;
     }
 
-    @Override
-    @OnlyIn(Dist.CLIENT)
     public void lerpTo(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport) {
         this.setPos(x, y, z);
         this.setRot(yaw, pitch);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public void lerpMotion(double x, double y, double z) {
+    public void lerpMotion(Vec3 movement) {
+        double x = movement.x, y = movement.y, z = movement.z;
         this.setDeltaMovement(0, 0, 0);
     }
 
@@ -166,7 +171,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
     }
 
     private void refreshFlags(){
-        if(this.level().isClientSide){
+        if(this.level().isClientSide()){
             int newValue = this.entityData.get(FLAGS).intValue();
             if(intFlags != newValue){
                 intFlags = newValue;
@@ -202,7 +207,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
     }
     //disallowedHitBlock
     public boolean isNoClip() {
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide()) {
             return this.noPhysics;
         } else {
             refreshFlags();
@@ -228,9 +233,9 @@ public class EntityJudgementCut extends Projectile implements IShootable {
             }
 
             final int count = 3;
-            if(getIsCritical() && 0 < tickCount && tickCount <= count){
+            if(!this.level().isClientSide() && getIsCritical() && 0 < tickCount && tickCount <= count){
                 EntitySlashEffect jc = new EntitySlashEffect(SlashBlade.RegistryEvents.SlashEffect, this.level());
-                jc.absMoveTo(
+                jc.snapTo(
                         this.getX(), this.getY(), this.getZ(),
                         (360.0f / count) * tickCount + this.seed, 0);
                 jc.setRotationRoll(30);
@@ -260,7 +265,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
     }
 
     protected void tryDespawn() {
-        if(!this.level().isClientSide){
+        if(!this.level().isClientSide()){
             if (getLifetime() < this.tickCount) {
                 this.burst();
             }
@@ -307,7 +312,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
                 affectEntity(targetLivingEntity, getPotionEffects(), 1.0f);
 
                 if (shooter != null && targetLivingEntity != shooter && targetLivingEntity instanceof PlayerEntity && shooter instanceof ServerPlayerEntity) {
-                    ((ServerPlayerEntity) shooter).playNotifySound(this.getHitEntityPlayerSound(), SoundCategory.PLAYERS, 0.18F, 0.45F);
+                    mods.flammpfeil.slashblade.compat.SBEffects.notifySound(((ServerPlayerEntity) shooter), this.getHitEntityPlayerSound(), SoundCategory.PLAYERS, 0.18F, 0.45F);
                 }
             }
 
@@ -358,7 +363,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
     }
 
     public List<MobEffectInstance> getPotionEffects(){
-        List<MobEffectInstance> effects = PotionUtils.getAllEffects(this.getPersistentData());
+        List<MobEffectInstance> effects = mods.flammpfeil.slashblade.compat.SBEffects.effects(this.getPersistentData(), this.level().registryAccess());
 
         if(effects.isEmpty())
             effects.add(new MobEffectInstance(MobEffects.POISON, 1, 1));
@@ -369,7 +374,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
     public void burst(){
         //this.playSound(SoundEvents.BLOCK_GLASS_BREAK, 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
 
-        if(!this.level().isClientSide){
+        if(!this.level().isClientSide()){
             if(this.level() instanceof ServerLevel)
                 ((ServerLevel)this.level()).sendParticles(ParticleTypes.CRIT, this.getX(), this.getY(), this.getZ(), 16, 0.5, 0.5,0.5,0.25f);
 
@@ -406,9 +411,9 @@ public class EntityJudgementCut extends Projectile implements IShootable {
 
     public void affectEntity(LivingEntity focusEntity, List<MobEffectInstance> effects, double factor){
         for(MobEffectInstance effectinstance : getPotionEffects()) {
-            MobEffect effect = effectinstance.getEffect();
-            if (effect.isInstantenous()) {
-                effect.applyInstantenousEffect(this, this.getShooter(), focusEntity, effectinstance.getAmplifier(), factor);
+            var effect = effectinstance.getEffect();
+            if (effect.value().isInstantenous()) {
+                effect.value().applyInstantenousEffect((net.minecraft.server.level.ServerLevel)this.level(), this, this.getShooter(), focusEntity, effectinstance.getAmplifier(), factor);
             } else {
                 int duration = (int)(factor * (double)effectinstance.getDuration() + 0.5D);
                 if (duration > 0) {

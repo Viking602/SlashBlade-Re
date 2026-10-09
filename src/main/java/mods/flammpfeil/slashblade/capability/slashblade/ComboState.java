@@ -1,5 +1,7 @@
 package mods.flammpfeil.slashblade.capability.slashblade;
 
+import mods.flammpfeil.slashblade.compat.SBData;
+import mods.flammpfeil.slashblade.compat.StateKey;
 import com.google.common.collect.*;
 import mods.flammpfeil.slashblade.ability.ArrowReflector;
 import mods.flammpfeil.slashblade.ability.StunManager;
@@ -17,15 +19,11 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
@@ -33,14 +31,14 @@ import java.util.stream.Collectors;
 import static mods.flammpfeil.slashblade.init.DefaultResources.BaseMotionLocation;
 
 public class ComboState extends RegistryBase<ComboState>{
-    static Map<ResourceLocation, ComboState> registry = Maps.newHashMap();
+    static Map<Identifier, ComboState> registry = Maps.newHashMap();
 
     @Override
-    public Map<ResourceLocation, ComboState> getRegistry() {
+    public Map<Identifier, ComboState> getRegistry() {
         return ComboState.registry;
     }
 
-    public static final Capability<IInputState> INPUT_STATE = CapabilityManager.get(new CapabilityToken<>(){});
+    public static final StateKey<IInputState> INPUT_STATE = StateKey.of(IInputState.class);
 
     public static final ComboState NONE = new ComboState(BaseInstanceName, 1000,
             ()->0, ()->1, ()->1.0f, ()->true,()->0,
@@ -71,7 +69,7 @@ public class ComboState extends RegistryBase<ComboState>{
             BaseMotionLocation, (a)-> {
 
         EnumSet<InputCommand> commands =
-            a.getCapability(INPUT_STATE).map((state)->state.getCommands(a)).orElseGet(()-> EnumSet.noneOf(InputCommand.class));
+            SBData.get(a, INPUT_STATE).map((state)->state.getCommands(a)).orElseGet(()-> EnumSet.noneOf(InputCommand.class));
 
         return standbyMap.stream()
                 .filter((entry)->commands.containsAll(entry.getKey()))
@@ -113,13 +111,13 @@ public class ComboState extends RegistryBase<ComboState>{
                 int elapsed = player.getTicksUsingItem();
 
                 EnumSet<InputCommand> commands =
-                        player.getCapability(INPUT_STATE).map((state)->state.getCommands(player)).orElseGet(()-> EnumSet.noneOf(InputCommand.class));
+                        SBData.get(player, INPUT_STATE).map((state)->state.getCommands(player)).orElseGet(()-> EnumSet.noneOf(InputCommand.class));
 
                 if (5 == elapsed && commands.containsAll(combo_b1_alt)) {
                     Vec3 motion = player.getDeltaMovement();
                     player.setDeltaMovement(motion.x, motion.y + 0.7, motion.z);
                     player.setOnGround(false);
-                    player.hasImpulse = true;
+                    player.hurtMarked = true;
                 }
             })
             .addHitEffect((e,a)->StunManager.setStun(e, 15))
@@ -153,7 +151,7 @@ public class ComboState extends RegistryBase<ComboState>{
 
                 FallHandler.fallDecrease(playerIn);
 
-                playerIn.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state)->{
+                SBData.get(playerIn.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state)->{
                     long elapsed = state.getElapsedTime(playerIn);
                     if(elapsed == 4){
                         AttackManager.areaAttack(playerIn, KnockBackHandler::setCancel);
@@ -200,7 +198,7 @@ public class ComboState extends RegistryBase<ComboState>{
                 int elapsed = playerIn.getTicksUsingItem();
 
                 if(elapsed < 6){
-                    playerIn.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state)->{
+                    SBData.get(playerIn.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state)->{
                         AttackManager.areaAttack(playerIn, KnockBackHandler::setCancel,1.0f,false,false,true);
                     });
 
@@ -214,8 +212,8 @@ public class ComboState extends RegistryBase<ComboState>{
                 if(elapsed <= 3 && playerIn.onGround())
                     playerIn.moveRelative( playerIn.isInWater() ? 0.35f : 0.8f , new Vec3(0, 0, 1));
 
-                if(elapsed == 10 && (playerIn.level().isClientSide ? playerIn.onGround() : true)){
-                    playerIn.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+                if(elapsed == 10 && (playerIn.level().isClientSide() ? playerIn.onGround() : true)){
+                    SBData.get(playerIn.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
                         ComboState combo = ComboState.ARTS_RISING_STAR;
                         state.setComboSeq(combo);
                         state.setLastActionTime(playerIn.level().getGameTime());
@@ -239,12 +237,12 @@ public class ComboState extends RegistryBase<ComboState>{
                 Vec3 motion = playerIn.getDeltaMovement();
                 playerIn.setDeltaMovement(0, motion.y + 0.7, 0);
                 playerIn.setOnGround(false);
-                playerIn.hasImpulse = true;
+                playerIn.hurtMarked = true;
             })
             .addHoldAction((playerIn)->{
                 int elapsed = playerIn.getTicksUsingItem();
                 if(elapsed < 6){
-                    playerIn.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state)->{
+                    SBData.get(playerIn.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state)->{
                         AttackManager.areaAttack(playerIn,(ee)->KnockBackHandler.setVertical(ee,0.5),1.0f,false,false,true);
                     });
 
@@ -272,7 +270,7 @@ public class ComboState extends RegistryBase<ComboState>{
             .addHoldAction((playerIn)->{
                 int elapsed = playerIn.getTicksUsingItem();
                 if(!playerIn.onGround()){
-                    playerIn.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state)->{
+                    SBData.get(playerIn.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state)->{
                         AttackManager.areaAttack(playerIn,(ee)->KnockBackHandler.setVertical(ee,-5),1.0f,false,false,true);
                     });
 
@@ -286,7 +284,7 @@ public class ComboState extends RegistryBase<ComboState>{
                     playerIn.fallDistance = 1;
                 else{
                     //finish
-                    playerIn.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state)->{
+                    SBData.get(playerIn.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state)->{
                         AttackManager.areaAttack(playerIn,(ee)->KnockBackHandler.setVertical(ee,-5),1.3f,true,true,true);
                         state.setComboSeq(ComboState.ARTS_HELM_BREAKER_F);
                         state.setLastActionTime(playerIn.level().getGameTime());
@@ -312,10 +310,10 @@ public class ComboState extends RegistryBase<ComboState>{
             BaseMotionLocation, (a)->{
 
         EnumSet<InputCommand> commands =
-                a.getCapability(INPUT_STATE).map((state)->state.getCommands(a)).orElseGet(()-> EnumSet.noneOf(InputCommand.class));
+                SBData.get(a, INPUT_STATE).map((state)->state.getCommands(a)).orElseGet(()-> EnumSet.noneOf(InputCommand.class));
 
         if(commands.containsAll(jc_cycle_input)){
-            return a.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).map(s->{
+            return SBData.get(a.getMainHandItem(), ItemSlashBlade.BLADESTATE).map(s->{
                 long time = a.level().getGameTime();
                 long lastAction = s.getLastActionTime();
 
@@ -343,7 +341,7 @@ public class ComboState extends RegistryBase<ComboState>{
     /*-----------------------------------------*/
 
 
-    private ResourceLocation motionLoc;
+    private Identifier motionLoc;
 
     //frame
     private Supplier<Integer> start;
@@ -373,7 +371,7 @@ public class ComboState extends RegistryBase<ComboState>{
 
     private int priority;
 
-    public ResourceLocation getMotionLoc() {
+    public Identifier getMotionLoc() {
         return motionLoc;
     }
 
@@ -436,7 +434,7 @@ public class ComboState extends RegistryBase<ComboState>{
     }
 
     public ComboState(String name,int priority, Supplier<Integer> start, Supplier<Integer> end, Supplier<Float> speed, Supplier<Boolean> loop, Supplier<Integer> timeout
-            , ResourceLocation motionLoc
+            , Identifier motionLoc
             , Function<LivingEntity, ComboState> next
             , Supplier<ComboState> nextOfTimeout) {
         super(name);
@@ -486,7 +484,7 @@ public class ComboState extends RegistryBase<ComboState>{
         return this.nextOfTimeout.get();
     }
 
-    @Nonnull
+    @NotNull
     public ComboState checkTimeOut(float msec){
         return this.getTimeoutMS() < msec ? nextOfTimeout.get() : this;
     }
@@ -504,7 +502,7 @@ public class ComboState extends RegistryBase<ComboState>{
     }
 
     static public SlashArts.ArtsType releaseActionQuickCharge(LivingEntity user, Integer elapsed){
-        int level = EnchantmentHelper.getEnchantmentLevel(Enchantments.SOUL_SPEED,user);
+        int level = mods.flammpfeil.slashblade.compat.SBEnchantments.livingLevel(Enchantments.SOUL_SPEED,user);
         if(elapsed <= 3 + level) {
             AdvancementHelper.grantedIf(Enchantments.SOUL_SPEED,user);
             AdvancementHelper.grantCriterion(user,Extra.ADVANCEMENT_QUICK_CHARGE);
@@ -536,7 +534,7 @@ public class ComboState extends RegistryBase<ComboState>{
             if(timeout <= elapsed){
                 return next.apply(livingEntity);
             }else{
-                return livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE)
+                return SBData.get(livingEntity.getMainHandItem(), ItemSlashBlade.BLADESTATE)
                         .map((state)->state.getComboSeq())
                         .orElseGet(()->ComboState.NONE);
             }
@@ -544,7 +542,18 @@ public class ComboState extends RegistryBase<ComboState>{
     }
 
     public static class TimeLineTickAction implements Consumer<LivingEntity>{
-        long offset = -1;
+        private static final class Cursor {
+            long actionTime;
+            ComboState origin;
+            java.util.UUID blade;
+            int offset;
+            int lastRaw;
+            int lastHandled = -1;
+        }
+        // Client and server entities have independent cursors. Weak identity keys
+        // avoid retaining players, and the cursor never retains its entity.
+        private final java.util.concurrent.ConcurrentMap<LivingEntity, Cursor> cursors =
+                new MapMaker().weakKeys().makeMap();
 
         public static TimeLineTickActionBuilder getBuilder(){
             return new TimeLineTickActionBuilder();
@@ -563,32 +572,44 @@ public class ComboState extends RegistryBase<ComboState>{
             }
         }
 
-        Map<Integer, Consumer<LivingEntity>> timeLine = Maps.newHashMap();
+        private final int[] eventTicks;
+        private final Consumer<LivingEntity>[] eventActions;
 
+        @SuppressWarnings("unchecked")
         TimeLineTickAction(Map<Integer, Consumer<LivingEntity>> timeLine){
-            this.timeLine.putAll(timeLine);
-
+            var ordered=timeLine.entrySet().stream().sorted(Map.Entry.comparingByKey()).toList();
+            eventTicks=new int[ordered.size()]; eventActions=new Consumer[ordered.size()];
+            for(int i=0;i<ordered.size();i++) { eventTicks[i]=ordered.get(i).getKey(); eventActions[i]=ordered.get(i).getValue(); }
         }
 
         @Override
         public void accept(LivingEntity livingEntity) {
-            long elapsed = getElapsed(livingEntity);
-
-            if(offset < 0){
-                offset = elapsed;
-            }
-            elapsed -= offset;
-
-            Consumer<LivingEntity> action = timeLine.getOrDefault((int)elapsed, this::defaultConsumer);
-
-            action.accept(livingEntity);
+            SBData.get(livingEntity.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+                int raw = state.resolvCurrentComboStateTicks(livingEntity).getKey();
+                Cursor cursor = cursors.computeIfAbsent(livingEntity, ignored -> new Cursor());
+                if (cursor.origin != state.getComboSeq() || cursor.actionTime != state.getLastActionTime() || !state.getUniqueId().equals(cursor.blade) || raw < cursor.lastRaw) {
+                    cursor.origin = state.getComboSeq();
+                    cursor.actionTime = state.getLastActionTime();
+                    cursor.blade = state.getUniqueId();
+                    cursor.offset = raw;
+                    cursor.lastHandled = -1;
+                }
+                cursor.lastRaw = raw;
+                int elapsed = raw - cursor.offset;
+                int previous = cursor.lastHandled;
+                if (elapsed <= previous) return;
+                cursor.lastHandled = elapsed;
+                // A delayed tick still executes crossed events once, in order.
+                for(int i=0;i<eventTicks.length;i++)
+                    if(previous<eventTicks[i] && eventTicks[i]<=elapsed)eventActions[i].accept(livingEntity);
+            });
         }
 
         void defaultConsumer(LivingEntity entityIn){}
     }
 
     static public long getElapsed(LivingEntity livingEntity){
-        return livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE)
+        return SBData.get(livingEntity.getMainHandItem(), ItemSlashBlade.BLADESTATE)
                 .map((state)->state.getElapsedTime(livingEntity))
                 .orElseGet(()->0l);
     }

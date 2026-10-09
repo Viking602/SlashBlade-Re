@@ -8,9 +8,14 @@ import java.util.function.Consumer;
 
 public class NBTHelper {
 
+    public static boolean containsType(CompoundTag tag, String key, int type) {
+        Tag value = tag.get(key);
+        return value != null && (value.getId() == type || (type == 99 && value instanceof NumericTag));
+    }
+
     public static Vec3 getVector3d(CompoundTag tag, String key) {
-        ListTag listnbt = tag.getList(key, 6);
-        return new Vec3(listnbt.getDouble(0), listnbt.getDouble(1), listnbt.getDouble(2));
+        ListTag listnbt = tag.getListOrEmpty(key);
+        return new Vec3(listnbt.getDoubleOr(0, 0.0D), listnbt.getDoubleOr(1, 0.0D), listnbt.getDoubleOr(2, 0.0D));
     }
 
     public static void putVector3d(CompoundTag tag, String key, Vec3 value) {
@@ -51,7 +56,7 @@ public class NBTHelper {
         }
 
         public NBTCoupler remove(String key){
-            if(this.instance.hasUUID(key)){
+            if(this.instance.read(key, net.minecraft.core.UUIDUtil.CODEC).isPresent()){
                 this.instance.remove(key + "Most");
                 this.instance.remove(key + "Least");
 
@@ -63,8 +68,8 @@ public class NBTHelper {
         public NBTCoupler getChild(String key){
             CompoundTag tag;
 
-            if(this.instance.contains(key, 10))
-                tag = this.instance.getCompound(key);
+            if(mods.flammpfeil.slashblade.util.NBTHelper.containsType(this.instance, key, 10))
+                tag = this.instance.getCompoundOrEmpty(key);
             else{
                 tag = new CompoundTag();
                 this.instance.put(key, tag);
@@ -84,8 +89,8 @@ public class NBTHelper {
             return this.instance;
         }
         public CompoundTag getRawCompound(String key){
-            if(this.instance.contains(key, 10))
-                return this.instance.getCompound(key);
+            if(mods.flammpfeil.slashblade.util.NBTHelper.containsType(this.instance, key, 10))
+                return this.instance.getCompoundOrEmpty(key);
             else{
                 CompoundTag nbt = new CompoundTag();
                 this.instance.put(key , nbt);
@@ -94,8 +99,8 @@ public class NBTHelper {
         }
 
         public NBTCoupler doRawCompound(String key, Consumer<CompoundTag> action){
-            if(this.instance.contains(key, 10))
-                action.accept(this.instance.getCompound(key));
+            if(mods.flammpfeil.slashblade.util.NBTHelper.containsType(this.instance, key, 10))
+                action.accept(this.instance.getCompoundOrEmpty(key));
 
             return this;
         }
@@ -128,7 +133,7 @@ public class NBTHelper {
             dest.putBoolean(key, (Boolean)value[0]);
         } else if(value[0] != null){
             if (type.equals(UUID.class)) {
-                dest.putUUID(key, (UUID)value[0]);
+                dest.store(key, net.minecraft.core.UUIDUtil.CODEC, (UUID)value[0]);
             } else if (type.equals(byte[].class)) {
                 dest.putByteArray(key, (byte[])value[0]);
             } else if (type.equals(int[].class)) {
@@ -167,45 +172,45 @@ public class NBTHelper {
 
         if (type.equals(Integer.class)) {
             typeId = 99;
-            result = src.getInt(key);
+            result = src.getIntOr(key, 0);
         } else if (type.equals(Float.class)) {
             typeId = 99;
-            result = src.getFloat(key);
+            result = src.getFloatOr(key, 0.0F);
         } else if (type.equals(Short.class)) {
             typeId = 99;
-            result = src.getShort(key);
+            result = src.getShortOr(key, (short)0);
         } else if (type.equals(Byte.class)) {
             typeId = 99;
-            result = src.getByte(key);
+            result = src.getByteOr(key, (byte)0);
         } else if (type.equals(Long.class)) {
             typeId = 99;
-            result = src.getLong(key);
+            result = src.getLongOr(key, 0L);
         } else if (type.equals(Double.class)) {
             typeId = 99;
-            result = src.getDouble(key);
+            result = src.getDoubleOr(key, 0.0D);
         } else if (type.equals(Boolean.class)) {
             typeId = 99;
-            result = src.getBoolean(key);
+            result = src.getBooleanOr(key, false);
         } else if(src.contains(key)){
             if (type.equals(UUID.class)) {
                 typeId = -2;
-                if(src.hasUUID(key))
-                    result = src.getUUID(key);
+                if(src.read(key, net.minecraft.core.UUIDUtil.CODEC).isPresent())
+                    result = src.read(key, net.minecraft.core.UUIDUtil.CODEC).orElse(new java.util.UUID(0L,0L));
             } else if (type.equals(byte[].class)) {
                 typeId = 7;
-                result = src.getByteArray(key);
+                result = src.getByteArray(key).orElse(new byte[0]);
             } else if (type.equals(int[].class)) {
                 typeId = 11;
-                result = src.getIntArray(key);
+                result = src.getIntArray(key).orElse(new int[0]);
             } else if (type.equals(long[].class)) {
                 typeId = 12;
-                result = src.getLongArray(key);
+                result = src.getLongArray(key).orElse(new long[0]);
             }else if(type.equals(CompoundTag.class)){
                 typeId = 10;
-                result = src.getCompound(key);
+                result = src.getCompoundOrEmpty(key);
             }else if (type.equals(String.class)) {
                 typeId = 8;
-                result = src.getString(key);
+                result = src.getStringOr(key, "");
             }
         }else if(type.equals(Vec3.class)){
             typeId = 6;
@@ -213,9 +218,9 @@ public class NBTHelper {
         }
 
         if(0 < defaultValue.length){
-            boolean exists = (typeId == -2) ? src.hasUUID(key) : src.contains(key, typeId);
+            boolean exists = (typeId == -2) ? src.read(key, net.minecraft.core.UUIDUtil.CODEC).isPresent() : mods.flammpfeil.slashblade.util.NBTHelper.containsType(src, key, typeId);
             if(!exists)
-                result = defaultValue;
+                result = defaultValue[0];
         }
 
         return Optional.ofNullable((T)result);

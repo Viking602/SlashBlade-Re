@@ -1,0 +1,100 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " /S",
+    "LCH",
+    "Ag "
+  ],
+  "key": {
+    "/": "minecraft:blaze_rod",
+    "S": "slashblade:proudsoul_sphere",
+    "L": "minecraft:lapis_block",
+    "C": "minecraft:chest",
+    "H": "minecraft:coal_block",
+    "A": "minecraft:string",
+    "g": "minecraft:gold_ingot"
+  },
+  "result": {
+    "id": "minecraft:chest",
+    "components": {
+      "minecraft:custom_name": {
+        "translate": "item.slashblade.simple.iron.material"
+      },
+      "minecraft:container": [
+        {
+          "slot": 4,
+          "item": {
+            "id": "minecraft:blaze_rod"
+          }
+        },
+        {
+          "slot": 5,
+          "item": {
+            "id": "slashblade:proudsoul_sphere"
+          }
+        },
+        {
+          "slot": 12,
+          "item": {
+            "id": "minecraft:lapis_block"
+          }
+        },
+        {
+          "slot": 14,
+          "item": {
+            "id": "minecraft:coal_block"
+          }
+        },
+        {
+          "slot": 21,
+          "item": {
+            "id": "minecraft:string"
+          }
+        },
+        {
+          "slot": 22,
+          "item": {
+            "id": "minecraft:gold_ingot"
+          }
+        }
+      ],
+      "minecraft:custom_data": {
+        "RequiredBlade": {
+          "broken": 1,
+          "result": {
+            "id": "slashblade:slashblade",
+            "components": {
+              "slashblade:blade_state": {
+                "isSealed": 0,
+                "isNoScabbard": 0,
+                "translationKey": "item.slashblade.simple.iron",
+                "isDestructable": 0,
+                "SummonedSwordColor": -13421569,
+                "currentCombo": "arts_rapid_slash",
+                "RepairCounter": 0,
+                "Damage": 0.0,
+                "rarityType": 1,
+                "ComboRoot": "standby",
+                "lastPosHash": "",
+                "RangeAttackType": "none",
+                "isDefaultBewitched": 0,
+                "SpecialAttackType": "none",
+                "TextureName": "slashblade:model/blade.png",
+                "ModelName": "slashblade:model/named/yamato.obj",
+                "baseAttackModifier": 4.0,
+                "StandbyRenderType": 0,
+                "ComboRootAir": "standby_inair"
+              },
+              "minecraft:rarity": "uncommon"
+            }
+          },
+          "level": 10,
+          "killCount": 0,
+          "refine": 0,
+          "noScabbard": 0,
+          "translationKey": "item.slashblade.simple.white"
+        }
+      }
+    }
+  }
+}

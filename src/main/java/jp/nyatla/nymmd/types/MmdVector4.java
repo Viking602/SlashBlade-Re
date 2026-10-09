@@ -52,27 +52,24 @@ public class MmdVector4
 	public void QuaternionSlerp(MmdVector4 pvec4Src1,MmdVector4 pvec4Src2, double fLerpValue )
 	{
 
-		// Qlerp
-		double	qr = pvec4Src1.x * pvec4Src2.x + pvec4Src1.y * pvec4Src2.y + pvec4Src1.z * pvec4Src2.z + pvec4Src1.w * pvec4Src2.w;
-		double	t0 = 1.0f - fLerpValue;
+        double dot = pvec4Src1.x * pvec4Src2.x + pvec4Src1.y * pvec4Src2.y
+                + pvec4Src1.z * pvec4Src2.z + pvec4Src1.w * pvec4Src2.w;
+        double sign = dot < 0 ? -1 : 1;
+        dot = Math.min(1, Math.abs(dot));
+        double a = 1 - fLerpValue, b = fLerpValue;
+        if (dot < .9995) {
+            double angle = Math.acos(dot), sine = Math.sin(angle);
+            a = Math.sin((1 - fLerpValue) * angle) / sine;
+            b = Math.sin(fLerpValue * angle) / sine;
+        }
+        b *= sign;
+        this.x = a * pvec4Src1.x + b * pvec4Src2.x;
+        this.y = a * pvec4Src1.y + b * pvec4Src2.y;
+        this.z = a * pvec4Src1.z + b * pvec4Src2.z;
+        this.w = a * pvec4Src1.w + b * pvec4Src2.w;
+        QuaternionNormalize(this);
+    }
 
-		if( qr < 0 )
-		{
-			this.x = pvec4Src1.x * t0 - pvec4Src2.x * fLerpValue;
-			this.y = pvec4Src1.y * t0 - pvec4Src2.y * fLerpValue;
-			this.z = pvec4Src1.z * t0 - pvec4Src2.z * fLerpValue;
-			this.w = pvec4Src1.w * t0 - pvec4Src2.w * fLerpValue;
-		}
-		else
-		{
-			this.x = pvec4Src1.x * t0 + pvec4Src2.x * fLerpValue;
-			this.y = pvec4Src1.y * t0 + pvec4Src2.y * fLerpValue;
-			this.z = pvec4Src1.z * t0 + pvec4Src2.z * fLerpValue;
-			this.w = pvec4Src1.w * t0 + pvec4Src2.w * fLerpValue;
-		}
-		QuaternionNormalize(this);
-		return;
-	}
 	public void QuaternionNormalize(MmdVector4 pvec4Src)
 	{
 		final double fSqr =1.0 / Math.sqrt(( pvec4Src.x * pvec4Src.x + pvec4Src.y * pvec4Src.y + pvec4Src.z * pvec4Src.z + pvec4Src.w * pvec4Src.w));

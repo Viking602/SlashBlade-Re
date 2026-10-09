@@ -1,26 +1,25 @@
 package mods.flammpfeil.slashblade.item;
 
+import mods.flammpfeil.slashblade.compat.SBItemData;
+import mods.flammpfeil.slashblade.compat.SBData;
+import mods.flammpfeil.slashblade.compat.StateKey;
 import com.google.common.collect.*;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.capability.inputstate.IInputState;
 import mods.flammpfeil.slashblade.capability.inputstate.InputState;
 import mods.flammpfeil.slashblade.capability.slashblade.ComboState;
 import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
-import mods.flammpfeil.slashblade.client.renderer.SlashBladeTEISR;
 import mods.flammpfeil.slashblade.entity.BladeItemEntity;
 import mods.flammpfeil.slashblade.event.AnvilCraftingRecipe;
 import mods.flammpfeil.slashblade.event.BladeMaterialTooltips;
 import mods.flammpfeil.slashblade.init.SBItems;
 import mods.flammpfeil.slashblade.util.InputCommand;
 import mods.flammpfeil.slashblade.util.NBTHelper;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -41,121 +40,61 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.DistExecutor;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import mods.flammpfeil.slashblade.compat.LazyOptional;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tier;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import net.minecraft.world.item.Item.Properties;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemSlashBlade extends SwordItem {
+public class ItemSlashBlade extends Item {
     protected static final UUID ATTACK_DAMAGE_AMPLIFIER = UUID.fromString("2D988C13-595B-4E58-B254-39BB6FA077FD");
     protected static final UUID PLAYER_REACH_AMPLIFIER = UUID.fromString("2D988C13-595B-4E58-B254-39BB6FA077FE");
 
-    public static final Capability<ISlashBladeState> BLADESTATE = CapabilityManager.get(new CapabilityToken<>(){});
-    public static final Capability<IInputState> INPUT_STATE = CapabilityManager.get(new CapabilityToken<>(){});
+    public static final StateKey<ISlashBladeState> BLADESTATE = StateKey.of(ISlashBladeState.class);
+    public static final StateKey<IInputState> INPUT_STATE = StateKey.of(IInputState.class);
 
-    public ItemSlashBlade(Tier tier, int attackDamageIn, float attackSpeedIn, Properties builder) {
-        super(tier, attackDamageIn, attackSpeedIn, builder);
+    public ItemSlashBlade(ItemTierSlashBlade tier, int attackDamageIn, float attackSpeedIn, Properties builder) {
+        super(builder.sword(tier.material(), attackDamageIn, attackSpeedIn));
     }
 
-    @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack)
-    {
-        Multimap<Attribute, AttributeModifier> def = super.getAttributeModifiers(slot,stack);
-        Multimap<Attribute, AttributeModifier> result = ArrayListMultimap.create();
 
-        result.putAll(Attributes.ATTACK_DAMAGE, def.get(Attributes.ATTACK_DAMAGE));
-        result.putAll(Attributes.ATTACK_SPEED, def.get(Attributes.ATTACK_SPEED));
 
-        if (slot == EquipmentSlot.MAINHAND) {
-            LazyOptional<ISlashBladeState> state = stack.getCapability(BLADESTATE);
-            state.ifPresent(s -> {
-                float baseAttackModifier = s.getBaseAttackModifier();
-                AttributeModifier base = new AttributeModifier(BASE_ATTACK_DAMAGE_UUID,
-                        "Weapon modifier",
-                        (double) baseAttackModifier,
-                        AttributeModifier.Operation.ADDITION);
-                result.remove(Attributes.ATTACK_DAMAGE,base);
-                result.put(Attributes.ATTACK_DAMAGE,base);
-
-                float rankAttackAmplifier = s.getAttackAmplifier();
-                result.put(Attributes.ATTACK_DAMAGE,
-                        new AttributeModifier(ATTACK_DAMAGE_AMPLIFIER,
-                                "Weapon amplifier",
-
-                                (double) rankAttackAmplifier,
-                                AttributeModifier.Operation.ADDITION));
-
-                result.put(ForgeMod.ENTITY_REACH.get(), new AttributeModifier(PLAYER_REACH_AMPLIFIER,
-                        "Reach amplifer",
-                        s.isBroken() ? ReachModifier.BrokendReach() : ReachModifier.BladeReach(), AttributeModifier.Operation.ADDITION));
-
-            });
-        }
-
-        return result;
-    }
-
-    @Override
     public Rarity getRarity(ItemStack stack) {
-        LazyOptional<ISlashBladeState> state = stack.getCapability(BLADESTATE);
-
-        return state
-                .filter(s -> s.getRarity() != Rarity.COMMON)
-                .map(s -> s.getRarity())
-                .orElseGet(() -> super.getRarity(stack));
-
+        return SBData.get(stack, BLADESTATE).map(ISlashBladeState::getRarity).orElse(Rarity.COMMON);
     }
 
 
-    public int getUseDuration(ItemStack stack) {
-        return 72000;
-    }
+    @Override public int getUseDuration(ItemStack stack, LivingEntity user) { return 72000; }
+    public int getUseDuration(ItemStack stack) { return 72000; }
 
-    public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
-        ItemStack itemstack = playerIn.getItemInHand(handIn);
-
-        boolean result = itemstack.getCapability(BLADESTATE).map((state) -> {
-
-            playerIn.getCapability(INPUT_STATE).ifPresent((s)->s.getCommands().add(InputCommand.R_CLICK));
-
-            ComboState combo = state.progressCombo(playerIn);
-
-            playerIn.getCapability(INPUT_STATE).ifPresent((s)->s.getCommands().remove(InputCommand.R_CLICK));
-
-            if(combo != ComboState.NONE)
-                playerIn.swing(handIn);
-
-            return true;
-        }).orElse(false);
-
-        playerIn.startUsingItem(handIn);
-        return new InteractionResultHolder<>(InteractionResult.SUCCESS, itemstack);
+    @Override public InteractionResult use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        SBData.get(stack, BLADESTATE).ifPresent(state -> {
+            SBData.get(player, INPUT_STATE).ifPresent(input -> input.getCommands().add(InputCommand.R_CLICK));
+            try {
+                ComboState combo = state.progressCombo(player);
+                if (combo != ComboState.NONE) player.swing(hand);
+            } finally { SBData.get(player, INPUT_STATE).ifPresent(input -> input.getCommands().remove(InputCommand.R_CLICK)); }
+        });
+        player.startUsingItem(hand);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -163,15 +102,15 @@ public class ItemSlashBlade extends SwordItem {
 
         Level worldIn = playerIn.level();
 
-        Optional<ISlashBladeState> stateHolder = itemstack.getCapability(BLADESTATE)
+        Optional<ISlashBladeState> stateHolder = SBData.get(itemstack, BLADESTATE)
                 .filter((state) -> !state.onClick());
 
         stateHolder.ifPresent((state) -> {
-            playerIn.getCapability(INPUT_STATE).ifPresent((s)->s.getCommands().add(InputCommand.L_CLICK));
+            SBData.get(playerIn, INPUT_STATE).ifPresent((s)->s.getCommands().add(InputCommand.L_CLICK));
 
             ComboState combo = state.progressCombo(playerIn);
 
-            playerIn.getCapability(INPUT_STATE).ifPresent((s)->s.getCommands().remove(InputCommand.L_CLICK));
+            SBData.get(playerIn, INPUT_STATE).ifPresent((s)->s.getCommands().remove(InputCommand.L_CLICK));
         });
 
         return stateHolder.isPresent();
@@ -181,27 +120,27 @@ public class ItemSlashBlade extends SwordItem {
 
     static public Consumer<LivingEntity> getOnBroken(ItemStack stack){
         return (user)->{
-            user.broadcastBreakEvent(user.getUsedItemHand());
+            user.onEquippedItemBroken(stack.getItem(), user.getUsedItemHand() == InteractionHand.OFF_HAND ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND);
 
             ItemStack soul = new ItemStack(SBItems.proudsoul);
 
-            CompoundTag blade = stack.save(new CompoundTag());
-            soul.addTagElement(BladeMaterialTooltips.BLADE_DATA, blade);
+            CompoundTag blade = SBItemData.save(stack);
+            SBItemData.put(soul, BladeMaterialTooltips.BLADE_DATA, blade);
 
-            stack.getCapability(BLADESTATE).ifPresent(s->{
-                s.getTexture().ifPresent(r->soul.addTagElement("Texture", StringTag.valueOf(r.toString())));
-                s.getModel().ifPresent(r->soul.addTagElement("Model", StringTag.valueOf(r.toString())));
+            SBData.get(stack, BLADESTATE).ifPresent(s->{
+                s.getTexture().ifPresent(r->SBItemData.put(soul, "Texture", StringTag.valueOf(r.toString())));
+                s.getModel().ifPresent(r->SBItemData.put(soul, "Model", StringTag.valueOf(r.toString())));
             });
 
             {//add clone blade recipe
                 ItemStack cpBlade = stack.copy();
-                cpBlade.getCapability(BLADESTATE).ifPresent(s->{
+                SBData.get(cpBlade, BLADESTATE).ifPresent(s->{
                     s.setDamage(0);
                     s.setOwner(null);
                     s.setRefine(0);
                     s.setKillCount(0);
                 });
-                cpBlade.getEnchantmentTags().clear();
+                cpBlade.remove(net.minecraft.core.component.DataComponents.ENCHANTMENTS);
 
                 AnvilCraftingRecipe recipe = new AnvilCraftingRecipe();
                 recipe.setLevel(10);
@@ -210,10 +149,10 @@ public class ItemSlashBlade extends SwordItem {
                 recipe.setBroken(false);
                 recipe.setNoScabbard(false);
                 recipe.setTranslationKey("item.slashblade.slashblade");
-                recipe.setResultWithNBT(cpBlade.save(new CompoundTag()));
+                recipe.setResultWithNBT(SBItemData.save(cpBlade));
                 recipe.setOverwriteTag(null);
 
-                soul.addTagElement("RequiredBlade", recipe.writeNBT());
+                SBItemData.put(soul, "RequiredBlade", recipe.writeNBT());
             }
 
             ItemEntity itementity = new ItemEntity(user.level(), user.getX(), user.getY() , user.getZ(), soul);
@@ -221,11 +160,11 @@ public class ItemSlashBlade extends SwordItem {
 
                 static final String isReleased = "isReleased";
                 @Override
-                public boolean causeFallDamage(float distance, float damageMultiplier, DamageSource ds) {
+                public boolean causeFallDamage(double distance, float damageMultiplier, DamageSource ds) {
 
                     CompoundTag tag = this.getPersistentData();
 
-                    if(!tag.getBoolean(isReleased)){
+                    if(!tag.getBooleanOr(isReleased, false)){
                         this.getPersistentData().putBoolean(isReleased, true);
 
                         if(this.level() instanceof ServerLevel){
@@ -250,13 +189,13 @@ public class ItemSlashBlade extends SwordItem {
 
             e.setAirSupply(-1);
 
-            e.setThrower(user.getUUID());
+            e.setThrower(user);
 
             user.level().addFreshEntity(e);
 
             user.getPersistentData().putLong(BREAK_ACTION_TIMEOUT, user.level().getGameTime() + 20*5);
 
-            stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state->{
+            SBData.get(stack, ItemSlashBlade.BLADESTATE).ifPresent(state->{
                 if(0 < state.getRefine()){
                     state.setRefine(state.getRefine() - 1);
                     state.doBrokenAction(user);
@@ -266,23 +205,23 @@ public class ItemSlashBlade extends SwordItem {
     }
 
     @Override
-    public boolean hurtEnemy(ItemStack stackF, LivingEntity target, LivingEntity attacker) {
+    public void hurtEnemy(ItemStack stackF, LivingEntity target, LivingEntity attacker) {
 
         ItemStack stack = attacker.getMainHandItem();
 
-        stack.getCapability(BLADESTATE).ifPresent((state)->{
+        SBData.get(stack, BLADESTATE).ifPresent((state)->{
             state.resolvCurrentComboState(attacker).hitEffect(target, attacker);
 
             state.damageBlade(stack, 1, attacker, this.getOnBroken(stack));
 
         });
 
-        return true;
+
     }
     public boolean mineBlock(ItemStack stack, Level worldIn, BlockState state, BlockPos pos, LivingEntity entityLiving) {
 
         if (state.getDestroySpeed(worldIn, pos) != 0.0F) {
-            stack.getCapability(BLADESTATE).ifPresent((s)->{
+            SBData.get(stack, BLADESTATE).ifPresent((s)->{
                 s.damageBlade(stack, 1, entityLiving, this.getOnBroken(stack));
             });
         }
@@ -291,12 +230,12 @@ public class ItemSlashBlade extends SwordItem {
     }
 
     @Override
-    public void releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
+    public boolean releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
         int elapsed = this.getUseDuration(stack) - timeLeft;
 
-        if (!worldIn.isClientSide) {
+        if (!worldIn.isClientSide()) {
 
-            stack.getCapability(BLADESTATE).ifPresent((state) -> {
+            SBData.get(stack, BLADESTATE).ifPresent((state) -> {
 
                 ComboState sa = state.doChargeAction(entityLiving, elapsed);
 
@@ -307,18 +246,19 @@ public class ItemSlashBlade extends SwordItem {
                 }
             });
         }
+        return true;
     }
 
     @Override
     public void onUseTick(Level level, LivingEntity player, ItemStack stack, int count) {
-        stack.getCapability(BLADESTATE).ifPresent((state)->{
+        SBData.get(stack, BLADESTATE).ifPresent((state)->{
             state.getComboSeq().holdAction(player);
 
-            if(!player.level().isClientSide){
+            if(!player.level().isClientSide()){
                 int ticks = player.getTicksUsingItem();
                 if(0 < ticks){
 
-                    if( ticks == 20){//state.getFullChargeTicks(player)){
+                    if (ticks == state.getFullChargeTicks(player)) {
                         Vec3 pos = player.getEyePosition(1.0f).add(player.getLookAngle());
                         ((ServerLevel)player.level()).sendParticles(ParticleTypes.PORTAL,pos.x,pos.y,pos.z, 7, 0.7,0.7,0.7, 0.02);
                     }
@@ -328,11 +268,15 @@ public class ItemSlashBlade extends SwordItem {
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-        super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
+    public void inventoryTick(ItemStack stack, ServerLevel worldIn, Entity entityIn, @Nullable EquipmentSlot slot) {
+        tickInventory(stack, worldIn, entityIn, slot == EquipmentSlot.MAINHAND);
+    }
+
+    public void tickInventory(ItemStack stack, Level worldIn, Entity entityIn, boolean isSelected) {
+
 
         if(!isSelected) {
-            stack.getCapability(BLADESTATE).ifPresent((state)->{
+            SBData.get(stack, BLADESTATE).ifPresent((state)->{
                 if(entityIn instanceof Player
                 && ((Player) entityIn).hasEffect(MobEffects.HUNGER)
                 && 0 < ((Player) entityIn).getFoodData().getFoodLevel()) {
@@ -354,10 +298,10 @@ public class ItemSlashBlade extends SwordItem {
         if(entityIn == null)
             return;
 
-        stack.getCapability(BLADESTATE).ifPresent((state)->{
+        SBData.get(stack, BLADESTATE).ifPresent((state)->{
             if(entityIn instanceof LivingEntity){
 
-                entityIn.getCapability(INPUT_STATE).ifPresent(mInput->{
+                SBData.get(entityIn, INPUT_STATE).ifPresent(mInput->{
                     mInput.getScheduler().onTick((LivingEntity) entityIn);
                 });
 
@@ -372,81 +316,16 @@ public class ItemSlashBlade extends SwordItem {
         });
     }
 
-    @Nullable
-    @Override
-    public CompoundTag getShareTag(ItemStack stack) {
-        return stack.getCapability(ItemSlashBlade.BLADESTATE)
-                .filter(s->s.getShareTag() != null)
-                .map(s->{
-                    CompoundTag tag = s.getShareTag();
-                    tag.putString("translationKey", s.getTranslationKey());
-                    if(tag.getBoolean("isBroken") != s.isBroken())
-                        tag.putString("isBroken",Boolean.toString(s.isBroken()));
-
-                    stack.addTagElement("ShareTag", tag);
-
-                    return stack.getTag();
-                })
-                .orElseGet(()-> {
-
-                    CompoundTag tag = stack.getCapability(ItemSlashBlade.BLADESTATE).map(s->
-                        NBTHelper.getNBTCoupler(stack.getOrCreateTag())
-                                .getChild("ShareTag").
-                                put("translationKey", s.getTranslationKey()).
-                                put("isBroken", Boolean.toString(s.isBroken())).
-                                put("isNoScabbard", Boolean.toString(s.isNoScabbard())).getRawCompound()
-                    ).orElseGet(()->new CompoundTag());
-
-                    /*
-                    CompoundNBT tag = stack.write(new CompoundNBT()).copy();
-
-                    NBTHelper.getNBTCoupler(tag)
-                            .getChild("ForgeCaps")
-                            .getChild("slashblade:bladestate")
-                            .doRawCompound("State", ISlashBladeState::removeActiveState);
-                    */
-
-                    stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(s->s.setShareTag(tag));
-
-                    return stack.getTag();
-                });
-
-    }
+    public CompoundTag getShareTag(ItemStack stack) { return mods.flammpfeil.slashblade.compat.SBItemData.tag(stack); }
 
     public static final String ICON_TAG_KEY = "SlashBladeIcon";
     //public static final String CLIENT_CAPS_KEY = "AllCapsData";
 
-    @Override
-    public void readShareTag(ItemStack stack, @Nullable CompoundTag nbt) {
 
-        super.readShareTag(stack, nbt);
-
-        if(nbt == null)
-            return;
-
-        if(nbt.contains(ICON_TAG_KEY)) {
-            stack.deserializeNBT(nbt.getCompound(ICON_TAG_KEY));
-            return;
-        }
-
-/*
-        if(nbt.contains(CLIENT_CAPS_KEY,10)){
-            stack.deserializeNBT(nbt.getCompound(CLIENT_CAPS_KEY));
-        }else{
-            stack.deserializeNBT(nbt);
-        }
-
-        DistExecutor.runWhenOn(Dist.CLIENT, ()->()->{
-            CompoundNBT tag = nbt.copy();
-            tag.remove(CLIENT_CAPS_KEY);
-            stack.setTagInfo(CLIENT_CAPS_KEY, tag);
-        });
-        */
-    }
 
     //damage ----------------------------------------------------------
     int getHalfMaxdamage(){
-        return this.getMaxDamage() / 2;
+        return 100 / 2;
     }
     
     @Override
@@ -463,8 +342,8 @@ public class ItemSlashBlade extends SwordItem {
         if(damage > stack.getMaxDamage())
             stack.setCount(2);
 
-        stack.getCapability(BLADESTATE).ifPresent((s)->{
-            float amount = (damage - getHalfMaxdamage()) / (float)this.getMaxDamage();
+        SBData.get(stack, BLADESTATE).ifPresent((s)->{
+            float amount = (damage - getHalfMaxdamage()) / (float)100;
 
             s.setDamage(s.getDamage() + amount);
         });
@@ -472,52 +351,39 @@ public class ItemSlashBlade extends SwordItem {
 
     @Override
     public boolean isDamaged(ItemStack stack) {
-        return stack.getCapability(BLADESTATE).map(s->0 < s.getDamage()).orElse(false);
+        return SBData.get(stack, BLADESTATE).map(s->0 < s.getDamage()).orElse(false);
     }
 
     @Override
-    public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, T entity, Consumer<T> onBroken) {
+    public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, @Nullable T entity, Consumer<Item> onBroken) {
         return Math.min(amount, getHalfMaxdamage() / 2);
     }
 
 
-    @Override
-    public boolean isBarVisible(ItemStack stack) {
-        return Minecraft.getInstance().player.getMainHandItem() == stack;
-
-        //super.showDurabilityBar(stack);
-        //return false;
-    }
+    // GUI icons render their own diamond-shaped durability gauge in SlashBladeTEISR.
+    @Override public boolean isBarVisible(ItemStack stack) { return false; }
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        return Math.round(13.F - 13.0F * stack.getCapability(BLADESTATE).map(s->s.getDamage()).orElse(0.0f));
+        return Math.round(13.F - 13.0F * SBData.get(stack, BLADESTATE).map(s->s.getDamage()).orElse(0.0f));
         //return super.getDurabilityForDisplay(stack);
     }
 
     @Override
     public int getBarColor(ItemStack stack) {
-        boolean isBroken = stack.getCapability(BLADESTATE).filter(s->s.isBroken()).isPresent();
+        boolean isBroken = SBData.get(stack, BLADESTATE).filter(s->s.isBroken()).isPresent();
 
         return isBroken ? 0xFF66AE : 0x02E0EE;
     }
 
-    @Override
     public String getDescriptionId(ItemStack stack) {
-        return stack.getCapability(BLADESTATE)
+        return SBData.get(stack, BLADESTATE)
                 .filter((s)->!s.getTranslationKey().isEmpty())
                 .map((state)->state.getTranslationKey())
-                .orElseGet(()->super.getDescriptionId(stack));
+                .orElseGet(()->super.getDescriptionId());
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public static RecipeManager getClientRM(){
-        ClientLevel cw = Minecraft.getInstance().level;
-        if(cw != null)
-            return cw.getRecipeManager();
-        else
-            return null;
-    }
+
     public static RecipeManager getServerRM(){
         MinecraftServer sw = ServerLifecycleHooks.getCurrentServer();
         if(sw != null)
@@ -527,24 +393,7 @@ public class ItemSlashBlade extends SwordItem {
     }
 
 
-    @Override
-    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-
-        if(Ingredient.of(ItemTags.STONE_TOOL_MATERIALS).test(repair)){
-            return true;
-        }
-
-        /*
-        Tag<Item> tags = ItemTags.getCollection().get(new ResourceLocation("slashblade","proudsouls"));
-
-        if(tags != null){
-            boolean result = Ingredient.fromTag(tags).test(repair);
-        }*/
-
-        //todo: repair custom material
-
-        return super.isValidRepairItem(toRepair, repair);
-    }
+    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) { return repair.is(ItemTags.STONE_TOOL_MATERIALS) || repair.is(ItemTags.create(Identifier.fromNamespaceAndPath("slashblade", "proudsouls"))); }
 
     RangeMap refineColor = ImmutableRangeMap.builder()
             .put(Range.lessThan(10), ChatFormatting.WHITE)
@@ -556,27 +405,22 @@ public class ItemSlashBlade extends SwordItem {
             .build();
 
 
-    @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(s->{
-            if(0 < s.getKillCount())
-                tooltip.add(Component.translatable("slashblade.tooltip.killcount", s.getKillCount()));
-
-            if(0 < s.getRefine()){
-                tooltip.add(Component.translatable("slashblade.tooltip.refine", s.getRefine()).withStyle((ChatFormatting)refineColor.get(s.getRefine())));
-            }
+    @Override public void appendHoverText(ItemStack stack, Item.TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+        SBData.get(stack, BLADESTATE).ifPresent(state -> {
+            if (state.getKillCount() > 0) tooltip.accept(Component.translatable("slashblade.tooltip.killcount", state.getKillCount()));
+            if (state.getRefine() > 0) tooltip.accept(Component.translatable("slashblade.tooltip.refine", state.getRefine()).withStyle((ChatFormatting)refineColor.get(state.getRefine())));
         });
-
-        super.appendHoverText(stack, worldIn, tooltip, flagIn);
+        super.appendHoverText(stack, context, display, tooltip, flag);
     }
+    @Override public Component getName(ItemStack stack) { return Component.translatable(getDescriptionId(stack)); }
 
 
     /**
      * @return true = cancel : false = swing
      */
     @Override
-    public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
-        return !stack.getCapability(BLADESTATE).filter(s->s.getLastActionTime() == entity.level().getGameTime()).isPresent();
+    public boolean onEntitySwing(ItemStack stack, LivingEntity entity, InteractionHand hand) {
+        return !SBData.get(stack, BLADESTATE).filter(s->s.getLastActionTime() == entity.level().getGameTime()).isPresent();
     }
 
     @Override
@@ -587,6 +431,9 @@ public class ItemSlashBlade extends SwordItem {
     @Nullable
     @Override
     public Entity createEntity(Level world, Entity location, ItemStack itemstack) {
+        // /give creates a visual-only item with one tick left. Keeping that entity
+        // immortal would leave a permanent unpickable blade beside the player.
+        if (location instanceof ItemEntity original && original.getAge() >= itemstack.getEntityLifespan(world) - 1) return null;
         BladeItemEntity e = new BladeItemEntity(SlashBlade.RegistryEvents.BladeItem, world);
         e.restoreFrom(location);
         e.init();
@@ -598,20 +445,5 @@ public class ItemSlashBlade extends SwordItem {
         return super.getEntityLifespan(itemStack, world);// Short.MAX_VALUE;
     }
 
-    @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
 
-        consumer.accept(new IClientItemExtensions() {
-            BlockEntityWithoutLevelRenderer renderer = new SlashBladeTEISR(
-                    Minecraft.getInstance().getBlockEntityRenderDispatcher(),
-                    Minecraft.getInstance().getEntityModels());
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return renderer;
-            }
-        });
-
-        super.initializeClient(consumer);
-    }
 }

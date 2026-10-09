@@ -83,9 +83,12 @@ public class MotionData
 		// 前後のキーの間でどの位置にいるか
 		if( lKey0 != lKey1 )
 		{
-			float fLerpValue = (fFrame - fTime0) / (fTime1 - fTime0);
-			pvec3Pos.Vector3Lerp(bone_key_frame[lKey0].vec3Position,bone_key_frame[lKey1].vec3Position, fLerpValue);
-			pvec4Rot.QuaternionSlerp(bone_key_frame[lKey0].vec4Rotate,bone_key_frame[lKey1].vec4Rotate, fLerpValue);
+			float fLerpValue = Math.clamp((fFrame - fTime0) / (fTime1 - fTime0), 0, 1);
+			BoneKeyFrame from = bone_key_frame[lKey0], to = bone_key_frame[lKey1];
+			pvec3Pos.x = from.vec3Position.x + (to.vec3Position.x - from.vec3Position.x) * VmdBezier.evaluate(to.interpolation, 0, fLerpValue);
+			pvec3Pos.y = from.vec3Position.y + (to.vec3Position.y - from.vec3Position.y) * VmdBezier.evaluate(to.interpolation, 1, fLerpValue);
+			pvec3Pos.z = from.vec3Position.z + (to.vec3Position.z - from.vec3Position.z) * VmdBezier.evaluate(to.interpolation, 2, fLerpValue);
+			pvec4Rot.QuaternionSlerp(from.vec4Rotate, to.vec4Rotate, VmdBezier.evaluate(to.interpolation, 3, fLerpValue));
 			pvec4Rot.QuaternionNormalize(pvec4Rot);//これほんとにいるの？
 		}else{
 			pvec3Pos.setValue(bone_key_frame[lKey0].vec3Position);

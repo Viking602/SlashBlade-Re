@@ -16,26 +16,24 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.util.LazyLoadedValue;
-import net.minecraft.resources.ResourceLocation;
+import mods.flammpfeil.slashblade.compat.LazyValue;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import com.mojang.math.Axis;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
-@OnlyIn(Dist.CLIENT)
-public class SlashEffectRenderer<T extends EntitySlashEffect> extends EntityRenderer<T> {
+public class SlashEffectRenderer<T extends EntitySlashEffect> extends BladeEntityRenderer<T> {
 
-    static private final ResourceLocation modelLocation = new ResourceLocation(SlashBlade.modid, "model/util/slash.obj");
-    static private final ResourceLocation textureLocation = new ResourceLocation(SlashBlade.modid, "model/util/slash.png");
+    static private final Identifier modelLocation = Identifier.fromNamespaceAndPath(SlashBlade.modid, "model/util/slash.obj");
+    static private final Identifier textureLocation = Identifier.fromNamespaceAndPath(SlashBlade.modid, "model/util/slash.png");
 
-    static private LazyLoadedValue<ItemStack> enchantedItem = new LazyLoadedValue<ItemStack>(() -> new ItemStack(SBItems.proudsoul));
+    static private LazyValue<ItemStack> enchantedItem = new LazyValue<ItemStack>(() -> new ItemStack(SBItems.proudsoul));
 
     @Nullable
-    @Override
-    public ResourceLocation getTextureLocation(T entity) {
+    public Identifier getTextureLocation(T entity) {
         return textureLocation;
     }
 
@@ -88,7 +86,7 @@ public class SlashEffectRenderer<T extends EntitySlashEffect> extends EntityRend
             }
 
 
-            ResourceLocation rl = getTextureLocation(entity);
+            Identifier rl = getTextureLocation(entity);
 
             //baseAlpha = 1.0f;
             int alpha = ((0xFF & (int) (0xFF * baseAlpha)) << 24);

@@ -1,0 +1,31 @@
+{
+  "display": {
+    "title": {
+      "translate": "adv.slashblade.trick_down"
+    },
+    "description": {
+      "translate": "adv.slashblade.trick_down.desc",
+      "with": [
+        {
+          "keybind": "key.sprint"
+        },
+        {
+          "keybind": "key.back"
+        },
+        {
+          "keybind": "key.sneak"
+        }
+      ]
+    },
+    "icon": {
+      "id": "minecraft:anvil"
+    },
+    "frame": "task"
+  },
+  "parent": "slashblade:abilities/air_trick",
+  "criteria": {
+    "customtrigger": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.event;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.util.AdvancementHelper;
@@ -12,13 +13,13 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.event.AnvilUpdateEvent;
-import net.minecraftforge.event.entity.player.AnvilRepairEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.resources.Identifier;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.event.AnvilUpdateEvent;
+import net.neoforged.neoforge.event.entity.player.AnvilCraftEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class RefineHandler {
     private static final class SingletonHolder {
@@ -29,7 +30,7 @@ public class RefineHandler {
     }
     private RefineHandler(){}
     public void register(){
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -43,11 +44,11 @@ public class RefineHandler {
         if(!(base.getItem() instanceof ItemSlashBlade)) return;
         if(material.isEmpty()) return;
 
-        boolean isRepairable = base.getItem().isValidRepairItem(base,material);
+        boolean isRepairable = base.isValidRepairItem(material);
 
         if(!isRepairable) return;
 
-        int level = material.getEnchantmentValue();
+        int level = java.util.Optional.ofNullable(material.get(net.minecraft.core.component.DataComponents.ENCHANTABLE)).map(net.minecraft.world.item.enchantment.Enchantable::value).orElse(0);
 
         if(level < 0) return;
 
@@ -59,7 +60,7 @@ public class RefineHandler {
         while(cost < material.getCount()){
             cost ++;
 
-            float damage = result.getCapability(ItemSlashBlade.BLADESTATE).map(s->{
+            float damage = SBData.get(result, ItemSlashBlade.BLADESTATE).map(s->{
                 s.setDamage(s.getDamage() - (0.2f + 0.05f * level));
                 if(s.getRefine() < refineLimit)
                     s.setRefine(s.getRefine() + 1);
@@ -71,16 +72,16 @@ public class RefineHandler {
 
         event.setMaterialCost(cost);
         int levelCostBase = 1;
-        event.setCost(levelCostBase * cost);
+        event.setXpCost(levelCostBase * cost);
         event.setOutput(result);
     }
 
-    static private final ResourceLocation REFINE = new ResourceLocation(SlashBlade.modid, "tips/refine");
+    static private final Identifier REFINE = Identifier.fromNamespaceAndPath(SlashBlade.modid, "tips/refine");
 
-    static private final TagKey<Item> soul = ItemTags.create(new ResourceLocation("slashblade","proudsouls"));
+    static private final TagKey<Item> soul = ItemTags.create(Identifier.fromNamespaceAndPath("slashblade", "proudsouls"));
 
     @SubscribeEvent
-    public void onAnvilRepairEvent(AnvilRepairEvent event){
+    public void onAnvilRepairEvent(AnvilCraftEvent.Post event){
 
         if(!(event.getEntity() instanceof ServerPlayer)) return;
 
@@ -92,12 +93,12 @@ public class RefineHandler {
         if(!(base.getItem() instanceof ItemSlashBlade)) return;
         if(material.isEmpty()) return;
 
-        boolean isRepairable = base.getItem().isValidRepairItem(base,material);
+        boolean isRepairable = base.isValidRepairItem(material);
 
         if(!isRepairable) return;
 
-        int before = base.getCapability(ItemSlashBlade.BLADESTATE).map(s->s.getRefine()).orElse(0);
-        int after = output.getCapability(ItemSlashBlade.BLADESTATE).map(s->s.getRefine()).orElse(0);
+        int before = SBData.get(base, ItemSlashBlade.BLADESTATE).map(s->s.getRefine()).orElse(0);
+        int after = SBData.get(output, ItemSlashBlade.BLADESTATE).map(s->s.getRefine()).orElse(0);
 
         if(before < after)
             AdvancementHelper.grantCriterion((ServerPlayer) event.getEntity(), REFINE);

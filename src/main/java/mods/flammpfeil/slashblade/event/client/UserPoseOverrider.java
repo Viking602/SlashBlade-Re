@@ -9,9 +9,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import com.mojang.math.Axis;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.RenderLivingEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class UserPoseOverrider {
 
@@ -25,7 +25,7 @@ public class UserPoseOverrider {
     }
     private UserPoseOverrider(){}
     public void register(){
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
         UsePoseOverrider = true;
     }
 
@@ -33,27 +33,24 @@ public class UserPoseOverrider {
     private static final String TAG_ROT_PREV = "sb_yrot_prev";
 
     @SubscribeEvent
-    public void onRenderPlayerEventPre(RenderLivingEvent.Pre event){
-        ItemStack stack = event.getEntity().getMainHandItem();
+    public void onRenderPlayerEventPre(RenderLivingEvent.Pre<?, ?, ?> event) {
+        org.joml.Matrix4f rotation = event.getRenderState().getRenderData(mods.flammpfeil.slashblade.client.renderer.layers.LivingBladeLayer.ROTATION);
+        if (rotation != null) event.getPoseStack().mulPose(rotation);
+        // Player VMD root motion belongs to the humanoid model's root. Applying
+        // it here also transforms the already animated sword a second time.
+    }
 
-        if(stack.isEmpty()) return;
-        if(!(stack.getItem() instanceof ItemSlashBlade)) return;
-
-        float rot = event.getEntity().getPersistentData().getFloat(TAG_ROT);
-        float rotPrev = event.getEntity().getPersistentData().getFloat(TAG_ROT_PREV);
-
-        PoseStack matrixStackIn = event.getPoseStack();
-        LivingEntity entityLiving = event.getEntity();
-        float partialTicks = event.getPartialTick();
-
-        float f = Mth.rotLerp(partialTicks, entityLiving.yBodyRotO, entityLiving.yBodyRot);
-        matrixStackIn.mulPose(Axis.YP.rotationDegrees(180.0F - f));
-        anotherPoseRotP(matrixStackIn, entityLiving, partialTicks);
-
-        matrixStackIn.mulPose(Axis.YP.rotationDegrees(Mth.rotLerp(partialTicks,rot,rotPrev)));
-
-        anotherPoseRotN(matrixStackIn, entityLiving, partialTicks);
-        matrixStackIn.mulPose(Axis.YN.rotationDegrees(180.0F - f));
+    public static org.joml.Matrix4f extractRotation(LivingEntity entity, float partialTicks) {
+        PoseStack pose = new PoseStack();
+        float rot = entity.getPersistentData().getFloatOr(TAG_ROT, 0.0F);
+        float prev = entity.getPersistentData().getFloatOr(TAG_ROT_PREV, 0.0F);
+        float body = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
+        pose.mulPose(Axis.YP.rotationDegrees(180.0F - body));
+        anotherPoseRotP(pose, entity, partialTicks);
+        pose.mulPose(Axis.YP.rotationDegrees(Mth.rotLerp(partialTicks, prev, rot)));
+        anotherPoseRotN(pose, entity, partialTicks);
+        pose.mulPose(Axis.YN.rotationDegrees(180.0F - body));
+        return new org.joml.Matrix4f(pose.last().pose());
     }
 
     static public void anotherPoseRotP(PoseStack matrixStackIn, LivingEntity entityLiving, float partialTicks){
@@ -121,7 +118,7 @@ public class UserPoseOverrider {
     static public void setRot(Entity target, float rotYaw, boolean isOffset){
         CompoundTag tag = target.getPersistentData();
 
-        float prevRot = tag.getFloat(TAG_ROT);
+        float prevRot = tag.getFloatOr(TAG_ROT, 0.0F);
         tag.putFloat(TAG_ROT_PREV, prevRot);
 
         if(isOffset)
@@ -137,8 +134,8 @@ public class UserPoseOverrider {
     }
 
     static public void invertRot(PoseStack matrixStack, Entity entity, float partialTicks){
-        float rot = entity.getPersistentData().getFloat(TAG_ROT);
-        float rotPrev = entity.getPersistentData().getFloat(TAG_ROT_PREV);
-        matrixStack.mulPose(Axis.YP.rotationDegrees(Mth.rotLerp(partialTicks,rot,rotPrev)));
+        float rot = entity.getPersistentData().getFloatOr(TAG_ROT, 0.0F);
+        float rotPrev = entity.getPersistentData().getFloatOr(TAG_ROT_PREV, 0.0F);
+        matrixStack.mulPose(Axis.YP.rotationDegrees(Mth.rotLerp(partialTicks,rotPrev,rot)));
     }
 }

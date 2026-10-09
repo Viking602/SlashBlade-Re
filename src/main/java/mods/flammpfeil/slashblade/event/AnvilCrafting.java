@@ -6,12 +6,12 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AnvilUpdateEvent;
-import net.minecraftforge.event.entity.player.AnvilRepairEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.resources.Identifier;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AnvilUpdateEvent;
+import net.neoforged.neoforge.event.entity.player.AnvilCraftEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class AnvilCrafting {
     private static final class SingletonHolder {
@@ -22,7 +22,7 @@ public class AnvilCrafting {
     }
     private AnvilCrafting(){}
     public void register(){
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -39,14 +39,14 @@ public class AnvilCrafting {
         if(!recipe.matches(base)) return;
 
         event.setMaterialCost(1);
-        event.setCost(recipe.getLevel());
+        event.setXpCost(recipe.getLevel());
         event.setOutput(recipe.getResult(base));
     }
 
-    static private final ResourceLocation REFORGE = new ResourceLocation(SlashBlade.modid, "tips/reforge");
+    static private final Identifier REFORGE = Identifier.fromNamespaceAndPath(SlashBlade.modid, "tips/reforge");
 
     @SubscribeEvent
-    public void onAnvilRepairEvent(AnvilRepairEvent event){
+    public void onAnvilRepairEvent(AnvilCraftEvent.Post event){
 
         if(!(event.getEntity() instanceof ServerPlayer)) return;
 

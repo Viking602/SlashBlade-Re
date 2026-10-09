@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.util;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import com.google.common.collect.Lists;
 import mods.flammpfeil.slashblade.entity.EntityAbstractSummonedSword;
 import mods.flammpfeil.slashblade.entity.IShootable;
@@ -10,7 +11,7 @@ import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
@@ -19,11 +20,11 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.entity.PartEntity;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-import javax.annotation.Nullable;
+import net.neoforged.neoforge.entity.PartEntity;
+import net.neoforged.bus.api.SubscribeEvent;
+
+import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -39,10 +40,19 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 public class TargetSelector {
     static public final TargetingConditions lockon = (TargetingConditions.forCombat())
             .range(12.0D)
-            .selector(new AttackablePredicate());
+            .selector((target, level) -> new AttackablePredicate().test(target));
 
     static public final TargetingConditions lockon_focus = (TargetingConditions.forCombat())
             .range(12.0D);
+    public static boolean testLockonFocus(Level level, LivingEntity actor, LivingEntity target) {
+        if (level instanceof ServerLevel server) return lockon_focus.test(server, actor, target);
+        // Client flight prediction cannot access the server-only targeting API.
+        // Apply the same combat and visibility range checks against local entities.
+        double range = Math.max(12 * target.getVisibilityPercent(actor), 2);
+        return actor != target && target.canBeSeenByAnyone() && actor.canAttack(target)
+            && !actor.isAlliedTo(target) && actor.distanceToSqr(target) <= range * range
+            && (!(actor instanceof Mob mob) || mob.getSensing().hasLineOfSight(target));
+    }
 
     static final String AttackableTag = "RevengeAttacker";
 
@@ -52,7 +62,7 @@ public class TargetSelector {
 
     static public final TargetingConditions areaAttack = (new TargetingConditions(true){
                 @Override
-                public boolean test(@Nullable LivingEntity attacker, LivingEntity target) {
+                public boolean test(ServerLevel level, @Nullable LivingEntity attacker, LivingEntity target) {
                     boolean isAttackable = false;
 
                     isAttackable |= isAttackable(target.getLastHurtByMob(), attacker);
@@ -63,12 +73,12 @@ public class TargetSelector {
                     if(isAttackable)
                         target.addTag(AttackableTag);
 
-                    return super.test(attacker, target);
+                    return super.test(level, attacker, target);
                 }
             })
             .range(12.0D)
             .ignoreInvisibilityTesting()
-            .selector(new AttackablePredicate());
+            .selector((target, level) -> new AttackablePredicate().test(target));
 
     static public TargetingConditions getAreaAttackPredicate(double reach){
         return areaAttack.range(reach);
@@ -92,7 +102,7 @@ public class TargetSelector {
                 if (((Wolf) livingentity).isAngry()/*isAngry()*/)
                     return true;
 
-            if (livingentity.getTags().contains(AttackableTag)){
+            if (livingentity.entityTags().contains(AttackableTag)){
                 livingentity.removeTag(AttackableTag);
                 return true;
             }
@@ -151,9 +161,9 @@ public class TargetSelector {
                 .filter(t-> {
                     boolean result = false;
                     if(t instanceof LivingEntity){
-                        result = predicate.test(attacker, (LivingEntity) t);
+                        result = predicate.test((ServerLevel)world, attacker, (LivingEntity) t);
                     }else if(t instanceof PartEntity && ((PartEntity) t).getParent() instanceof LivingEntity){
-                        result = predicate.test(attacker, (LivingEntity) ((PartEntity) t).getParent()) && t.distanceToSqr(attacker) < (reach * reach);
+                        result = predicate.test((ServerLevel)world, attacker, (LivingEntity) ((PartEntity) t).getParent()) && t.distanceToSqr(attacker) < (reach * reach);
                     }
                     return result;
                 })
@@ -184,7 +194,7 @@ public class TargetSelector {
         TargetingConditions predicate = getAreaAttackPredicate(0); //reach check has already been completed
 
         list1.addAll(world.getEntitiesOfClass(LivingEntity.class, aabb, (e)->true).stream()
-                .filter(t -> predicate.test(user, t))
+                .filter(t -> predicate.test((ServerLevel)world, user, t))
                 .collect(Collectors.toList()));
 
         return list1;
@@ -223,7 +233,7 @@ public class TargetSelector {
 
     static public double getResolvedReach(LivingEntity user){
         double reach = 4.0D; /* 4 block*/
-        AttributeInstance attrib = user.getAttribute(ForgeMod.ENTITY_REACH.get());
+        AttributeInstance attrib = user.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ENTITY_INTERACTION_RANGE);
         if(attrib != null){
             reach = attrib.getValue() - 1;
         }
@@ -244,7 +254,7 @@ public class TargetSelector {
         if (stack.isEmpty()) return;
         if (!(stack.getItem() instanceof ItemSlashBlade)) return;
 
-        stack.getCapability(ItemSlashBlade.BLADESTATE)
+        SBData.get(stack, ItemSlashBlade.BLADESTATE)
                 .ifPresent(s->{
                     Entity tmp = s.getTargetEntity(sender.level());
                     if (tmp == null) return;
@@ -259,7 +269,7 @@ public class TargetSelector {
                     if(target.level() instanceof ServerLevel){
                         ServerLevel sw = (ServerLevel)target.level();
 
-                        sw.sendParticles(sender, ParticleTypes.ANGRY_VILLAGER, false,
+                        sw.sendParticles(sender, ParticleTypes.ANGRY_VILLAGER, false, false,
                                 target.getX(), target.getY() + target.getEyeHeight(), target.getZ(),
                                 5,
                                 target.getBbWidth() * 1.5,

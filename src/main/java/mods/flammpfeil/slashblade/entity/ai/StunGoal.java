@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.entity.ai;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.capability.mobeffect.CapabilityMobEffect;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -20,7 +21,7 @@ public class StunGoal extends Goal {
      * Returns whether the EntityAIBase should begin execution.
      */
     public boolean canUse() {
-        boolean onStun = this.entity.getCapability(CapabilityMobEffect.MOB_EFFECT)
+        boolean onStun = SBData.get(this.entity, CapabilityMobEffect.MOB_EFFECT)
                 .filter((state)->state.isStun(this.entity.level().getGameTime()))
                 .isPresent();
 
@@ -31,7 +32,7 @@ public class StunGoal extends Goal {
      * Reset the task's internal state. Called when this task is interrupted by another one
      */
     public void stop() {
-        this.entity.getCapability(CapabilityMobEffect.MOB_EFFECT)
+        SBData.get(this.entity, CapabilityMobEffect.MOB_EFFECT)
                 .ifPresent((state)->{
                     state.clearStunTimeOut();
                 });

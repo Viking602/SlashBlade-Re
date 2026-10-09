@@ -1,0 +1,100 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " QF",
+    "BCS",
+    "WE "
+  ],
+  "key": {
+    "E": "minecraft:obsidian",
+    "F": "minecraft:feather",
+    "B": "minecraft:blaze_powder",
+    "C": "minecraft:chest",
+    "S": "slashblade:proudsoul_crystal",
+    "W": "minecraft:wheat",
+    "Q": "minecraft:quartz_block"
+  },
+  "result": {
+    "id": "minecraft:chest",
+    "components": {
+      "minecraft:custom_name": {
+        "translate": "item.slashblade.ex.fox.black.material"
+      },
+      "minecraft:container": [
+        {
+          "slot": 4,
+          "item": {
+            "id": "minecraft:quartz_block"
+          }
+        },
+        {
+          "slot": 5,
+          "item": {
+            "id": "minecraft:feather"
+          }
+        },
+        {
+          "slot": 12,
+          "item": {
+            "id": "minecraft:blaze_powder"
+          }
+        },
+        {
+          "slot": 14,
+          "item": {
+            "id": "slashblade:proudsoul_crystal"
+          }
+        },
+        {
+          "slot": 21,
+          "item": {
+            "id": "minecraft:wheat"
+          }
+        },
+        {
+          "slot": 22,
+          "item": {
+            "id": "minecraft:obsidian"
+          }
+        }
+      ],
+      "minecraft:custom_data": {
+        "RequiredBlade": {
+          "broken": 0,
+          "result": {
+            "id": "slashblade:slashblade",
+            "components": {
+              "slashblade:blade_state": {
+                "isSealed": 0,
+                "isNoScabbard": 0,
+                "translationKey": "item.slashblade.ex.fox.black",
+                "isDestructable": 0,
+                "SummonedSwordColor": 1118481,
+                "currentCombo": "arts_rapid_slash",
+                "RepairCounter": 0,
+                "Damage": 0.0,
+                "rarityType": 3,
+                "ComboRoot": "standby",
+                "lastPosHash": "",
+                "RangeAttackType": "none",
+                "isDefaultBewitched": 0,
+                "SpecialAttackType": "none",
+                "TextureName": "slashblade:model/named/sange/black.png",
+                "ModelName": "slashblade:model/named/sange/sange.obj",
+                "baseAttackModifier": 7.0,
+                "StandbyRenderType": 0,
+                "ComboRootAir": "standby_inair"
+              },
+              "minecraft:rarity": "epic"
+            }
+          },
+          "level": 20,
+          "killCount": 0,
+          "refine": 0,
+          "noScabbard": 0,
+          "translationKey": "item.slashblade.ex.ruby"
+        }
+      }
+    }
+  }
+}

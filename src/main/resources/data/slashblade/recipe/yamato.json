@@ -1,0 +1,39 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  #",
+    " # ",
+    "IP "
+  ],
+  "key": {
+    "#": "minecraft:purpur_block",
+    "P": "slashblade:proudsoul_trapezohedron",
+    "I": "minecraft:dragon_head"
+  },
+  "result": {
+    "id": "slashblade:slashblade",
+    "components": {
+      "slashblade:blade_state": {
+        "translationKey": "item.slashblade.yamato",
+        "TextureName": "slashblade:model/named/yamato.png",
+        "ModelName": "slashblade:model/named/yamato.obj",
+        "baseAttackModifier": 9.0,
+        "isSealed": 0,
+        "isNoScabbard": 0,
+        "isDestructable": 0,
+        "SummonedSwordColor": -13421569,
+        "RepairCounter": 0,
+        "rarityType": 3,
+        "ComboRoot": "standby",
+        "RangeAttackType": "none",
+        "isDefaultBewitched": 0,
+        "SpecialAttackType": "none",
+        "SummonedSwordColorInverse": 0,
+        "isBroken": 0,
+        "StandbyRenderType": 0,
+        "ComboRootAir": "standby_inair"
+      },
+      "minecraft:rarity": "epic"
+    }
+  }
+}

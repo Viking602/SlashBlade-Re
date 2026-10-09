@@ -5,8 +5,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class KnockBackHandler {
 
@@ -51,7 +51,7 @@ public class KnockBackHandler {
         if ((target.getRandom().nextDouble() < target.getAttribute(Attributes.KNOCKBACK_RESISTANCE).getValue()))
             return;
 
-        target.hasImpulse = true;
+        target.hurtMarked = true;
 
         Vec3 motion = target.getDeltaMovement();
 

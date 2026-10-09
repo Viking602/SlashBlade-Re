@@ -1,0 +1,41 @@
+{
+  "display": {
+    "title": {
+      "translate": "item.slashblade.proudsoul"
+    },
+    "description": {
+      "translate": "adv.slashblade.proudsoul"
+    },
+    "icon": {
+      "id": "slashblade:proudsoul",
+      "components": {
+        "minecraft:custom_data": {
+          "Crafting": "slashblade:material/soul"
+        }
+      }
+    },
+    "frame": "task"
+  },
+  "parent": "slashblade:material/proudsoul_tiny",
+  "criteria": {
+    "BrokenBlade": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "items": [
+            "slashblade:slashblade"
+          ]
+        }
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "slashblade:material/tiny",
+      "slashblade:material/ingot",
+      "slashblade:material/soul",
+      "slashblade:bladestand/bladestand_1",
+      "slashblade:bladestand/bladestand_2"
+    ]
+  }
+}

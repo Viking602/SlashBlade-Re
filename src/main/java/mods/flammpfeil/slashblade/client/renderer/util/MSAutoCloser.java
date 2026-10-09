@@ -1,7 +1,6 @@
 package mods.flammpfeil.slashblade.client.renderer.util;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.platform.GlStateManager;
 
 public class MSAutoCloser implements AutoCloseable{
 

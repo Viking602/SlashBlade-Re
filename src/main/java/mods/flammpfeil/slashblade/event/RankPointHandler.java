@@ -1,12 +1,13 @@
 package mods.flammpfeil.slashblade.event;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class RankPointHandler {
     private static final class SingletonHolder {
@@ -17,7 +18,7 @@ public class RankPointHandler {
     }
     private RankPointHandler(){}
     public void register(){
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     /**
@@ -25,15 +26,15 @@ public class RankPointHandler {
      * @param event
      */
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onLivingDeathEvent(LivingHurtEvent event) {
+    public void onLivingDeathEvent(LivingIncomingDamageEvent event) {
 
         LivingEntity victim = event.getEntity();
         if(victim != null)
-            victim.getCapability(CapabilityConcentrationRank.RANK_POINT).ifPresent(cr->cr.addRankPoint(victim, -cr.getUnitCapacity()));
+            SBData.get(victim, CapabilityConcentrationRank.RANK_POINT).ifPresent(cr->cr.addRankPoint(victim, -cr.getUnitCapacity()));
 
 
         Entity trueSource = event.getSource().getEntity();
         if (!(trueSource instanceof LivingEntity)) return;
-        trueSource.getCapability(CapabilityConcentrationRank.RANK_POINT).ifPresent(cr->cr.addRankPoint(event.getSource()));
+        SBData.get(trueSource, CapabilityConcentrationRank.RANK_POINT).ifPresent(cr->cr.addRankPoint(event.getSource()));
     }
 }

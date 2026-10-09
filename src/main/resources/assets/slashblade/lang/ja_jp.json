@@ -173,5 +173,8 @@
   "adv.slashblade.exeffect.soul_speed.desc": "ジャスト入力の受付時間がSoulSpeedのレベル1毎に1tick延長されます。",
 
   "adv.slashblade.exeffect.feather_falling": "Slow Fall",
-  "adv.slashblade.exeffect.feather_falling.desc": "FeatherFallingのレベルに応じて空中アクション中の落下速度が緩和されます。"
+  "adv.slashblade.exeffect.feather_falling.desc": "FeatherFallingのレベルに応じて空中アクション中の落下速度が緩和されます。",
+  "key.slashblade.super_sa": "超SA",
+  "slashblade.super_sa.hint": "超SA: %s を1秒長押しして離す",
+  "slashblade.super_sa.requirements": "1000体討伐・耐久満タンの妖刀が必要"
 }

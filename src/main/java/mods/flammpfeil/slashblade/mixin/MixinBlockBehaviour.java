@@ -23,13 +23,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(BlockBehaviour.BlockStateBase.class)
+@Mixin(value = BlockBehaviour.BlockStateBase.class, remap = false)
 public class MixinBlockBehaviour {
 
     @Inject(at = @At("HEAD")
             , method="getCollisionShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;"
             , cancellable = true
-            , remap = true)
+            , remap = false)
     public void getCollisionShape(BlockGetter p_60743_, BlockPos p_60744_, CollisionContext p_60745_, CallbackInfoReturnable<VoxelShape> callback)
     {
         if(!(asState().getBlock() instanceof LeavesBlock)) return;
@@ -41,18 +41,18 @@ public class MixinBlockBehaviour {
         ItemStack itemStack = ((Player) ((EntityCollisionContext) p_60745_).getEntity()).getMainHandItem();
         if(!(itemStack.getItem() instanceof ItemSlashBlade)) return;
 
-        callback.setReturnValue(Blocks.SCAFFOLDING.getCollisionShape(Blocks.SCAFFOLDING.defaultBlockState(), p_60743_, p_60744_, p_60745_));
+        callback.setReturnValue(Blocks.SCAFFOLDING.defaultBlockState().getCollisionShape( p_60743_, p_60744_, p_60745_));
         callback.cancel();
     }
     @Inject(at = @At("HEAD")
             , method="getVisualShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;"
             , cancellable = true
-            , remap = true)
+            , remap = false)
     public void getVisualShape(BlockGetter p_60743_, BlockPos p_60744_, CollisionContext p_60745_, CallbackInfoReturnable<VoxelShape> callback)
     {
         if(!(asState().getBlock() instanceof LeavesBlock)) return;
 
-        callback.setReturnValue(Blocks.SCAFFOLDING.getVisualShape(Blocks.SCAFFOLDING.defaultBlockState(), p_60743_, p_60744_, p_60745_));
+        callback.setReturnValue(Blocks.SCAFFOLDING.defaultBlockState().getVisualShape( p_60743_, p_60744_, p_60745_));
         callback.cancel();
     }
 

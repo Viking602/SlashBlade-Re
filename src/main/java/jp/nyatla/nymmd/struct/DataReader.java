@@ -49,18 +49,13 @@ public class DataReader
 	public DataReader(InputStream i_stream) throws MmdException
 	{
 		try{
-			//コレなんとかしよう。C#のBinaryReaderみたいに振舞うように。
-			int file_len=i_stream.available();
-			if(file_len<1){
-				file_len=2*1024*1024;
-			}
-			byte[] buf=new byte[file_len];
-			int buf_len=i_stream.read(buf,0,file_len);
-			this._buf=ByteBuffer.wrap(buf,0,buf_len);
+			// Resource/JAR streams may return only a small chunk from read(), and
+			// available() is not the file length. Read through EOF once at resource load.
+			this._buf=ByteBuffer.wrap(i_stream.readAllBytes());
 			this._buf.order(ByteOrder.LITTLE_ENDIAN);
 			return;
 		}catch(Exception e){
-			throw new MmdException();
+			throw new MmdException(e);
 		}
 	}
 	public int readByte()

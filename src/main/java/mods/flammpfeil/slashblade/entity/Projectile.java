@@ -15,25 +15,30 @@ public abstract class Projectile extends net.minecraft.world.entity.projectile.P
         super(p_37248_, p_37249_);
     }
 
+    @Override public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float damage) {
+        return false; // Summoned blades are deflected explicitly by ArrowReflector, and have no health.
+    }
+
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(OWNERID, -1);
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
+        builder.define(OWNERID, -1);
     }
 
     @Nullable
     @Override
     public Entity getOwner() {
-        int id = this.entityData.get(OWNERID);
-
-        if(0 <= id){
-            Entity tmp = this.level().getEntity(id);
-            if(super.getOwner() != tmp)
-                this.setOwner(tmp);
-        }else{
-            this.setOwner(null);
+        // Server ownership is a persistent UUID reference. Numeric entity IDs only
+        // serve the client spawn/tracking path and change after a world reload.
+        if (!this.level().isClientSide()) {
+            Entity owner = super.getOwner();
+            if (owner != null && entityData.get(OWNERID) != owner.getId()) entityData.set(OWNERID, owner.getId());
+            return owner;
         }
-
-        return super.getOwner();
+        int id = entityData.get(OWNERID);
+        if (id < 0) return null;
+        Entity owner = level().getEntity(id);
+        if (owner != null) super.setOwner(owner);
+        return owner;
     }
 
     @Override

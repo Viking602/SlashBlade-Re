@@ -8,9 +8,9 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.resources.Identifier;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
 
 import java.io.BufferedReader;
@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
  */
 public class WavefrontObject
 {
-    static public VertexFormat POSITION_TEX_LMAP_COL_NORMAL = new VertexFormat(ImmutableMap.<String,VertexFormatElement>builder().put("Position",DefaultVertexFormat.ELEMENT_POSITION).put("Color",DefaultVertexFormat.ELEMENT_COLOR).put("UV0",DefaultVertexFormat.ELEMENT_UV0).put("UV2",DefaultVertexFormat.ELEMENT_UV2).put("Normal",DefaultVertexFormat.ELEMENT_NORMAL).put("Padding",DefaultVertexFormat.ELEMENT_PADDING).build());
+    public static final VertexFormat POSITION_TEX_LMAP_COL_NORMAL = DefaultVertexFormat.ENTITY;
 
     private static Pattern vertexPattern = Pattern.compile("(v( (\\-){0,1}\\d+(\\.\\d+)?){3,4} *\\n)|(v( (\\-){0,1}\\d+(\\.\\d+)?){3,4} *$)");
     private static Pattern vertexNormalPattern = Pattern.compile("(vn( (\\-){0,1}\\d+(\\.\\d+)?){3,4} *\\n)|(vn( (\\-){0,1}\\d+(\\.\\d+)?){3,4} *$)");
@@ -49,7 +49,7 @@ public class WavefrontObject
     private GroupObject currentGroupObject;
     private String fileName;
 
-    public WavefrontObject(ResourceLocation resource) throws ModelFormatException
+    public WavefrontObject(Identifier resource) throws ModelFormatException
     {
         this.fileName = resource.toString();
 
@@ -172,7 +172,6 @@ public class WavefrontObject
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void tessellateAll(VertexConsumer tessellator)
     {
         for (GroupObject groupObject : groupObjects)
@@ -181,7 +180,6 @@ public class WavefrontObject
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void tessellateOnly(VertexConsumer tessellator, String... groupNames) {
         for (GroupObject groupObject : groupObjects)
         {
@@ -195,7 +193,6 @@ public class WavefrontObject
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void tessellatePart(VertexConsumer tessellator, String partName) {
         for (GroupObject groupObject : groupObjects)
         {
@@ -206,7 +203,6 @@ public class WavefrontObject
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void tessellateAllExcept(VertexConsumer tessellator, String... excludedGroupNames)
     {
         boolean exclude;

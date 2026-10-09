@@ -18,7 +18,8 @@ public enum InputCommand {
     ON_AIR,
     SAVE_TOOLBAR,
     SPRINT,
-    JUMP;
+    JUMP,
+    STYLE;
 
     public final static EnumSet<InputCommand> move = EnumSet.of(InputCommand.FORWARD, InputCommand.BACK, InputCommand.LEFT, InputCommand.RIGHT);
 

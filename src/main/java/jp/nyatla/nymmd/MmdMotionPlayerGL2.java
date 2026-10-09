@@ -7,7 +7,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import jp.nyatla.nymmd.types.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.lwjgl.opengl.GL11;
 
 import java.nio.ByteBuffer;
@@ -25,7 +25,7 @@ public class MmdMotionPlayerGL2 extends MmdMotionPlayer
 		public float fShininess;
 		public short[] indices;
 		public int ulNumIndices;
-		public ResourceLocation texture_id;
+		public Identifier texture_id;
 		public int unknown;
 	}	
 	public MmdMotionPlayerGL2()
@@ -135,103 +135,21 @@ public class MmdMotionPlayerGL2 extends MmdMotionPlayer
 		}
 		return;
 	}
-	public void render()
-	{
-		GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-		GL11.glPushClientAttrib(GL11.GL_CLIENT_ALL_ATTRIB_BITS);
-
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glCullFace(GL11.GL_FRONT);
-		GL11.glEnable(GL11.GL_NORMALIZE);
-		GL11.glShadeModel(GL11.GL_SMOOTH);
-
-		// とりあえずbufferに変換しよう
-		// とりあえず転写用
-
-
-		BufferBuilder wr = Tesselator.getInstance().getBuilder();
-		int number_of_vertex=this._ref_pmd_model.getNumberOfVertex();
-
-		// 頂点座標、法線、テクスチャ座標の各配列をセット
-		for (int i = this._materials.length-1; i>=0 ; i--)
-		{
-			wr.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL);
-
-			final Material mt_ptr=this._materials[i];
-
-
-
-			for(int pos : mt_ptr.indices){
-				int npos = number_of_vertex*3+pos*3;
-				//wr.setNormal(_fbuf[npos++], _fbuf[npos++], _fbuf[npos++]);
-				int vpos = pos*3;
-				//wr.addVertexWithUV(_fbuf[vpos++],_fbuf[vpos++],_fbuf[vpos++],this._tex_array[pos].u,this._tex_array[pos].v);
-				wr.vertex(_fbuf[vpos++],_fbuf[vpos++],-_fbuf[vpos++]).uv(this._tex_array[pos].u,this._tex_array[pos].v).normal(_fbuf[npos++], _fbuf[npos++], _fbuf[npos++]).color(1,1,1,1).endVertex();
-			}
-
-			// マテリアル設定
-			/**/
-			GL11.glEnable(GL11.GL_COLOR_MATERIAL);
-			GL11.glColorMaterial(GL11.GL_FRONT_AND_BACK,GL11.GL_AMBIENT_AND_DIFFUSE);
-
-			GL11.glColor4f(mt_ptr.color[0],mt_ptr.color[1],mt_ptr.color[2],mt_ptr.color[3]);
-
-			//GL11.glColor4f(mt_ptr.color.get(0),mt_ptr.color.get(1),mt_ptr.color.get(2),mt_ptr.color.get(3));
-
-			/**/
-
-			/*
-			FloatBuffer color = makeFloatBuffer(12);
-			mt_ptr.color.position(0);
-			color.put(mt_ptr.color);
-			color.position(0);
-			GL11.glMaterial(GL11.GL_FRONT_AND_BACK, GL11.GL_DIFFUSE, color);
-			color.position(4);
-			GL11.glMaterial(GL11.GL_FRONT_AND_BACK, GL11.GL_AMBIENT, color);
-			color.position(8);
-			GL11.glMaterial(GL11.GL_FRONT_AND_BACK, GL11.GL_SPECULAR, color);
-			GL11.glMaterialf(GL11.GL_FRONT_AND_BACK, GL11.GL_SHININESS, 0);//mt_ptr.fShininess);
-			/**/
-
-            //カリング判定：何となくうまくいったから
-			if ((0x100 & mt_ptr.unknown) == 0x100)
-            {
-				GL11.glDisable(GL11.GL_CULL_FACE);
+    public void render(com.mojang.blaze3d.vertex.PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buffers, int light) {
+        int normalOffset = this._ref_pmd_model.getNumberOfVertex() * 3;
+        for (Material material : this._materials) {
+            Identifier texture = material.texture_id != null ? material.texture_id : mods.flammpfeil.slashblade.client.renderer.model.BladeModelManager.resourceDefaultTexture;
+            var output = buffers.getBuffer(mods.flammpfeil.slashblade.client.renderer.util.BladeRenderState.getSlashBladeBlend(texture));
+            for (short index : material.indices) {
+                int vertex = Short.toUnsignedInt(index), pos = vertex * 3, normal = normalOffset + pos;
+                output.addVertex(pose.last(), _fbuf[pos], _fbuf[pos+1], -_fbuf[pos+2])
+                    .setColor(material.color[0], material.color[1], material.color[2], material.color[3])
+                    .setUv(_tex_array[vertex].u, _tex_array[vertex].v).setLight(light)
+                    .setOverlay(net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY)
+                    .setNormal(pose.last(), _fbuf[normal], _fbuf[normal+1], -_fbuf[normal+2]);
             }
-            else
-            {
-				GL11.glEnable(GL11.GL_CULL_FACE);
-            }
-
-
-            if(mt_ptr.texture_id != null){
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
-				Minecraft.getInstance().getEntityRenderDispatcher().textureManager.getTexture(mt_ptr.texture_id);
-			}else{
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
-			}
-			/*
-			if (mt_ptr.texture_id!=0) {
-				// テクスチャありならBindする
-				GL11.glEnable(GL11.GL_TEXTURE_2D);
-				GL11.glBindTexture(GL11.GL_TEXTURE_2D, mt_ptr.texture_id);
-			} else {
-				// テクスチャなし
-				GL11.glDisable(GL11.GL_TEXTURE_2D);
-			}
-			*/
-
-			// 頂点インデックスを指定してポリゴン描画
-			//GL11.glDrawElements(GL11.GL_TRIANGLES, mt_ptr.indices);
-
-
-			Tesselator.getInstance().end();
-		}
-
-		GL11.glPopClientAttrib();
-		GL11.glPopAttrib();
-		return;
-	}
+        }
+    }
 
     private static FloatBuffer makeFloatBuffer(int i_size)
     {

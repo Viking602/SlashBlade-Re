@@ -1,9 +1,12 @@
 package mods.flammpfeil.slashblade.client.renderer;
 
+import mods.flammpfeil.slashblade.compat.SBItemData;
+import mods.flammpfeil.slashblade.compat.SBData;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mods.flammpfeil.slashblade.client.renderer.model.BladeFirstPersonRender;
 import mods.flammpfeil.slashblade.client.renderer.model.BladeModel;
 import mods.flammpfeil.slashblade.client.renderer.model.BladeModelManager;
+import mods.flammpfeil.slashblade.client.renderer.model.BladeIconLayout;
 import mods.flammpfeil.slashblade.client.renderer.model.obj.WavefrontObject;
 import mods.flammpfeil.slashblade.client.renderer.util.MSAutoCloser;
 import mods.flammpfeil.slashblade.client.renderer.util.BladeRenderState;
@@ -14,14 +17,14 @@ import mods.flammpfeil.slashblade.item.SwordType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
+
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import com.mojang.math.Axis;
@@ -29,22 +32,16 @@ import com.mojang.math.Axis;
 import java.awt.*;
 import java.util.EnumSet;
 
-public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer {
+public class SlashBladeTEISR {
 
-    public SlashBladeTEISR(BlockEntityRenderDispatcher p_172550_, EntityModelSet p_172551_) {
-        super(p_172550_, p_172551_);
-    }
+    private final BladeIconLayout iconLayout;
+    public SlashBladeTEISR() { this(null); }
+    public SlashBladeTEISR(BladeIconLayout iconLayout) { this.iconLayout = iconLayout; }
 
-    @Override
     public void renderByItem(ItemStack itemStackIn, ItemDisplayContext type, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
     //public void render(ItemStack itemStackIn, MatrixStack matrixStack, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
         if(!(itemStackIn.getItem() instanceof ItemSlashBlade)) return;
         ItemSlashBlade item = (ItemSlashBlade)itemStackIn.getItem();
-
-        if(itemStackIn.hasTag() && itemStackIn.getTag().contains(ItemSlashBlade.ICON_TAG_KEY)){
-            itemStackIn.readShareTag(itemStackIn.getTag());
-            itemStackIn.removeTagKey(ItemSlashBlade.ICON_TAG_KEY);
-        }
 
         renderBlade(itemStackIn, type, matrixStack, bufferIn, combinedLightIn, combinedOverlayIn);
     }
@@ -80,7 +77,7 @@ public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer {
 
             boolean handle = false;
 
-            if(!types.contains(SwordType.NoScabbard)) {
+            if(BladeModel.user != null && !types.contains(SwordType.NoScabbard)) {
                 handle = BladeModel.user.getMainArm() == HumanoidArm.RIGHT ?
                         transformType == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND :
                         transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
@@ -121,12 +118,8 @@ public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer {
             } else if (transformType == ItemDisplayContext.GUI) {
                 renderIcon(stack, matrixStack, bufferIn, combinedLightIn,0.008f, true);
             } else if (transformType == ItemDisplayContext.FIXED) {
-                if (stack.isFramed() && stack.getFrame() instanceof BladeStandEntity) {
-                    renderModel(stack, matrixStack, bufferIn, combinedLightIn);
-                } else {
-                    matrixStack.mulPose(Axis.YP.rotationDegrees(180.0f));
-                    renderIcon(stack, matrixStack, bufferIn, combinedLightIn,0.0095f);
-                }
+                matrixStack.mulPose(Axis.YP.rotationDegrees(180.0f));
+                renderIcon(stack, matrixStack, bufferIn, combinedLightIn,0.0095f);
             }else{
                 renderIcon(stack, matrixStack, bufferIn, combinedLightIn,0.0095f);
             }
@@ -144,12 +137,12 @@ public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer {
 
         EnumSet<SwordType> types = SwordType.from(stack);
 
-        ResourceLocation modelLocation = stack.getCapability(ItemSlashBlade.BLADESTATE)
+        Identifier modelLocation = SBData.get(stack, ItemSlashBlade.BLADESTATE)
                 .filter(s->s.getModel().isPresent())
                 .map(s->s.getModel().get())
                 .orElseGet(()-> BladeModelManager.resourceDefaultModel);
         WavefrontObject model = BladeModelManager.getInstance().getModel(modelLocation);
-        ResourceLocation textureLocation = stack.getCapability(ItemSlashBlade.BLADESTATE)
+        Identifier textureLocation = SBData.get(stack, ItemSlashBlade.BLADESTATE)
                 .filter(s->s.getTexture().isPresent())
                 .map(s->s.getTexture().get())
                 .orElseGet(()->BladeModelManager.resourceDefaultTexture);
@@ -163,42 +156,43 @@ public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer {
             renderTarget = "item_bladens";
         }
 
-        BladeRenderState.renderOverrided(stack, model, renderTarget, textureLocation, matrixStack, bufferIn, lightIn);
-        BladeRenderState.renderOverridedLuminous(stack, model, renderTarget + "_luminous", textureLocation, matrixStack, bufferIn, lightIn);
+        try (MSAutoCloser bladePose = MSAutoCloser.pushMatrix(matrixStack)) {
+            if (renderDurability && iconLayout != null) iconLayout.applyBlade(matrixStack, model, renderTarget);
+            if (renderDurability) {
+                BladeRenderState.renderOverridedIcon(stack, model, renderTarget, textureLocation, matrixStack, bufferIn, lightIn);
+            } else {
+                BladeRenderState.renderOverrided(stack, model, renderTarget, textureLocation, matrixStack, bufferIn, lightIn);
+            }
+            BladeRenderState.renderOverridedLuminous(stack, model, renderTarget + "_luminous", textureLocation, matrixStack, bufferIn, lightIn);
+        }
 
         if(renderDurability){
 
             WavefrontObject durabilityModel = BladeModelManager.getInstance().getModel(BladeModelManager.resourceDurabilityModel);
+            if (iconLayout != null) iconLayout.applyGauge(matrixStack, durabilityModel);
 
-            float durability = stack.getCapability(ItemSlashBlade.BLADESTATE).map(s->s.getDurabilityForDisplay()).orElse(0.0f);
+            float durability = SBData.get(stack, ItemSlashBlade.BLADESTATE).map(s->s.getDurabilityForDisplay()).orElse(0.0f);
             matrixStack.translate(0.0F, 0.0F, 0.1f);
 
-            if(BladeModel.user != null && BladeModel.user.getMainHandItem() == stack){
+            // SpecialModelRenderer snapshots ItemStacks, so reference equality with
+            // the live main hand cannot select a reliable GUI variant. Every slot,
+            // including the main hand, uses the original model's damage gauge.
+            Color aCol = new Color(0.25f,0.25f,0.25f,1.0f);
+            Color bCol = new Color(0xA52C63);
+            int r = 0xFF & (int)Mth.lerp(durability, aCol.getRed(), bCol.getRed());
+            int g = 0xFF & (int)Mth.lerp(durability, aCol.getGreen(), bCol.getGreen());
+            int b = 0xFF & (int)Mth.lerp(durability, aCol.getBlue(), bCol.getBlue());
 
-                BladeRenderState.setCol(new Color(0xEEEEEE));
-                BladeRenderState.renderOverrided(stack, durabilityModel, "base", BladeModelManager.resourceDurabilityTexture, matrixStack, bufferIn, lightIn);
-                matrixStack.translate(0.0F, 0.0F, 0.1f);
-                BladeRenderState.setCol(Color.black);
-                BladeRenderState.renderOverrided(stack, durabilityModel, "color_r", BladeModelManager.resourceDurabilityTexture, matrixStack, bufferIn, lightIn);
-            }else{
-                Color aCol = new Color(0.25f,0.25f,0.25f,1.0f);
-                Color bCol = new Color(0xA52C63);
-                int r = 0xFF & (int)Mth.lerp(aCol.getRed(), bCol.getRed(),durability);
-                int g = 0xFF & (int)Mth.lerp(aCol.getGreen(), bCol.getGreen(),durability);
-                int b = 0xFF & (int)Mth.lerp(aCol.getBlue(), bCol.getBlue(),durability);
+            BladeRenderState.setCol(new Color(r,g,b));
+            BladeRenderState.renderOverridedIcon(stack, durabilityModel, "base", BladeModelManager.resourceDurabilityTexture, matrixStack, bufferIn, lightIn);
 
-                BladeRenderState.setCol(new Color(r,g,b));
-                BladeRenderState.renderOverrided(stack, durabilityModel, "base", BladeModelManager.resourceDurabilityTexture, matrixStack, bufferIn, lightIn);
-
-
-                boolean isBroken = types.contains(SwordType.Broken);
-                matrixStack.translate(0.0F, 0.0F, -2.0f * durability);
-                BladeRenderState.renderOverrided(stack, durabilityModel, isBroken ? "color_r" : "color", BladeModelManager.resourceDurabilityTexture, matrixStack, bufferIn, lightIn);
-            }
+            boolean isBroken = types.contains(SwordType.Broken);
+            matrixStack.translate(0.0F, 0.0F, -2.0f * durability);
+            BladeRenderState.renderOverridedIcon(stack, durabilityModel, isBroken ? "color_r" : "color", BladeModelManager.resourceDurabilityTexture, matrixStack, bufferIn, lightIn);
         }
     }
 
-    private void renderModel(ItemStack stack, PoseStack matrixStack, MultiBufferSource bufferIn, int lightIn){
+    public void renderStand(ItemStack stack, PoseStack matrixStack, MultiBufferSource bufferIn, int lightIn, BladeStandEntity stand){
 
         float scale = 0.003125f;
         matrixStack.scale(scale, scale, scale);
@@ -208,12 +202,12 @@ public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer {
         EnumSet<SwordType> types = SwordType.from(stack);
         //BladeModel.itemBlade.getModelLocation(itemStackIn)
 
-        ResourceLocation modelLocation = stack.getCapability(ItemSlashBlade.BLADESTATE)
+        Identifier modelLocation = SBData.get(stack, ItemSlashBlade.BLADESTATE)
                 .filter(s->s.getModel().isPresent())
                 .map(s->s.getModel().get())
                 .orElseGet(()-> BladeModelManager.resourceDefaultModel);
         WavefrontObject model = BladeModelManager.getInstance().getModel(modelLocation);
-        ResourceLocation textureLocation = stack.getCapability(ItemSlashBlade.BLADESTATE)
+        Identifier textureLocation = SBData.get(stack, ItemSlashBlade.BLADESTATE)
                 .filter(s->s.getTexture().isPresent())
                 .map(s->s.getTexture().get())
                 .orElseGet(()->BladeModelManager.resourceDefaultTexture);
@@ -228,9 +222,8 @@ public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer {
         boolean hFlip = false;
         boolean hasScabbard = !types.contains(SwordType.NoScabbard);
 
-        if(stack.isFramed()){
-            if(stack.getFrame() instanceof BladeStandEntity){
-                BladeStandEntity stand = (BladeStandEntity) stack.getFrame();
+        {
+            if(stand != null){
                 Item type = stand.currentType;
 
                 Pose pose = stand.getPose();
@@ -400,7 +393,7 @@ public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer {
 
             {
                 WavefrontObject model = BladeModelManager.getInstance().getModel(itemBlade.getModelLocation(itemstack));
-                ResourceLocation resourceTexture = itemBlade.getModelTexture(itemstack);
+                Identifier resourceTexture = itemBlade.getModelTexture(itemstack);
                 bindTexture(resourceTexture);
 
                 GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);

@@ -1,13 +1,13 @@
 package mods.flammpfeil.slashblade.item;
 
 import mods.flammpfeil.slashblade.init.SBItems;
-import net.minecraft.client.renderer.EffectInstance;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -34,8 +34,8 @@ public class ItemSoulActivated extends Item {
     }
 
     @Override
-    public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int slot, boolean selected) {
-        if(entity != null && entity instanceof Player && ((Player)entity).getInventory().isHotbarSlot(slot)){
+    public void inventoryTick(ItemStack itemStack, net.minecraft.server.level.ServerLevel level, Entity entity, @org.jetbrains.annotations.Nullable EquipmentSlot slot) {
+        if(entity instanceof Player && (slot == EquipmentSlot.MAINHAND || slot == EquipmentSlot.OFFHAND || isInHotbar((Player)entity, itemStack))){
             Player player = (Player) entity;
 
             MobEffectInstance effect = new MobEffectInstance(MobEffects.HUNGER, 200, 1, false, false);
@@ -69,6 +69,10 @@ public class ItemSoulActivated extends Item {
     }
 
 
+    private static boolean isInHotbar(Player player, ItemStack stack) {
+        for (int index = 0; index < 9; index++) if (player.getInventory().getItem(index) == stack) return true;
+        return false;
+    }
     //reverse
     @Override
     public boolean isBarVisible(ItemStack p_150899_) {

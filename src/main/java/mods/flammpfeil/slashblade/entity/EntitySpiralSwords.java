@@ -12,7 +12,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
-import net.minecraftforge.network.PlayMessages;
 
 public class EntitySpiralSwords extends EntityAbstractSummonedSword{
     private static final EntityDataAccessor<Boolean> IT_FIRED = SynchedEntityData.defineId(EntitySpiralSwords.class, EntityDataSerializers.BOOLEAN);
@@ -24,10 +23,10 @@ public class EntitySpiralSwords extends EntityAbstractSummonedSword{
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
 
-        this.entityData.define(IT_FIRED, false);
+        builder.define(IT_FIRED, false);
     }
 
     public void doFire(){
@@ -37,16 +36,16 @@ public class EntitySpiralSwords extends EntityAbstractSummonedSword{
         return this.getEntityData().get(IT_FIRED);
     }
 
-    public static EntitySpiralSwords createInstance(PlayMessages.SpawnEntity packet, Level worldIn){
+    public static EntitySpiralSwords createInstance(net.minecraft.network.protocol.game.ClientboundAddEntityPacket packet, Level worldIn){
         return new EntitySpiralSwords(SlashBlade.RegistryEvents.SpiralSwords, worldIn);
     }
 
     @Override
     public void tick() {
         if(!itFired()){
-            if(level().isClientSide){
-                if(getVehicle() == null){
-                    startRiding(this.getOwner(),true);
+            if(level().isClientSide()){
+                if(getFormationHost() == null){
+                    startFormation(this.getOwner());
                 }
             }
         }
@@ -58,8 +57,8 @@ public class EntitySpiralSwords extends EntityAbstractSummonedSword{
     public void rideTick(){
         if(itFired()){
             faceEntityStandby();
-            Entity target = getVehicle();
-            this.stopRiding();
+            Entity target = getFormationHost();
+            this.stopFormation();
 
             this.tickCount = 0;
             Vec3 dir = this.getViewVector(1.0f);
@@ -73,11 +72,11 @@ public class EntitySpiralSwords extends EntityAbstractSummonedSword{
 
         //this.startRiding()
         this.setDeltaMovement(Vec3.ZERO);
-        if (canUpdate())
+        if (!isRemoved())
             this.baseTick();
 
         faceEntityStandby();
-        //this.getVehicle().positionRider(this);
+        //this.getFormationHost().positionRider(this);
 
         //todo: add lifetime
         if(200 < this.tickCount)
@@ -108,10 +107,10 @@ public class EntitySpiralSwords extends EntityAbstractSummonedSword{
             }
         }
 
-        if (raytraceresult != null && raytraceresult.getType() == HitResult.Type.ENTITY && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
+        if (raytraceresult != null && raytraceresult.getType() == HitResult.Type.ENTITY && !net.neoforged.neoforge.event.EventHooks.onProjectileImpact(this, raytraceresult)) {
             this.onHit(raytraceresult);
             this.resetAlreadyHits();
-            this.hasImpulse = true;
+            this.hurtMarked = true;
         }
     }
 
@@ -119,7 +118,7 @@ public class EntitySpiralSwords extends EntityAbstractSummonedSword{
 
         long cycle = 30;
         long tickOffset = 0;
-        if(this.level().isClientSide)
+        if(this.level().isClientSide())
             tickOffset = 1;
         int ticks = (int)((this.level().getGameTime() + tickOffset) % cycle);
         /*
@@ -140,9 +139,9 @@ public class EntitySpiralSwords extends EntityAbstractSummonedSword{
         dir = dir.yRot((float)-yaw);
         dir = dir.normalize().scale(2);
 
-        if (this.getVehicle() != null) {
-            dir = dir.add(this.getVehicle().position());
-            dir = dir.add(0, this.getVehicle().getEyeHeight() / 2.0, 0);
+        if (this.getFormationHost() != null) {
+            dir = dir.add(this.getFormationHost().position());
+            dir = dir.add(0, this.getFormationHost().getEyeHeight() / 2.0, 0);
         }
 
         this.xRotO = this.getXRot();

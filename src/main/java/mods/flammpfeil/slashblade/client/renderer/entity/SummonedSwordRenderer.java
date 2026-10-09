@@ -10,21 +10,19 @@ import mods.flammpfeil.slashblade.entity.EntityAbstractSummonedSword;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
-@OnlyIn(Dist.CLIENT)
-public class SummonedSwordRenderer<T extends EntityAbstractSummonedSword> extends EntityRenderer<T> {
+public class SummonedSwordRenderer<T extends EntityAbstractSummonedSword> extends BladeEntityRenderer<T> {
 
     @Nullable
-    @Override
-    public ResourceLocation getTextureLocation(T entity) {
+    public Identifier getTextureLocation(T entity) {
         return entity.getTextureLoc();
     }
 

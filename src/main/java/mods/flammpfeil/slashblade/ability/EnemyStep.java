@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.ability;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.capability.slashblade.ComboState;
 import mods.flammpfeil.slashblade.event.InputCommandEvent;
@@ -10,7 +11,7 @@ import mods.flammpfeil.slashblade.util.NBTHelper;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -22,8 +23,8 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.SubscribeEvent;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -41,14 +42,14 @@ public class EnemyStep {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     static final TargetingConditions tc = new TargetingConditions(false)
             .ignoreLineOfSight()
             .ignoreInvisibilityTesting();
 
-    static public final ResourceLocation ADVANCEMENT_ENEMY_STEP = new ResourceLocation(SlashBlade.modid, "abilities/enemy_step");
+    static public final Identifier ADVANCEMENT_ENEMY_STEP = Identifier.fromNamespaceAndPath(SlashBlade.modid, "abilities/enemy_step");
 
     @SubscribeEvent
     public void onInputChange(InputCommandEvent event) {
@@ -62,7 +63,7 @@ public class EnemyStep {
         if(old.contains(InputCommand.JUMP)) return;
         if(!current.contains(InputCommand.JUMP)) return;
 
-        List<LivingEntity> list = worldIn.getNearbyEntities(LivingEntity.class, tc, sender, sender.getBoundingBox().inflate(1));
+        List<LivingEntity> list = ((net.minecraft.server.level.ServerLevel)worldIn).getNearbyEntities(LivingEntity.class, tc, sender, sender.getBoundingBox().inflate(1));
         if(list.isEmpty()) return;
 
         Untouchable.setUntouchable(sender, Untouchable.JUMP_TICKS);
@@ -74,9 +75,9 @@ public class EnemyStep {
         sender.connection.send(new ClientboundSetEntityMotionPacket(sender.getId(), motion.scale(0.75f)));
 
         AdvancementHelper.grantCriterion(sender,ADVANCEMENT_ENEMY_STEP);
-        sender.playNotifySound(SoundEvents.PLAYER_SMALL_FALL, SoundSource.PLAYERS, 0.5f, 1.2f);
+        mods.flammpfeil.slashblade.compat.SBEffects.notifySound(sender, SoundEvents.PLAYER_SMALL_FALL, SoundSource.PLAYERS, 0.5f, 1.2f);
 
-        sender.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(s->{
+        SBData.get(sender.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent(s->{
             s.updateComboSeq(sender, ComboState.NONE);
         });
 

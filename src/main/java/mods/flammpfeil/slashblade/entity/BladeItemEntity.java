@@ -16,10 +16,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.network.PlayMessages;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.network.PlayMessages;
 
 public class BladeItemEntity extends ItemEntity {
     public BladeItemEntity(EntityType<? extends BladeItemEntity> p_i50217_1_, Level p_i50217_2_) {
@@ -29,19 +25,16 @@ public class BladeItemEntity extends ItemEntity {
     public void init(){
         this.setInvulnerable(true);
 
-        CompoundTag compoundnbt = this.saveWithoutId(new CompoundTag());
-        compoundnbt.remove("Dimension");
-        compoundnbt.putShort("Health", (short)100);
-        compoundnbt.putShort("Age", Short.MIN_VALUE);
-        this.load(compoundnbt);
+        this.health = 100;
+        this.setUnlimitedLifetime();
     }
 
-    public static BladeItemEntity createInstanceFromPacket(PlayMessages.SpawnEntity packet, Level worldIn){
+    public static BladeItemEntity createInstanceFromPacket(net.minecraft.network.protocol.game.ClientboundAddEntityPacket packet, Level worldIn){
         return new BladeItemEntity(SlashBlade.RegistryEvents.BladeItem, worldIn);
     }
 
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket(net.minecraft.server.level.ServerEntity entity) {
+        return super.getAddEntityPacket(entity);
     }
 
     @Override
@@ -56,7 +49,7 @@ public class BladeItemEntity extends ItemEntity {
         }
 
 
-        if(this.level().isClientSide){
+        if(this.level().isClientSide()){
             if (random.nextInt(5) == 0 && getAirSupply() < 0) {
                 Direction direction = Direction.UP;
                 double d0 = (double)this.getX() - (double)(random.nextFloat() * 0.1F);
@@ -83,7 +76,7 @@ public class BladeItemEntity extends ItemEntity {
     }
 
     @Override
-    public boolean causeFallDamage(float distance, float damageMultiplier, DamageSource ds) {
+    public boolean causeFallDamage(double distance, float damageMultiplier, DamageSource ds) {
         super.causeFallDamage(distance, damageMultiplier, ds);
 
         int i = Mth.ceil(distance);

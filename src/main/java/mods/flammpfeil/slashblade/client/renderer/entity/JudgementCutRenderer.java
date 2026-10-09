@@ -11,24 +11,22 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import com.mojang.math.Axis;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 
-@OnlyIn(Dist.CLIENT)
-public class JudgementCutRenderer<T extends EntityJudgementCut> extends EntityRenderer<T> {
+public class JudgementCutRenderer<T extends EntityJudgementCut> extends BladeEntityRenderer<T> {
 
-    static private final ResourceLocation modelLocation = new ResourceLocation(SlashBlade.modid, "model/util/slashdim.obj");
-    static private final ResourceLocation textureLocation = new ResourceLocation(SlashBlade.modid, "model/util/slashdim.png");
+    static private final Identifier modelLocation = Identifier.fromNamespaceAndPath(SlashBlade.modid, "model/util/slashdim.obj");
+    static private final Identifier textureLocation = Identifier.fromNamespaceAndPath(SlashBlade.modid, "model/util/slashdim.png");
 
     @Nullable
-    @Override
-    public ResourceLocation getTextureLocation(T entity) {
+    public Identifier getTextureLocation(T entity) {
         return textureLocation;
     }
 

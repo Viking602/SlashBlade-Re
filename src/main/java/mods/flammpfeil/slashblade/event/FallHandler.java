@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.event;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.capability.slashblade.ComboState;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.util.AdvancementHelper;
@@ -15,11 +16,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.event.entity.player.PlayerFlyableFallEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerFlyableFallEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class FallHandler {
     private static final class SingletonHolder {
@@ -30,7 +31,7 @@ public class FallHandler {
     }
     private FallHandler(){}
     public void register(){
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
@@ -44,7 +45,7 @@ public class FallHandler {
     }
 
     public static void resetState(LivingEntity user){
-        user.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state)->{
+        SBData.get(user.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent((state)->{
             state.setFallDecreaseRate(0);
 
             ComboState combo = state.getComboSeq();
@@ -56,7 +57,7 @@ public class FallHandler {
     }
 
     public static void spawnLandingParticle(LivingEntity user , float fallFactor){
-        if (!user.level().isClientSide) {
+        if (!user.level().isClientSide()) {
             int x = Mth.floor(user.getX());
             int y = Mth.floor(user.getY() - (double)0.5F);
             int z = Mth.floor(user.getZ());
@@ -73,7 +74,7 @@ public class FallHandler {
         }
     }
     public static void spawnLandingParticle(Entity user, Vec3 targetPos, Vec3 normal, float fallFactor){
-        if (!user.level().isClientSide) {
+        if (!user.level().isClientSide()) {
 
             Vec3 blockPos = targetPos.add(normal.normalize().scale(0.5f));
 
@@ -96,7 +97,7 @@ public class FallHandler {
         if(!user.isNoGravity() && !user.onGround()){
             user.fallDistance = 1;
 
-            float currentRatio = user.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).map((state)->
+            float currentRatio = SBData.get(user.getMainHandItem(), ItemSlashBlade.BLADESTATE).map((state)->
             {
                 float decRatio = state.getFallDecreaseRate();
 
@@ -110,13 +111,13 @@ public class FallHandler {
 
             double gravityReductionFactor = 0.85f;
 
-            int level = EnchantmentHelper.getEnchantmentLevel(Enchantments.FALL_PROTECTION, user);
+            int level = mods.flammpfeil.slashblade.compat.SBEnchantments.livingLevel(Enchantments.FEATHER_FALLING, user);
             if(0 < level){
                 gravityReductionFactor = Math.min(0.93, gravityReductionFactor + 0.2 * level);
-                AdvancementHelper.grantedIf(Enchantments.FALL_PROTECTION, user);
+                AdvancementHelper.grantedIf(Enchantments.FEATHER_FALLING, user);
             }
 
-            AttributeInstance gravity = user.getAttribute(ForgeMod.ENTITY_GRAVITY.get());
+            AttributeInstance gravity = user.getAttribute(Attributes.GRAVITY);
             double g = gravity.getValue() * gravityReductionFactor;
 
             Vec3 motion = user.getDeltaMovement();
@@ -130,7 +131,7 @@ public class FallHandler {
             user.fallDistance = 1;
 
             Vec3 motion = user.getDeltaMovement();
-            AttributeInstance gravity = user.getAttribute(ForgeMod.ENTITY_GRAVITY.get());
+            AttributeInstance gravity = user.getAttribute(Attributes.GRAVITY);
             double g = gravity.getValue();
             if(motion.y < 0)
                 user.setDeltaMovement(motion.x, (motion.y + g + 0.002f), motion.z);

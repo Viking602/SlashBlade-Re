@@ -1,12 +1,13 @@
 package mods.flammpfeil.slashblade.event;
 
+import mods.flammpfeil.slashblade.compat.SBItemData;
 import mods.flammpfeil.slashblade.util.NBTHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class BladeMaterialTooltips {
     }
     private BladeMaterialTooltips(){}
     public void register(){
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     static public final String BLADE_DATA = "BladeData";
@@ -31,13 +32,11 @@ public class BladeMaterialTooltips {
 
         ItemStack stack = event.getItemStack();
 
-        if(stack.hasTag() && stack.getTag().contains(BLADE_DATA)){
-            CompoundTag bladeData = stack.getTag().getCompound(BLADE_DATA);
+        if(SBItemData.hasTag(stack) && SBItemData.tag(stack).contains(BLADE_DATA)){
+            CompoundTag bladeData = SBItemData.tag(stack).getCompoundOrEmpty(BLADE_DATA);
 
-            String translationKey = NBTHelper.getNBTCoupler(bladeData)
-                    .getChild("tag")
-                    .getChild("ShareTag")
-                    .getRawCompound().getString("translationKey");
+            ItemStack recovered = SBItemData.load(bladeData);
+            String translationKey = recovered.isEmpty() ? "" : SBItemData.descriptionId(recovered);
 
             event.getToolTip().add(Component.translatable(translationKey));
         }

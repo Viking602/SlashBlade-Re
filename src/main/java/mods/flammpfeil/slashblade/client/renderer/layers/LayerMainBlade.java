@@ -1,9 +1,7 @@
 package mods.flammpfeil.slashblade.client.renderer.layers;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.kosmx.playerAnim.api.TransformType;
-import dev.kosmx.playerAnim.core.util.Vec3f;
-import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
 import jp.nyatla.nymmd.*;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.capability.slashblade.CapabilitySlashBlade;
@@ -27,24 +25,26 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import com.mojang.math.Axis;
-import net.minecraftforge.common.util.LazyOptional;
+import mods.flammpfeil.slashblade.compat.LazyOptional;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import mods.flammpfeil.slashblade.client.animation.BladeMotionState;
+import mods.flammpfeil.slashblade.client.renderer.model.BladeAnimationTimeline;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class LayerMainBlade<T extends LivingEntity, M extends EntityModel<T>> extends RenderLayer<T, M> {
+public class LayerMainBlade {
 
-    public LayerMainBlade(RenderLayerParent<T, M> entityRendererIn) {
-        super(entityRendererIn);
-    }
+    public LayerMainBlade() {}
 
     final LazyOptional<MmdPmdModelMc> bladeholder =
             LazyOptional.of(() -> {
                 try {
-                    return new MmdPmdModelMc(new ResourceLocation(SlashBlade.modid, "model/bladeholder.pmd"));
+                    return new MmdPmdModelMc(Identifier.fromNamespaceAndPath(SlashBlade.modid, "model/bladeholder.pmd"));
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (MmdException e) {
@@ -75,8 +75,8 @@ public class LayerMainBlade<T extends LivingEntity, M extends EntityModel<T>> ex
         float modif = 6.0f;
         if (MobEffectUtil.hasDigSpeed(entity)) {
             modif = 6 - (1 + MobEffectUtil.getDigSpeedAmplification(entity));
-        } else if(entity.hasEffect(MobEffects.DIG_SLOWDOWN)) {
-            modif = 6 + (1 + entity.getEffect(MobEffects.DIG_SLOWDOWN).getAmplifier()) * 2;
+        } else if(entity.hasEffect(MobEffects.MINING_FATIGUE)) {
+            modif = 6 + (1 + entity.getEffect(MobEffects.MINING_FATIGUE).getAmplifier()) * 2;
         }
 
         modif /= 6.0f;
@@ -84,8 +84,45 @@ public class LayerMainBlade<T extends LivingEntity, M extends EntityModel<T>> ex
         return baseSpeed / modif;
     }
 
-    @Override
-    public void render(PoseStack matrixStack, MultiBufferSource bufferIn, int lightIn, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+    /** Immutable snapshots of the authored blade and sheath bones, shared with regression probes. */
+    public Matrix4f[] sampleHardpoints(BladeMotionState.Sample sample) {
+        return sampleHardpoints(motionPlayer.orElseThrow(() -> new IllegalStateException("Missing blade animation skeleton")), sample);
+    }
+
+    private Matrix4f[] sampleHardpoints(MmdMotionPlayerGL2 player, BladeMotionState.Sample sample) {
+        if (sample.blending() && sample.alpha() == 0) return sampleHardpoints(player, sample.previous());
+        Matrix4f[] target = sampleHardpoints(player, sample.current());
+        if (!sample.blending()) return target;
+        Matrix4f[] source = sampleHardpoints(player, sample.previous());
+        for (int i = 0; i < target.length; i++) {
+            Vector3f position = source[i].getTranslation(new Vector3f()).lerp(target[i].getTranslation(new Vector3f()), sample.alpha());
+            Quaternionf rotation = source[i].getUnnormalizedRotation(new Quaternionf()).normalize()
+                    .slerp(target[i].getUnnormalizedRotation(new Quaternionf()).normalize(), sample.alpha());
+            // Matrix element interpolation can collapse a rotating blade and shear
+            // its normals. Interpolate rigid translation and rotation instead.
+            target[i] = new Matrix4f().translationRotate(position, rotation);
+        }
+        return target;
+    }
+
+    private Matrix4f[] sampleHardpoints(MmdMotionPlayerGL2 player, BladeAnimationTimeline timeline) {
+        var motion = BladeMotionManager.getInstance().getMotion(timeline.combo().getMotionLoc());
+        try {
+            player.setVmd(motion);
+            player.updateMotion((float)TimeValueHelper.getMSecFromFrames(Math.min(timeline.frame(), motion.getMaxFrame())));
+        } catch (MmdException error) { throw new IllegalStateException("Could not sample blade animation", error); }
+        Matrix4f[] result = new Matrix4f[2];
+        float[] values = new float[16];
+        for (int i = 0; i < result.length; i++) {
+            int index = player.getBoneIndexByName(i == 0 ? "hardpointA" : "hardpointB");
+            if (index < 0) throw new IllegalStateException("Missing blade animation hardpoint " + i);
+            player._skinning_mat[index].getValue(values);
+            result[i] = VectorHelper.matrix4fFromArray(values);
+        }
+        return result;
+    }
+
+    public void render(PoseStack matrixStack, MultiBufferSource bufferIn, int lightIn, LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 
         float motionYOffset = 1.5f;
         double motionScale = 1.5 / 12.0;
@@ -95,74 +132,18 @@ public class LayerMainBlade<T extends LivingEntity, M extends EntityModel<T>> ex
 
         if(stack.isEmpty()) return;
 
-        LazyOptional<ISlashBladeState> state = stack.getCapability(CapabilitySlashBlade.BLADESTATE);
+        LazyOptional<ISlashBladeState> state = SBData.get(stack, CapabilitySlashBlade.BLADESTATE);
         state.ifPresent(s -> {
 
             motionPlayer.ifPresent(mmp ->
             {
-                ComboState combo = s.getComboSeq();
-                //tick to msec
-                double time = TimeValueHelper.getMSecFromTicks(Math.max(0, entity.level().getGameTime() - s.getLastActionTime()) + partialTicks);
-
-                while(combo != ComboState.NONE && combo.getTimeoutMS() < time){
-                    time -= combo.getTimeoutMS();
-
-                    combo = combo.getNextOfTimeout();
-                }
-                if(combo == ComboState.NONE){
-                    combo = s.getComboRoot();
-                }
-
-                MmdVmdMotionMc motion = BladeMotionManager.getInstance().getMotion(combo.getMotionLoc());
-
-                double maxSeconds = 0;
-                try {
-                    mmp.setVmd(motion);
-                    maxSeconds = TimeValueHelper.getMSecFromFrames(motion.getMaxFrame());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                double start = TimeValueHelper.getMSecFromFrames(combo.getStartFrame());
-                double end = TimeValueHelper.getMSecFromFrames(combo.getEndFrame());
-                double span = Math.abs(end - start);
-
-                span = Math.min(maxSeconds, span);
-
-                if (combo.getLoop()) {
-                    time = time % span;
-                }
-                time = Math.min(span, time);
-
-                time = start + time;
-
-                try {
-                    mmp.updateMotion((float)time);
-                } catch (MmdException e) {
-                    e.printStackTrace();
-                }
+                var sample = BladeMotionState.sample(entity, s, partialTicks);
+                Matrix4f[] hardpoints = sampleHardpoints(mmp, sample);
 
 
                 try(MSAutoCloser msacA = MSAutoCloser.pushMatrix(matrixStack)){
 
-                    if(!UserPoseOverrider.UsePoseOverrider && entity instanceof AbstractClientPlayer ){
-                        var animationPlayer = ((IAnimatedPlayer) entity).playerAnimator_getAnimation();
-                        animationPlayer.setTickDelta(partialTicks);
-                        if(animationPlayer.isActive()){
-
-                            Vec3f vec3d = animationPlayer.get3DTransform("body", TransformType.POSITION, Vec3f.ZERO);
-                            matrixStack.translate(-vec3d.getX(), (vec3d.getY() + 0.7), -vec3d.getZ());
-                            //These are additive properties
-                            Vec3f vec3f = animationPlayer.get3DTransform("body", TransformType.ROTATION, Vec3f.ZERO);
-                            matrixStack.mulPose(Axis.ZP.rotation(vec3f.getZ()));    //roll
-                            matrixStack.mulPose(Axis.YP.rotation(vec3f.getY()));    //pitch
-                            matrixStack.mulPose(Axis.XP.rotation(vec3f.getX()));    //yaw
-                            matrixStack.translate(0, - 0.7d, 0);
-                        }
-                    }else{
-                        UserPoseOverrider.invertRot(matrixStack,entity,partialTicks);
-                    }
-
+                    UserPoseOverrider.invertRot(matrixStack,entity,partialTicks);
 
                     //minecraft model neckPoint height = 1.5f
                     //mmd model neckPoint height = 12.0f
@@ -175,26 +156,15 @@ public class LayerMainBlade<T extends LivingEntity, M extends EntityModel<T>> ex
                     matrixStack.mulPose(Axis.ZP.rotationDegrees(180));
 
 
-                    ResourceLocation textureLocation = s.getTexture().orElseGet(() -> BladeModelManager.resourceDefaultTexture);
+                    Identifier textureLocation = s.getTexture().orElseGet(() -> BladeModelManager.resourceDefaultTexture);
                     //bindTexture(textureLocation);
 
                     WavefrontObject obj = BladeModelManager.getInstance().getModel(s.getModel().orElse(null));
 
                     try(MSAutoCloser msac = MSAutoCloser.pushMatrix(matrixStack)){
-                        int idx = mmp.getBoneIndexByName("hardpointA");
-
-                        if (0 <= idx) {
-                            float[] buf = new float[16];
-                            mmp._skinning_mat[idx].getValue(buf);
-
-                            Matrix4f mat = VectorHelper.matrix4fFromArray(buf);
-                            //mat.transpose();
-
-                            matrixStack.scale(-1, 1, 1);
-                            PoseStack.Pose entry = matrixStack.last();
-                            entry.pose().mul(mat);
-                            matrixStack.scale(-1, 1, 1);
-                        }
+                        matrixStack.scale(-1, 1, 1);
+                        matrixStack.mulPose(hardpoints[0]);
+                        matrixStack.scale(-1, 1, 1);
 
                         float modelScale = (float)(modelScaleBase * (1.0f / motionScale));
                         matrixStack.scale(modelScale, modelScale, modelScale);
@@ -213,20 +183,9 @@ public class LayerMainBlade<T extends LivingEntity, M extends EntityModel<T>> ex
                         BladeRenderState.renderOverridedLuminous(stack, obj, part + "_luminous", textureLocation, matrixStack, bufferIn, lightIn);
                     }
                     try(MSAutoCloser msac = MSAutoCloser.pushMatrix(matrixStack)){
-                        int idx = mmp.getBoneIndexByName("hardpointB");
-
-                        if (0 <= idx) {
-                            float[] buf = new float[16];
-                            mmp._skinning_mat[idx].getValue(buf);
-
-                            Matrix4f mat = VectorHelper.matrix4fFromArray(buf);
-                            //mat.transpose();
-
-                            matrixStack.scale(-1, 1, 1);
-                            PoseStack.Pose entry = matrixStack.last();
-                            entry.pose().mul(mat);
-                            matrixStack.scale(-1, 1, 1);
-                        }
+                        matrixStack.scale(-1, 1, 1);
+                        matrixStack.mulPose(hardpoints[1]);
+                        matrixStack.scale(-1, 1, 1);
 
 
                         float modelScale = (float)(modelScaleBase * (1.0f / motionScale));

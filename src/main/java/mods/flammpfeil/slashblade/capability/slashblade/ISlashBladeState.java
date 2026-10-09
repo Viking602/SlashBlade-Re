@@ -19,6 +19,9 @@
 
 package mods.flammpfeil.slashblade.capability.slashblade;
 
+import mods.flammpfeil.slashblade.compat.SBItemData;
+
+
 import com.google.common.collect.ImmutableRangeMap;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
@@ -40,15 +43,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.stats.Stats;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.network.PacketDistributor;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.AbstractMap;
 import java.util.Map;
@@ -73,7 +76,7 @@ public interface ISlashBladeState {
     default long getElapsedTime(LivingEntity user){
         long ticks = (Math.max(0, user.level().getGameTime() - this.getLastActionTime()));
 
-        if(user.level().isClientSide)
+        if(user.level().isClientSide())
             ticks = Math.max(0, ticks + 1);
 
         return ticks;
@@ -91,7 +94,7 @@ public interface ISlashBladeState {
     float getAttackAmplifier();
 	void setAttackAmplifier(float attackAmplifier);
 
-	@Nonnull
+	@NotNull
     ComboState getComboSeq();
 	void setComboSeq(ComboState comboSeq);
 
@@ -125,11 +128,11 @@ public interface ISlashBladeState {
     UUID getUniqueId();
     void setUniqueId(UUID id);
 
-    @Nonnull
+    @NotNull
     RangeAttack getRangeAttackType();
 	void setRangeAttackType(RangeAttack rangeAttackType);
 
-    @Nonnull
+    @NotNull
     default SlashArts getSlashArts(){
         String key = getSlashArtsKey();
         SlashArts result = null;
@@ -150,19 +153,19 @@ public interface ISlashBladeState {
     boolean isDefaultBewitched();
 	void setDefaultBewitched(boolean defaultBewitched);
 
-	@Nonnull
+	@NotNull
     Rarity getRarity();
 	void setRarity(Rarity rarity);
 
-    @Nonnull
+    @NotNull
 	String getTranslationKey();
 	void setTranslationKey(String translationKey);
 
-    @Nonnull
+    @NotNull
     CarryType getCarryType();
 	void setCarryType(CarryType carryType);
 
-    @Nonnull
+    @NotNull
     Color getEffectColor();
 	void setEffectColor(Color effectColor);
 
@@ -177,17 +180,17 @@ public interface ISlashBladeState {
         return getEffectColor().getRGB();
     }
 
-    @Nonnull
+    @NotNull
     Vec3 getAdjust();
 	void setAdjust(Vec3 adjust);
 
-    @Nonnull
-    Optional<ResourceLocation> getTexture();
-	void setTexture(ResourceLocation texture);
+    @NotNull
+    Optional<Identifier> getTexture();
+	void setTexture(Identifier texture);
 
-    @Nonnull
-    Optional<ResourceLocation> getModel();
-	void setModel(ResourceLocation model);
+    @NotNull
+    Optional<Identifier> getModel();
+	void setModel(Identifier model);
 
     int getTargetEntityId();
 	void setTargetEntityId(int id);
@@ -306,7 +309,7 @@ public interface ISlashBladeState {
 
         cs.clickAction(entity);
 
-        MinecraftForge.EVENT_BUS.post(new BladeMotionEvent(entity, cs));
+        NeoForge.EVENT_BUS.post(new BladeMotionEvent(entity, cs));
     }
 
     default ComboState resolvCurrentComboState(LivingEntity user){
@@ -358,7 +361,7 @@ public interface ISlashBladeState {
 
         boolean current = this.isBroken();
 
-        stack.hurtAndBreak(1, entityIn, (s)->{});
+        this.setDamage(this.getDamage() + amount / (float)stack.getMaxDamage());
 
         if(1.0f <= this.getDamage())
             this.setBroken(true);
@@ -367,7 +370,7 @@ public interface ISlashBladeState {
             onBroken.accept(entityIn);
 
             if (entityIn instanceof ServerPlayer) {
-                stack.getShareTag();
+                SBItemData.tag(stack);
                 CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer)entityIn, stack);
             }
 
@@ -388,11 +391,11 @@ public interface ISlashBladeState {
     void setHasChangedActiveState(boolean isChanged);
 
     default void sendChanges(Entity entityIn){
-        if(!entityIn.level().isClientSide && this.hasChangedActiveState()){
+        if(!entityIn.level().isClientSide() && this.hasChangedActiveState()){
             ActiveStateSyncMessage msg = new ActiveStateSyncMessage();
             msg.activeTag = this.getActiveState();
             msg.id = entityIn.getId();
-            NetworkManager.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(()->entityIn), msg);
+            PacketDistributor.sendToPlayersTrackingEntityAndSelf(entityIn, msg);
 
             this.setHasChangedActiveState(false);
         }

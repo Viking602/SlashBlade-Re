@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.specialattack;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.capability.concentrationrank.ConcentrationRankCapabilityProvider;
 import mods.flammpfeil.slashblade.entity.EntityJudgementCut;
@@ -15,13 +16,14 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.LazyOptional;
+import mods.flammpfeil.slashblade.compat.LazyOptional;
 
 import java.util.Optional;
 
 public class JudgementCut {
     static public EntityJudgementCut doJudgementCutJust(LivingEntity user){
         EntityJudgementCut sa = doJudgementCut(user);
+        if (sa == null) return null;
         sa.setDamage(sa.getDamage() + 1);
         sa.setIsCritical(true);
         return sa;
@@ -30,13 +32,14 @@ public class JudgementCut {
     static public EntityJudgementCut doJudgementCut(LivingEntity user){
 
         Level worldIn = user.level();
+        if (worldIn.isClientSide()) return null;
 
         Vec3 eyePos = user.getEyePosition(1.0f);
         final double airReach = 5;
         final double entityReach = 7;
 
         ItemStack stack = user.getMainHandItem();
-        Optional<Vec3> resultPos = stack.getCapability(ItemSlashBlade.BLADESTATE)
+        Optional<Vec3> resultPos = SBData.get(stack, ItemSlashBlade.BLADESTATE)
                 .filter(s->s.getTargetEntity(worldIn) != null)
                 .map(s->Optional.of(s.getTargetEntity(worldIn).getEyePosition(1.0f)))
                 .orElseGet(()->Optional.empty());
@@ -72,12 +75,12 @@ public class JudgementCut {
         jc.setPos(pos.x ,pos.y ,pos.z);
         jc.setOwner(user);
 
-        stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state)->{
+        SBData.get(stack, ItemSlashBlade.BLADESTATE).ifPresent((state)->{
             jc.setColor(state.getColorCode());
         });
 
         if(user != null)
-            user.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
+            SBData.get(user, ConcentrationRankCapabilityProvider.RANK_POINT)
                     .ifPresent(rank->jc.setRank(rank.getRankLevel(user.level().getGameTime())));
 
 

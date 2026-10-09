@@ -1,0 +1,7 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "slashblade:item/proudsoul_activated"
+  },
+  "hand_animation_on_swap": false
+}

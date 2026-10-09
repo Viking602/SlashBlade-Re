@@ -4,37 +4,35 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import mods.flammpfeil.slashblade.client.renderer.model.obj.WavefrontObject;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraft.resources.Identifier;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.bus.api.Event;
 
-@Cancelable
-@OnlyIn(Dist.CLIENT)
-public class RenderOverrideEvent extends Event {
+public class RenderOverrideEvent extends Event implements ICancellableEvent {
     ItemStack stack;
     WavefrontObject model;
     String target;
-    ResourceLocation texture;
+    Identifier texture;
 
     PoseStack matrixStack;
     MultiBufferSource buffer;
 
     WavefrontObject originalModel;
     String originalTarget;
-    ResourceLocation originalTexture;
+    Identifier originalTexture;
 
-    public ResourceLocation getTexture() {
+    public Identifier getTexture() {
         return texture;
     }
 
-    public void setTexture(ResourceLocation texture) {
+    public void setTexture(Identifier texture) {
         this.texture = texture;
     }
 
-    public ResourceLocation getOriginalTexture() {
+    public Identifier getOriginalTexture() {
         return originalTexture;
     }
 
@@ -74,7 +72,7 @@ public class RenderOverrideEvent extends Event {
         return buffer;
     }
 
-    public RenderOverrideEvent(ItemStack stack, WavefrontObject model, String target, ResourceLocation texture, PoseStack  matrixStack, MultiBufferSource buffer){
+    public RenderOverrideEvent(ItemStack stack, WavefrontObject model, String target, Identifier texture, PoseStack  matrixStack, MultiBufferSource buffer){
         this.stack = stack;
         this.originalModel = this.model = model;
         this.originalTarget = this.target = target;
@@ -85,10 +83,10 @@ public class RenderOverrideEvent extends Event {
     }
 
 
-    public static RenderOverrideEvent onRenderOverride(ItemStack stack, WavefrontObject model, String target, ResourceLocation texture, PoseStack  matrixStack, MultiBufferSource buffer)
+    public static RenderOverrideEvent onRenderOverride(ItemStack stack, WavefrontObject model, String target, Identifier texture, PoseStack  matrixStack, MultiBufferSource buffer)
     {
         RenderOverrideEvent event = new RenderOverrideEvent(stack, model, target, texture, matrixStack, buffer);
-        MinecraftForge.EVENT_BUS.post(event);
+        NeoForge.EVENT_BUS.post(event);
         return event;
     }
 }

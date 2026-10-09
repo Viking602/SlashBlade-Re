@@ -1,5 +1,6 @@
 package mods.flammpfeil.slashblade.ability;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.capability.mobeffect.CapabilityMobEffect;
 import mods.flammpfeil.slashblade.entity.EntityAbstractSummonedSword;
@@ -11,7 +12,7 @@ import mods.flammpfeil.slashblade.util.InputCommand;
 import mods.flammpfeil.slashblade.util.NBTHelper;
 import mods.flammpfeil.slashblade.util.VectorHelper;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,11 +27,11 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.common.NeoForge;
+
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.util.ObfuscationReflectionHelper;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -49,7 +50,7 @@ public class SlayerStyleArts {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     final static EnumSet<InputCommand> fowerd_sprint_sneak = EnumSet.of(InputCommand.FORWARD, InputCommand.SPRINT, InputCommand.SNEAK);
@@ -57,10 +58,10 @@ public class SlayerStyleArts {
     final static EnumSet<InputCommand> move = EnumSet.of(InputCommand.FORWARD, InputCommand.BACK, InputCommand.LEFT, InputCommand.RIGHT);
 
 
-    static public final ResourceLocation ADVANCEMENT_AIR_TRICK = new ResourceLocation(SlashBlade.modid, "abilities/air_trick");
-    static public final ResourceLocation ADVANCEMENT_TRICK_DOWN = new ResourceLocation(SlashBlade.modid, "abilities/trick_down");
-    static public final ResourceLocation ADVANCEMENT_TRICK_DODGE = new ResourceLocation(SlashBlade.modid, "abilities/trick_dodge");
-    static public final ResourceLocation ADVANCEMENT_TRICK_UP = new ResourceLocation(SlashBlade.modid, "abilities/trick_up");
+    static public final Identifier ADVANCEMENT_AIR_TRICK = Identifier.fromNamespaceAndPath(SlashBlade.modid, "abilities/air_trick");
+    static public final Identifier ADVANCEMENT_TRICK_DOWN = Identifier.fromNamespaceAndPath(SlashBlade.modid, "abilities/trick_down");
+    static public final Identifier ADVANCEMENT_TRICK_DODGE = Identifier.fromNamespaceAndPath(SlashBlade.modid, "abilities/trick_dodge");
+    static public final Identifier ADVANCEMENT_TRICK_UP = Identifier.fromNamespaceAndPath(SlashBlade.modid, "abilities/trick_up");
 
     final static int TRICKACTION_UNTOUCHABLE_TIME = 10;
 
@@ -78,7 +79,7 @@ public class SlayerStyleArts {
 
             if(current.containsAll(fowerd_sprint_sneak)){
                 //air trick Or trick up
-                isHandled = sender.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).map(state->{
+                isHandled = SBData.get(sender.getMainHandItem(), ItemSlashBlade.BLADESTATE).map(state->{
                     Entity tmpTarget = state.getTargetEntity(worldIn);
 
                     Entity target;
@@ -89,7 +90,7 @@ public class SlayerStyleArts {
                         target = tmpTarget;
                     }
 
-                    if(target == null && 0 == sender.getPersistentData().getInt("sb.avoid.trickup")) {
+                    if(target == null && 0 == sender.getPersistentData().getIntOr("sb.avoid.trickup", 0)) {
                         //trick up
                         Untouchable.setUntouchable(sender, TRICKACTION_UNTOUCHABLE_TIME);
 
@@ -107,7 +108,7 @@ public class SlayerStyleArts {
                         NBTHelper.putVector3d(sender.getPersistentData(),"sb.avoid.vec", sender.position());
 
                         AdvancementHelper.grantCriterion(sender,ADVANCEMENT_TRICK_UP);
-                        sender.playNotifySound(SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5f, 1.2f);
+                        mods.flammpfeil.slashblade.compat.SBEffects.notifySound(sender, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5f, 1.2f);
 
                         return true;
                     }else if(target != null){
@@ -131,7 +132,7 @@ public class SlayerStyleArts {
 
                                 @Override
                                 public void tick() {
-                                    if(this.getPersistentData().getBoolean("doForceHit")) {
+                                    if(this.getPersistentData().getBooleanOr("doForceHit", false)) {
                                         this.doForceHitEntity(target);
                                         this.getPersistentData().remove("doForceHit");
                                     }
@@ -159,7 +160,7 @@ public class SlayerStyleArts {
                             ss.getPersistentData().putBoolean("doForceHit",true);
 
                             worldIn.addFreshEntity(ss);
-                            sender.playNotifySound(SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.2F, 1.45F);
+                            mods.flammpfeil.slashblade.compat.SBEffects.notifySound(sender, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.2F, 1.45F);
 
                             //ss.doForceHitEntity(target);
                         }
@@ -189,7 +190,7 @@ public class SlayerStyleArts {
                     NBTHelper.putVector3d(sender.getPersistentData(),"sb.avoid.vec", sender.position());
 
                     AdvancementHelper.grantCriterion(sender,ADVANCEMENT_TRICK_DOWN);
-                    sender.playNotifySound(SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5f, 1.2f);
+                    mods.flammpfeil.slashblade.compat.SBEffects.notifySound(sender, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5f, 1.2f);
 
                     isHandled = true;
                 }else{
@@ -202,7 +203,7 @@ public class SlayerStyleArts {
             if(!isHandled && sender.onGround() && current.contains(InputCommand.SPRINT) && current.stream().anyMatch(cc->move.contains(cc))){
                 //quick avoid ground
 
-                int count = sender.getCapability(CapabilityMobEffect.MOB_EFFECT)
+                int count = SBData.get(sender, CapabilityMobEffect.MOB_EFFECT)
                         .map(ef->ef.doAvoid(sender.level().getGameTime()))
                         .orElse(0);
 
@@ -217,12 +218,12 @@ public class SlayerStyleArts {
 
                     Vec3 motion = this.maybeBackOffFromEdge(sender.getDeltaMovement(), sender);
 
-                    sender.playNotifySound(SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5f, 1.2f);
+                    mods.flammpfeil.slashblade.compat.SBEffects.notifySound(sender, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5f, 1.2f);
 
                     sender.move(MoverType.SELF, motion);
                     sender.isChangingDimension = true;
 
-                    //sender.moveTo(sender.position());
+                    //sender.snapTo(sender.position());
 
                     sender.connection.send(new ClientboundSetEntityMotionPacket(sender.getId(), motion.scale(0.5f)));
 
@@ -231,7 +232,7 @@ public class SlayerStyleArts {
 
                     AdvancementHelper.grantCriterion(sender,ADVANCEMENT_TRICK_DODGE);
 
-                    sender.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE)
+                    SBData.get(sender.getMainHandItem(), ItemSlashBlade.BLADESTATE)
                             .ifPresent(state->state.updateComboSeq(sender, state.getComboRootAir()));
                 }
 
@@ -260,81 +261,19 @@ public class SlayerStyleArts {
         }
     }
 
-    private static void executeTeleport(Entity entityIn, LivingEntity target) {
-        if(!(entityIn.level() instanceof ServerLevel)) return;
-
-        if(entityIn instanceof Player) {
-            Player player = ((Player) entityIn);
-            player.playNotifySound(SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.75F, 1.25F);
-
-            player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE)
-                    .ifPresent(state -> state.updateComboSeq(player, state.getComboRootAir()));
-
-            Untouchable.setUntouchable(player, TRICKACTION_UNTOUCHABLE_TIME);
+    private static void executeTeleport(Entity entity, LivingEntity target) {
+        if (!(entity.level() instanceof ServerLevel level)) return;
+        Vec3 destination = target.position().add(0, target.getBbHeight() / 2.0, 0).add(entity.getLookAngle().scale(-2));
+        if (!Level.isInSpawnableBounds(BlockPos.containing(destination))) return;
+        entity.stopRiding();
+        if (entity instanceof ServerPlayer player && player.isSleeping()) player.stopSleepInBed(true, true);
+        entity.teleportTo(level, destination.x, destination.y, destination.z, java.util.Set.of(), entity.getYRot(), entity.getXRot(), true);
+        entity.setYHeadRot(entity.getYRot());
+        if (!(entity instanceof LivingEntity living) || !living.isFallFlying()) {
+            entity.setDeltaMovement(entity.getDeltaMovement().multiply(1,0,1));
+            entity.setOnGround(false);
         }
-
-        ServerLevel worldIn = (ServerLevel) entityIn.level();
-
-        Vec3 tereportPos = target.position().add(0,target.getBbHeight() / 2.0, 0).add(entityIn.getLookAngle().scale(-2.0));
-
-        double x = tereportPos.x;
-        double y = tereportPos.y;
-        double z = tereportPos.z;
-        float yaw = entityIn.getYRot();
-        float pitch = entityIn.getXRot();
-
-        Set<RelativeMovement> relativeList = Collections.emptySet();
-        BlockPos blockpos = new BlockPos((int)x, (int)y, (int)z);
-        if (!Level.isInSpawnableBounds(blockpos)) {
-            return;
-        } else {
-            if (entityIn instanceof ServerPlayer) {
-                ChunkPos chunkpos = new ChunkPos(blockpos);
-                worldIn.getChunkSource().addRegionTicket(TicketType.POST_TELEPORT, chunkpos, 1, entityIn.getId());
-                entityIn.stopRiding();
-                if (((ServerPlayer)entityIn).isSleeping()) {
-                    ((ServerPlayer)entityIn).stopSleepInBed(true, true);
-                }
-
-                if (worldIn == entityIn.level()) {
-                    ((ServerPlayer)entityIn).connection.teleport(x, y, z, yaw, pitch, relativeList);
-                } else {
-                    ((ServerPlayer)entityIn).teleportTo(worldIn, x, y, z, yaw, pitch);
-                }
-
-                entityIn.setYHeadRot(yaw);
-            } else {
-                float f1 = Mth.wrapDegrees(yaw);
-                float f = Mth.wrapDegrees(pitch);
-                f = Mth.clamp(f, -90.0F, 90.0F);
-                if (worldIn == entityIn.level()) {
-                    entityIn.moveTo(x, y, z, f1, f);
-                    entityIn.setYHeadRot(f1);
-                } else {
-                    entityIn.unRide();
-                    Entity entity = entityIn;
-                    entityIn = entityIn.getType().create(worldIn);
-                    if (entityIn == null) {
-                        return;
-                    }
-
-                    entityIn.restoreFrom(entity);
-                    entityIn.moveTo(x, y, z, f1, f);
-                    entityIn.setYHeadRot(f1);
-                    //worldIn.addFromAnotherDimension(entityIn);
-                }
-            }
-
-            if (!(entityIn instanceof LivingEntity) || !((LivingEntity)entityIn).isFallFlying()) {
-                entityIn.setDeltaMovement(entityIn.getDeltaMovement().multiply(1.0D, 0.0D, 1.0D));
-                entityIn.setOnGround(false);
-            }
-
-            if (entityIn instanceof PathfinderMob) {
-                ((PathfinderMob)entityIn).getNavigation().stop();
-            }
-
-        }
+        if (entity instanceof PathfinderMob mob) mob.getNavigation().stop();
     }
 
     protected Vec3 maybeBackOffFromEdge(Vec3 vec, LivingEntity mover) {
@@ -389,12 +328,10 @@ public class SlayerStyleArts {
     static final float stepUpDefault = 0.6f;
 
     @SubscribeEvent
-    public void onTick(TickEvent.PlayerTickEvent event){
-        switch(event.phase){
-            case START -> {
-                float stepUp = event.player.maxUpStep();
+    public void onTickPre(net.neoforged.neoforge.event.tick.PlayerTickEvent.Pre event) {
+                float stepUp = event.getEntity().maxUpStep();
 
-                LivingEntity player = event.player;
+                LivingEntity player = event.getEntity();
                 Vec3 deltaMovement;
                 {
                     Vec3 input = new Vec3((double)player.xxa, (double)player.yya, (double)player.zza);
@@ -422,83 +359,84 @@ public class SlayerStyleArts {
                     }
                 }
 
-                if(doStepupBoost && (event.player.getMainHandItem().getItem() instanceof ItemSlashBlade) && stepUp < stepUpBoost){
-                    event.player.getPersistentData().putFloat("sb.store.stepup",stepUp);
-                    event.player.setMaxUpStep(stepUpBoost);
+                if(doStepupBoost && (event.getEntity().getMainHandItem().getItem() instanceof ItemSlashBlade) && stepUp < stepUpBoost){
+                    event.getEntity().getPersistentData().putFloat("sb.store.stepup",stepUp);
+                    event.getEntity().getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT).setBaseValue(stepUpBoost);
                 }
 
                 //trick up cooldown
-                if(event.player.onGround() && 0 < event.player.getPersistentData().getInt("sb.avoid.trickup")){
+                if(event.getEntity().onGround() && 0 < event.getEntity().getPersistentData().getIntOr("sb.avoid.trickup", 0)){
 
-                    int count = event.player.getPersistentData().getInt("sb.avoid.trickup");
+                    int count = event.getEntity().getPersistentData().getIntOr("sb.avoid.trickup", 0);
                     count--;
 
                     if(count <= 0){
-                        event.player.getPersistentData().remove("sb.avoid.trickup");
+                        event.getEntity().getPersistentData().remove("sb.avoid.trickup");
 
-                        if(event.player instanceof ServerPlayer){
-                            ((ServerPlayer)event.player).hasChangedDimension();
+                        if(event.getEntity() instanceof ServerPlayer){
+                            ((ServerPlayer)event.getEntity()).hasChangedDimension();
                         }
                     }else{
-                        event.player.getPersistentData().putInt("sb.avoid.trickup", count);
+                        event.getEntity().getPersistentData().putInt("sb.avoid.trickup", count);
                     }
                 }
 
 
                 //handle avoid
-                if(event.player.getPersistentData().contains("sb.avoid.counter")){
-                    int count = event.player.getPersistentData().getInt("sb.avoid.counter");
+                if(event.getEntity().getPersistentData().contains("sb.avoid.counter")){
+                    int count = event.getEntity().getPersistentData().getIntOr("sb.avoid.counter", 0);
                     count--;
 
                     if(count <= 0){
-                        if(event.player.getPersistentData().contains("sb.avoid.vec")){
-                            Vec3 pos = NBTHelper.getVector3d(event.player.getPersistentData(),"sb.avoid.vec");
-                            event.player.moveTo(pos);
+                        if(event.getEntity().getPersistentData().contains("sb.avoid.vec")){
+                            Vec3 pos = NBTHelper.getVector3d(event.getEntity().getPersistentData(),"sb.avoid.vec");
+                            event.getEntity().snapTo(pos);
                         }
 
-                        event.player.getPersistentData().remove("sb.avoid.counter");
-                        event.player.getPersistentData().remove("sb.avoid.vec");
+                        event.getEntity().getPersistentData().remove("sb.avoid.counter");
+                        event.getEntity().getPersistentData().remove("sb.avoid.vec");
 
-                        if(event.player instanceof ServerPlayer){
-                            ((ServerPlayer)event.player).hasChangedDimension();
+                        if(event.getEntity() instanceof ServerPlayer){
+                            ((ServerPlayer)event.getEntity()).hasChangedDimension();
                         }
                     }else{
-                        event.player.getPersistentData().putInt("sb.avoid.counter", count);
+                        event.getEntity().getPersistentData().putInt("sb.avoid.counter", count);
                     }
                 }
 
 
                 //handle AirTrick
-                if(event.player.getPersistentData().contains("sb.airtrick.counter")){
-                    int count = event.player.getPersistentData().getInt("sb.airtrick.counter");
+                if(event.getEntity().getPersistentData().contains("sb.airtrick.counter")){
+                    int count = event.getEntity().getPersistentData().getIntOr("sb.airtrick.counter", 0);
                     count--;
 
                     if(count <= 0){
-                        if(event.player.getPersistentData().contains("sb.airtrick.target")){
-                            int id = event.player.getPersistentData().getInt("sb.airtrick.target");
+                        if(event.getEntity().getPersistentData().contains("sb.airtrick.target")){
+                            int id = event.getEntity().getPersistentData().getIntOr("sb.airtrick.target", 0);
 
-                            Entity target = event.player.level().getEntity(id);
+                            Entity target = event.getEntity().level().getEntity(id);
                             if(target != null && target instanceof LivingEntity)
-                                executeTeleport(event.player, ((LivingEntity) target));
+                                executeTeleport(event.getEntity(), ((LivingEntity) target));
                         }
 
-                        event.player.getPersistentData().remove("sb.airtrick.counter");
-                        event.player.getPersistentData().remove("sb.airtrick.target");
-                        if(event.player instanceof ServerPlayer){
-                            ((ServerPlayer)event.player).hasChangedDimension();
+                        event.getEntity().getPersistentData().remove("sb.airtrick.counter");
+                        event.getEntity().getPersistentData().remove("sb.airtrick.target");
+                        if(event.getEntity() instanceof ServerPlayer){
+                            ((ServerPlayer)event.getEntity()).hasChangedDimension();
                         }
                     }else{
-                        event.player.getPersistentData().putInt("sb.airtrick.counter", count);
+                        event.getEntity().getPersistentData().putInt("sb.airtrick.counter", count);
                     }
                 }
-            }
-            case END -> {
-                float stepUp = event.player.getPersistentData().getFloat("sb.tmp.stepup");
+
+    }
+    @SubscribeEvent
+    public void onTickPost(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event) {
+                float stepUp = event.getEntity().getPersistentData().getFloatOr("sb.tmp.stepup", 0.0F);
                 stepUp = Math.max(stepUp, stepUpDefault);
 
-                if(stepUp < event.player.maxUpStep())
-                    event.player.setMaxUpStep(stepUp);
-            }
-        }
+                if(stepUp < event.getEntity().maxUpStep())
+                    event.getEntity().getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT).setBaseValue(stepUp);
+
     }
 }

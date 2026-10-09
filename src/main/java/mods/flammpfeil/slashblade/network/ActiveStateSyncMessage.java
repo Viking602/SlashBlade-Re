@@ -1,7 +1,7 @@
 package mods.flammpfeil.slashblade.network;
 
+import mods.flammpfeil.slashblade.compat.SBData;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
-import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.server.level.ServerPlayer;
@@ -9,11 +9,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
-import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class ActiveStateSyncMessage {
+public class ActiveStateSyncMessage implements net.minecraft.network.protocol.common.custom.CustomPacketPayload {
+    public static final Type<ActiveStateSyncMessage> TYPE = new Type<>(net.minecraft.resources.Identifier.fromNamespaceAndPath("slashblade", "active_state"));
+    public static final net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, ActiveStateSyncMessage> STREAM_CODEC =
+        net.minecraft.network.codec.StreamCodec.of((buffer, message) -> encode(message, buffer), ActiveStateSyncMessage::decode);
+    @Override public Type<ActiveStateSyncMessage> type() { return TYPE; }
+
     public CompoundTag activeTag;
     public int id;
 
@@ -32,27 +36,4 @@ public class ActiveStateSyncMessage {
         buf.writeNbt(msg.activeTag);
     }
 
-    static public void handle(ActiveStateSyncMessage msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-
-            if(!msg.activeTag.hasUUID("BladeUniqueId")) return;
-
-            // Work that needs to be threadsafe (most work)
-            ServerPlayer sender = ctx.get().getSender(); // the client that sent this packet
-
-            // do stuff
-            Entity target = Minecraft.getInstance().level.getEntity(msg.id);
-
-            if(target instanceof LivingEntity){
-                ItemStack stack = ((LivingEntity)target).getItemInHand(InteractionHand.MAIN_HAND);
-                if (stack.isEmpty()) return;
-                if (!(stack.getItem() instanceof ItemSlashBlade)) return;
-
-                stack.getCapability(ItemSlashBlade.BLADESTATE)
-                        .filter((state)->state.getUniqueId().equals(msg.activeTag.getUUID("BladeUniqueId")))
-                        .ifPresent((state)->state.setActiveState(msg.activeTag));
-            }
-        });
-        ctx.get().setPacketHandled(true);
-    }
 }

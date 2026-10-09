@@ -1,0 +1,39 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "#slashblade:namedsoul"
+  ],
+  "result": {
+    "id": "slashblade:slashblade",
+    "components": {
+      "slashblade:blade_state": {
+        "isSealed": 1,
+        "isNoScabbard": 0,
+        "translationKey": "item.slashblade.simple.bamboo",
+        "isDestructable": 1,
+        "SummonedSwordColor": -13421569,
+        "currentCombo": "arts_rapid_slash",
+        "RepairCounter": 0,
+        "Damage": 0.0,
+        "rarityType": 0,
+        "ComboRoot": "standby",
+        "lastPosHash": "",
+        "RangeAttackType": "none",
+        "isDefaultBewitched": 0,
+        "SpecialAttackType": "none",
+        "TextureName": "slashblade:model/bamboo.png",
+        "baseAttackModifier": 1.0,
+        "StandbyRenderType": 0,
+        "ComboRootAir": "standby_inair"
+      },
+      "minecraft:rarity": "common",
+      "minecraft:custom_data": {
+        "id": "slashblade:slashblade",
+        "Count": 1,
+        "tag": {
+          "Damage": 0
+        }
+      }
+    }
+  }
+}

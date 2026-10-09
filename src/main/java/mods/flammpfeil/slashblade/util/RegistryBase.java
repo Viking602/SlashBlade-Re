@@ -2,7 +2,7 @@ package mods.flammpfeil.slashblade.util;
 
 import com.google.common.collect.Maps;
 import mods.flammpfeil.slashblade.SlashBlade;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Map;
 
@@ -11,20 +11,20 @@ public abstract class RegistryBase<V> {
 
     static protected String BaseInstanceName = "none";
 
-    public final ResourceLocation path;
+    public final Identifier path;
 
     public RegistryBase(String name){
         this.name = name;
-        path = new ResourceLocation(SlashBlade.modid, getPath() + "/"+ name /*+ ".json"*/);
+        path = Identifier.fromNamespaceAndPath(SlashBlade.modid, getPath() + "/"+ name /*+ ".json"*/);
         getRegistry().put(path, (V)this);
     }
 
-    public abstract Map<ResourceLocation, V> getRegistry();
+    public abstract Map<Identifier, V> getRegistry();
 
     public abstract String getPath();
 
     public V valueOf(String name){
-        Object result =getRegistry().get(new ResourceLocation(SlashBlade.modid, getPath() + "/" + name));
+        Object result =getRegistry().get(Identifier.fromNamespaceAndPath(SlashBlade.modid, getPath() + "/" + name));
 
         return (V) result;
     }
