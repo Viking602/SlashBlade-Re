@@ -26,7 +26,7 @@ public final class PerspectiveParityClientProbe {
         var item=new net.minecraft.world.item.ItemStack(mods.flammpfeil.slashblade.init.SBItems.slashblade);
         var blade=mods.flammpfeil.slashblade.compat.SBData.get(item,mods.flammpfeil.slashblade.item.ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
         var renderer=(net.minecraft.client.renderer.entity.player.AvatarRenderer<net.minecraft.client.player.AbstractClientPlayer>)mc.getEntityRenderDispatcher().getPlayerRenderers().get(player.getSkin().model());
-        int samples=0,vertices=0;float maxError=0;
+        int samples=0,vertices=0,thirdPersonArmVertices=0;float maxError=0;
         try {
             player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,item);
             for(var hand:HumanoidArm.values()) for(int scenario=0;scenario<4;scenario++) {
@@ -56,6 +56,8 @@ public final class PerspectiveParityClientProbe {
                         var stack=new com.mojang.blaze3d.vertex.PoseStack();var offset=renderer.getRenderOffset(state);
                         stack.translate(offset.x,offset.y,offset.z);
                         renderer.submit(state,stack,expected,new net.minecraft.client.renderer.state.level.CameraRenderState());
+                        if(expected.armVertices==0) throw new IllegalStateException("third-person arms were hidden");
+                        thirdPersonArmVertices+=expected.armVertices;
                         var actual=new BladeMotionClientProbe.Capture(new Matrix4f());
                         var input=new com.mojang.blaze3d.vertex.PoseStack();input.mulPose(bob);var before=new Matrix4f(input.last().pose());
                         var e=new net.neoforged.neoforge.client.event.RenderHandEvent(net.minecraft.world.InteractionHand.MAIN_HAND,input,actual,15728880,partial,player.getXRot(),0,0,item);
@@ -84,7 +86,8 @@ public final class PerspectiveParityClientProbe {
             player.setYRot(yaw);player.setXRot(pitch);player.yHeadRot=head;player.yHeadRotO=headOld;player.yBodyRot=body;player.yBodyRotO=bodyOld;player.walkAnimation.stop();BladeMotionState.clear();
         }
         return Map.of("status","passed","samples",samples,"verticesCompared",vertices,"maxVertexErrorBlocks",maxError,
-                "scope","actual AvatarRenderer.submit versus registered RenderHandEvent after a single rigid framing transform; every supported clip; left/right; standing/crouching/walking/airborne; identical bones, skin vertices, normals, blade and saya");
+                "thirdPersonArmVertices",thirdPersonArmVertices,
+                "scope","actual AvatarRenderer.submit versus registered RenderHandEvent after a single rigid framing transform; every supported clip; left/right; standing/crouching/walking/airborne; identical bones, weapon vertices and normals; skin rendered only in third person");
     }
 
     private static void setLocalCrouching(net.minecraft.client.player.LocalPlayer player,boolean value) {
@@ -97,6 +100,7 @@ public final class PerspectiveParityClientProbe {
     }
 
     private static final class WorldCapture extends BladeMotionClientProbe.Capture {
+        int armVertices;
         WorldCapture(Matrix4f view) {super(view);}
         @Override public <S> void submitModel(net.minecraft.client.model.Model<? super S> model,S renderState,
                 com.mojang.blaze3d.vertex.PoseStack pose,net.minecraft.client.renderer.rendertype.RenderType type,
@@ -108,7 +112,11 @@ public final class PerspectiveParityClientProbe {
             var local=new com.mojang.blaze3d.vertex.PoseStack();local.mulPose(PlayerBladeAnimation.partMatrix(avatar.root()));
             var skin=net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(state.skin.body().texturePath());
             avatar.rightArm.render(local,mesh.getBuffer(skin),light,overlay);avatar.leftArm.render(local,mesh.getBuffer(skin),light,overlay);
-            mesh.submit(pose,this);
+            // Still exercise the real third-person skin submission, separately
+            // from the weapon geometry shared with the arm-free first-person view.
+            var skinCapture=new BladeMotionClientProbe.Capture(new Matrix4f());
+            mesh.submit(pose,skinCapture);
+            armVertices+=skinCapture.positions.size();
         }
     }
     public static Map<String,Object> verify(boolean strict) {

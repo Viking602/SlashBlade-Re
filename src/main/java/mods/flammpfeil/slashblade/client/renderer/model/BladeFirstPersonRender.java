@@ -7,8 +7,6 @@ import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.CameraType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -16,8 +14,6 @@ import net.minecraft.world.InteractionHand;
 import com.mojang.math.Axis;
 import mods.flammpfeil.slashblade.client.renderer.util.GeometryBuffer;
 import mods.flammpfeil.slashblade.client.animation.BladeAvatarPose;
-import mods.flammpfeil.slashblade.client.animation.PlayerBladeAnimation;
-import org.joml.Matrix4f;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
 
 /**
@@ -50,20 +46,9 @@ public class BladeFirstPersonRender {
             if (meshes == null) return;
             var input = event.getPoseStack();
             input.pushPose();
-            // Frame the complete shared rig once. Per-part offsets would separate
-            // the palm, grip and saya during transitions.
+            // Keep the solved avatar rig for the weapon sockets, but submit only
+            // blade and saya in first person. Third-person skin remains unchanged.
             input.mulPose(BladeAvatarPose.firstPersonSpace(avatar,event.getPartialTick()));
-            if (!mc.player.isInvisible()) {
-                var arms = new GeometryBuffer();
-                var skin = net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(state.skin.body().texturePath());
-                var local = new PoseStack();
-                local.mulPose(PlayerBladeAnimation.partMatrix(model.root()));
-                model.leftSleeve.visible = mc.player.isModelPartShown(net.minecraft.world.entity.player.PlayerModelPart.LEFT_SLEEVE);
-                model.rightSleeve.visible = mc.player.isModelPartShown(net.minecraft.world.entity.player.PlayerModelPart.RIGHT_SLEEVE);
-                model.rightArm.render(local, arms.getBuffer(skin), event.getPackedLight(), net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
-                model.leftArm.render(local, arms.getBuffer(skin), event.getPackedLight(), net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
-                arms.submit(input, event.getSubmitNodeCollector());
-            }
             mods.flammpfeil.slashblade.client.animation.BladeRig.submit(meshes, model, state, input, event.getSubmitNodeCollector());
             input.popPose();
             event.setCanceled(true);

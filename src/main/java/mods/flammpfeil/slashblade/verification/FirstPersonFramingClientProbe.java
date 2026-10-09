@@ -53,11 +53,11 @@ public final class FirstPersonFramingClientProbe {
                                 elapsed-(int)elapsed,angle,0,0,sword);
                         NeoForge.EVENT_BUS.post(event);
                         if(!event.isCanceled()) throw new IllegalStateException("framing bypassed the registered hand renderer");
-                        if(capture.armVertices<48 || capture.weaponVertices<30) throw new IllegalStateException("framing probe did not distinguish geometry: arms="+capture.armVertices+" weapon="+capture.weaponVertices);
+                        if(capture.armVertices!=0 || capture.weaponVertices<30) throw new IllegalStateException("first person must submit weapons without skin: arms="+capture.armVertices+" weapon="+capture.weaponVertices);
                         String label=side+"/pitch="+angle+"/yaw="+look+"/"+combo.getName()+"/"+phase;
                         float arms=capture.arms.coverage();
                         if(arms>worstArms) {worstArms=arms;worst=label;}
-                        if(arms>.42F && failures.size()<30) failures.add("arm occlusion "+arms+" "+label);
+                        if(arms>0 && failures.size()<30) failures.add("visible arm geometry "+arms+" "+label);
                         if(combo==Extra.STANDBY_EX) {
                             float visible=capture.weapon.coverage(),height=capture.weapon.height();
                             minIdleWeapon=Math.min(minIdleWeapon,visible);minIdleHeight=Math.min(minIdleHeight,height);idles++;
