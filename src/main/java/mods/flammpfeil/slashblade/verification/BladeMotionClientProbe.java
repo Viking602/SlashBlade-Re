@@ -108,7 +108,7 @@ public final class BladeMotionClientProbe {
         mc.player.setItemInHand(InteractionHand.MAIN_HAND, sword);
         var blade = SBData.get(sword, ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new);
         UserPoseOverrider.resetRot(mc.player);
-        var parity=PerspectiveParityClientProbe.verifyRegistered();
+        var parity=OriginalFirstPersonClientProbe.verify();
         int cases=(Integer)parity.get("samples"),vertices=(Integer)parity.get("verticesCompared");
         var ordinary = new RenderHandEvent(InteractionHand.MAIN_HAND, new PoseStack(), new Capture(new Matrix4f()),
                 15728880, .5F, 0, 0, 0, new ItemStack(Items.DIAMOND_SWORD));
@@ -132,9 +132,9 @@ public final class BladeMotionClientProbe {
         require(input.last().pose().equals(before, .00001F), "player body transform was applied to sword geometry a second time");
         var report = new LinkedHashMap<String, Object>();
         report.put("status", "passed"); report.put("cameraCases", cases); report.put("verticesCompared", vertices);
-        report.put("registeredPerspectiveParity",parity);
+        report.put("originalMotionReference",parity);
         report.put("attackVisibility", verifyAttackVisibility());
-        report.put("scope", "same-frame first/third actual submitted geometry; vanilla/offhand pass-through; no duplicated third-person body transform");
+        report.put("scope", "original VMD first-person weapon geometry and combat clock; vanilla/offhand pass-through; no duplicated third-person body transform");
         SlashBlade.LOGGER.info("Blade camera verification PASSED: cases={} vertices={}", cases, vertices);
         return report;
     }

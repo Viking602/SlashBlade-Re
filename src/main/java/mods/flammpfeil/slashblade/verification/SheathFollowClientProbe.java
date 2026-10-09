@@ -78,7 +78,7 @@ public final class SheathFollowClientProbe {
         }
         report.put("status","passed");report.put("samples",samples);report.put("verticesCompared",vertices);
         report.put("maxVertexErrorBlocks",maxError);report.put("oldScreenLockDetected",oldScreenLockDetected);
-        report.put("sayaTravelBlocks",travels);report.put("scope","shared world-avatar rig in first person; both hands, 11 clips; pelvis follow and preserved extraction axis; actual first/third vertices checked separately");
+        report.put("sayaTravelBlocks",travels);report.put("scope","articulated world-avatar rig, both hands, 11 clips; pelvis follow and preserved extraction axis; original first-person VMD tracks checked separately");
         return report;
     }
     private static void require(boolean condition,String message) {if(!condition)throw new IllegalStateException(message);}

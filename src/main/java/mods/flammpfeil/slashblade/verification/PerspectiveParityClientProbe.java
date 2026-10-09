@@ -18,7 +18,7 @@ import java.util.*;
 /** Compare view-specific solved palms/weapons after removing only presentation. */
 public final class PerspectiveParityClientProbe {
     @SuppressWarnings("unchecked")
-    public static Map<String,Object> verifyRegistered() {
+    public static Map<String,Object> verifyRegisteredRig() {
         var mc=Minecraft.getInstance();var player=mc.player;
         var saved=player.getMainHandItem();var savedHand=player.getMainArm();var savedPose=player.getPose();
         boolean ground=player.onGround(),crouching=player.isCrouching();
@@ -60,9 +60,10 @@ public final class PerspectiveParityClientProbe {
                         thirdPersonArmVertices+=expected.armVertices;
                         var actual=new BladeMotionClientProbe.Capture(new Matrix4f());
                         var input=new com.mojang.blaze3d.vertex.PoseStack();input.mulPose(bob);var before=new Matrix4f(input.last().pose());
-                        var e=new net.neoforged.neoforge.client.event.RenderHandEvent(net.minecraft.world.InteractionHand.MAIN_HAND,input,actual,15728880,partial,player.getXRot(),0,0,item);
-                        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(e);
-                        if(!e.isCanceled() || !input.last().pose().equals(before,.00001F)) throw new IllegalStateException("hand hook/pose restoration failure");
+                        input.pushPose();input.mulPose(BladeAvatarPose.firstPersonSpace(frame,partial));
+                        BladeRig.submit(frame.state().getRenderData(mods.flammpfeil.slashblade.client.renderer.layers.LivingBladeLayer.RIG),frame.model(),frame.state(),input,actual);
+                        input.popPose();
+                        if(!input.last().pose().equals(before,.00001F)) throw new IllegalStateException("rig pose restoration failure");
                         var wm=renderer.getModel();var fm=BladeRig.firstPersonModel(state.skin.model()==net.minecraft.world.entity.player.PlayerModelType.SLIM);
                         var worldParts=new net.minecraft.client.model.geom.ModelPart[]{wm.root(),wm.body,wm.head,wm.leftArm,wm.rightArm,wm.leftLeg,wm.rightLeg};
                         var firstParts=new net.minecraft.client.model.geom.ModelPart[]{fm.root(),fm.body,fm.head,fm.leftArm,fm.rightArm,fm.leftLeg,fm.rightLeg};
@@ -87,7 +88,7 @@ public final class PerspectiveParityClientProbe {
         }
         return Map.of("status","passed","samples",samples,"verticesCompared",vertices,"maxVertexErrorBlocks",maxError,
                 "thirdPersonArmVertices",thirdPersonArmVertices,
-                "scope","actual AvatarRenderer.submit versus registered RenderHandEvent after a single rigid framing transform; every supported clip; left/right; standing/crouching/walking/airborne; identical bones, weapon vertices and normals; skin rendered only in third person");
+                "scope","world AvatarRenderer versus isolated copy of the same articulated rig; every supported clip; left/right; standing/crouching/walking/airborne; identical bones, weapon vertices and normals; third-person skin remains rendered");
     }
 
     private static void setLocalCrouching(net.minecraft.client.player.LocalPlayer player,boolean value) {

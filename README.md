@@ -10,12 +10,12 @@ Chain your cuts. Time your Slash Arts. Feel the motion carry through your hands,
 
 **[Get started ↓](#get-started)** · [Controls](#make-your-first-cut) · [Build from source](#build-from-source) · [Report an issue](https://github.com/Viking602/SlashBlade-Re/issues)
 
-> **Development preview · `0.1.2-26.1.2-port.22`**<br>
+> **Development preview · `0.1.2-26.1.2-port.23`**<br>
 > This repository provides source code. Build the preview below; a packaged release is not published here yet.
 
 ![Continuous combat against a training Husk: normal combos, Slash Arts and Super SA](media/combat-preview.gif)
 
-**[Watch the full combat showcase](media/combat-showcase.mp4)** · [First-person recording](media/first-person-combat.mp4)
+**[Watch the full combat showcase](media/combat-showcase.mp4)** · [First-person recording](media/first-person-combat.mp4) · [Original-motion comparison](media/first-person-original.mp4)
 
 *Fresh, continuous gameplay: normal and extended combos, standard SA, Just SA, and Super SA, including recovery and sheathing. The stationary training Husk has extra health; the display shows actual damage, with no healing during the recording. Videos run at original speed and have no audio.*
 
@@ -27,8 +27,10 @@ The blade clears its sheath before the cut. Recovery flows into alignment and sh
 **Your whole body moves.**<br>
 Hips lead. Shoulders turn. Elbows and wrists bend. Hands, hilt, and sheath share a coordinated rig, with original choreography inspired by iaido and the pace of Devil May Cry.
 
-**Change your view. Keep your motion.**<br>
-First person shows only the blade and saya, with no hands, arms, or sleeves. The sheathed hilt stays in view at rest. Both views share the same katana size, character pose, and weapon attachments; third person keeps the full character. The camera follows the animated head with limited rotation, while your gameplay aim stays under your control.
+**Original cuts. A clearer first-person view.**<br>
+First person restores SlashBlade's original VMD blade and saya tracks. Quick cuts keep their authored timing; a brief, shared transition settles the weapon pair when a combo is interrupted. No hands, arms, or sleeves obstruct the view, and the resting hilt stays visible.
+
+Both views share the action clock and katana size. Third person uses the articulated character rig; first person uses the original weapon tracks, so their paths differ. The camera follows the animated head with limited rotation, while your gameplay aim stays under your control.
 
 **SlashBlade, carried forward.**<br>
 Ground and air combos, Slash Arts, Just SA, and Super SA join the familiar blades, crafting progression, soul materials, and summoned swords. English and Simplified Chinese are built in.
@@ -62,9 +64,9 @@ Super SA requires an eligible enchanted blade with at least **1,000 kills**, ful
 
 ## Built. Played. Compared.
 
-The `port.22` verification run passed **91 required GameTests** and an isolated client check with **73 installed mods**. First- and third-person bones, blade, and saya were compared across **1,704 samples**, allowing for the single transform that frames the whole rig in first person. The same checks confirm that third-person arms still render.
+The `port.23` verification run passed **91 required GameTests** and an isolated client check with **73 installed mods**. The first-person renderer matched the original VMD weapon tracks across **852 samples**. Another **28,968 transition samples** checked that the blade/saya relationship stays intact and the transition ends within one action tick. Third-person rig checks covered **1,704 samples**, including its visible arms.
 
-Another **1,932 first-person checks** covered the standard skin, both dominant hands, seven look angles from straight up to straight down, and three head-turn angles. The hilt remained visible at rest, with no arm geometry submitted. The sheathing check found no blade/saya collisions across **12,864 samples**.
+Another **1,932 first-person checks** covered the standard skin, both dominant hands, seven look angles from straight up to straight down, and three head-turn angles. The hilt remained visible at rest, with no arm geometry submitted. The articulated third-person sheathing check found no blade/saya collisions across **12,864 samples**; first person preserves the original VMD relationship instead.
 
 These checks cover the built-in blades and default animation set. Custom model proportions, other animation mods, and long multiplayer sessions still need separate testing. A blade can leave the frame briefly during a wide swing.
 

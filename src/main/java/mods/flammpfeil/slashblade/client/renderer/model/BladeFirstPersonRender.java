@@ -13,7 +13,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.InteractionHand;
 import com.mojang.math.Axis;
 import mods.flammpfeil.slashblade.client.renderer.util.GeometryBuffer;
-import mods.flammpfeil.slashblade.client.animation.BladeAvatarPose;
+import mods.flammpfeil.slashblade.client.animation.FirstPersonBladeMotion;
+import mods.flammpfeil.slashblade.client.animation.BladeRig;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
 
 /**
@@ -39,18 +40,14 @@ public class BladeFirstPersonRender {
         if (mods.flammpfeil.slashblade.client.animation.PlayerBladeAnimation.available()
                 && mods.flammpfeil.slashblade.init.DefaultResources.ExMotionLocation.equals(motion.current().combo().getMotionLoc())) {
             if (mc.player.isSleeping() || mc.player.isSpectator()) return;
-            var avatar = BladeAvatarPose.extract(mc.player,event.getPartialTick());
-            var state = avatar.state();
-            var model = avatar.model();
-            var meshes = state.getRenderData(mods.flammpfeil.slashblade.client.renderer.layers.LivingBladeLayer.RIG);
-            if (meshes == null) return;
+            var meshes = BladeRig.capture(event.getItemStack(),blade,event.getPackedLight());
+            var transforms = FirstPersonBladeMotion.transforms(mc.player,blade,motion,event.getPartialTick());
             var input = event.getPoseStack();
-            input.pushPose();
-            // Keep the solved avatar rig for the weapon sockets, but submit only
-            // blade and saya in first person. Third-person skin remains unchanged.
-            input.mulPose(BladeAvatarPose.firstPersonSpace(avatar,event.getPartialTick()));
-            mods.flammpfeil.slashblade.client.animation.BladeRig.submit(meshes, model, state, input, event.getSubmitNodeCollector());
-            input.popPose();
+            for(int i=0;i<2;i++) {
+                input.pushPose();input.mulPose(transforms[i]);
+                (i==0 ? meshes.blade() : meshes.sheath()).submit(input,event.getSubmitNodeCollector());
+                input.popPose();
+            }
             event.setCanceled(true);
             return;
         }

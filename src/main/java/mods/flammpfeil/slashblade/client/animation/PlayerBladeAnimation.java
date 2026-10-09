@@ -30,6 +30,7 @@ public final class PlayerBladeAnimation {
     public static void reload(ResourceManager resources) {
         BladeRig.clear();
         LimbSkinning.clear();
+        FirstPersonBladeMotion.reload();
         ready = true;
         SlashBlade.LOGGER.info("Loaded original Yamato-inspired choreography: alternating flurry, timed finishers, dedicated judgement preparation/release, constrained draw and noto");
     }

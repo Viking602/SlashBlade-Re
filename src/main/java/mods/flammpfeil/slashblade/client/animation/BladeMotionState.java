@@ -94,6 +94,6 @@ public final class BladeMotionState {
         return histories.computeIfAbsent(entity, ignored -> new History()).resolve(blade.getUniqueId(),
                 blade.getLastActionTime(), entity.level().getGameTime() + (double)partialTick, timeline);
     }
-    public static void clear() { histories.clear(); }
+    public static void clear() { histories.clear(); FirstPersonBladeMotion.clearHistory(); }
     private BladeMotionState() {}
 }

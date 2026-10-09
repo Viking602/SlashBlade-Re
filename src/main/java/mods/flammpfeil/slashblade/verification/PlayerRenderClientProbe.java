@@ -138,6 +138,7 @@ public final class PlayerRenderClientProbe {
             report.put("cameraBodyFollow", BladeCameraClientProbe.verify());
             report.put("sheathBodyFollow", SheathFollowClientProbe.verify());
             report.put("perspectiveParity", PerspectiveParityClientProbe.verify(true));
+            report.put("worldRigParity", PerspectiveParityClientProbe.verifyRegisteredRig());
             SlashBlade.LOGGER.info("Player entity renderer verification PASSED: cases={} local/remote standard/slim both hands with armor", cases);
         } catch (Throwable error) {
             report.put("status", "failed"); report.put("error", error.toString());
