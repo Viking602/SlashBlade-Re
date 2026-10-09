@@ -13,9 +13,11 @@ Chain your cuts. Time your Slash Arts. Feel the motion carry through your hands,
 > **Development preview · `0.1.2-26.1.2-port.20`**<br>
 > This repository provides source code. Build the preview below; a packaged release is not published here yet.
 
-![First-person and third-person views of the same katana animation frame](docs/media/perspective-comparison.gif)
+![Continuous combat against a training Husk: normal combos, Slash Arts and Super SA](media/combat-preview.gif)
 
-*One motion, two perspectives. First person on the left; third person on the right. Eight seconds, with matching animation frames. [Watch the MP4](docs/media/perspective-comparison.mp4).*
+**[Watch the full combat showcase](media/combat-showcase.mp4)** · [First-person recording](media/first-person-combat.mp4)
+
+*Fresh, continuous gameplay: normal and extended combos, standard SA, Just SA, and Super SA, including recovery and sheathing. The stationary training Husk has extra health; the display shows actual damage, with no healing during the recording. Videos run at original speed and have no audio.*
 
 ## Every cut, connected.
 
@@ -58,15 +60,11 @@ The animation system runs inside this mod. **Epic Fight and PlayerAnimator are n
 
 Super SA requires an eligible enchanted blade with at least **1,000 kills**, full durability, and no broken or sealed state. It consumes **50% durability**. Check the blade tooltip for readiness; **V** can be rebound in Controls.
 
-[Read the combat guide →](docs/COMBAT.md)
-
 ## Built. Played. Compared.
 
 The `port.20` verification run passed **91 required GameTests** and an isolated client check with **73 installed mods**. First- and third-person rendering were compared across **1,704 samples** covering standing, crouching, walking, airborne poses, and both dominant hands.
 
 These checks cover the built-in blades and default animation set. Custom model proportions, other animation mods, and long multiplayer sessions still need separate testing. Real character proportions also mean a low-held sheath or a raised blade can leave the first-person frame.
-
-[Verification scope and port notes →](docs/PORTING.md)
 
 ## Build from source
 
@@ -91,7 +89,7 @@ sh ./gradlew build
 
 Output: `build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.20.jar`.
 
-To run the server-side regression suite, use the same wrapper with `runGameTestServer`. See the [developer notes](docs/PORTING.md#development) before using the local instance scripts or client probes.
+To run the server-side regression suite, use the same wrapper with `runGameTestServer` in a disposable checkout. The task writes to a sibling `test-gametest` directory.
 
 ## Help shape the next cut
 

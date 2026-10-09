@@ -27,3 +27,9 @@ forge*changelog.txt
 # Python port/bootstrap helper caches
 __pycache__/
 *.pyc
+
+# Local development tools, notes, and PowerShell helpers stay off the remote.
+/tools/
+/tool/
+/docs/
+*.ps1

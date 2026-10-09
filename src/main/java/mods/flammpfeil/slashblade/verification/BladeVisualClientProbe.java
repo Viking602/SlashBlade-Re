@@ -155,7 +155,8 @@ public final class BladeVisualClientProbe {
     }
 
     public static void start() {
-        if(Boolean.getBoolean("slashblade.combatFirstPerson") && !Boolean.getBoolean("slashblade.perspectiveComparison")) {
+        if(Boolean.getBoolean("slashblade.combatShowcase") ||
+                (Boolean.getBoolean("slashblade.combatFirstPerson") && !Boolean.getBoolean("slashblade.perspectiveComparison"))) {
             CombatShowcaseClientProbe.start();
             return;
         }

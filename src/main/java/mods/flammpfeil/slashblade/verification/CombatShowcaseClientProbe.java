@@ -31,11 +31,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  * No keys, mouse events or client pose/clock overrides. Normal inventory ticks run all hits. */
 public final class CombatShowcaseClientProbe {
     private static final boolean FIRST_PERSON=Boolean.getBoolean("slashblade.combatFirstPerson");
+    private static final boolean SHOWCASE=Boolean.getBoolean("slashblade.combatShowcase");
+    private static final float SHOWCASE_HEALTH=400;
     private record Stage(String name,ComboState combo,int ticks,String action) {}
     private static final List<Stage> stages=new ArrayList<>();
     private static volatile boolean running,done;
     private static volatile String label="准备";
     private static volatile int shownTick;
+    private static volatile String displayLabel="Ready";
+    private static volatile float shownHealth=SHOWCASE_HEALTH,shownDamage;
+    private static float previousHealth;
+    private static final List<Map<String,Object>> hitEvents=new ArrayList<>();
     private static ServerPlayer actor;
     private static Mob target;
     private static Vec3 origin;
@@ -66,13 +72,13 @@ public final class CombatShowcaseClientProbe {
                 mc.options.setCameraType(CameraType.FIRST_PERSON);
                 mc.setCameraEntity(mc.player);
                 // Look at the actual cow target's torso, rather than the horizon.
-                mc.player.setXRot(20); mc.player.xRotO=20;
+                mc.player.setXRot(SHOWCASE?8:20); mc.player.xRotO=mc.player.getXRot();
                 return;
             }
             mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
             if(camera==null) {
                 camera=new ArmorStand(mc.level,mc.player.getX(),mc.player.getY(),mc.player.getZ());
-                camera.getAttribute(Attributes.CAMERA_DISTANCE).setBaseValue(5.2);
+                camera.getAttribute(Attributes.CAMERA_DISTANCE).setBaseValue(SHOWCASE?4.7:5.2);
             }
             // Frame the fighter and the target together from the left front quarter.
             camera.setPos(mc.player.getX(),mc.player.getY()+.3,mc.player.getZ()+1.5);
@@ -83,6 +89,12 @@ public final class CombatShowcaseClientProbe {
         NeoForge.EVENT_BUS.addListener((RenderGuiEvent.Pre e)-> {
             if(!running) return;
             var mc=Minecraft.getInstance(); var g=e.getGuiGraphics();
+            if(SHOWCASE) {
+                g.text(mc.font,"SlashBlade:Re  /  "+(FIRST_PERSON?"FIRST PERSON":"COMBAT SHOWCASE"),12,12,0xFFFFFFFF);
+                g.text(mc.font,displayLabel,12,27,0xFFFFDD88);
+                g.text(mc.font,String.format(Locale.ROOT,"Training Husk  %.1f / %.0f HP   |   Damage dealt  %.1f",shownHealth,SHOWCASE_HEALTH,shownDamage),12,42,0xFFDDDDDD);
+                e.setCanceled(true); return;
+            }
             g.text(mc.font,FIRST_PERSON ? "拔刀剑 · 第一视角挥砍演示" : "拔刀剑 · 完整战斗演示",12,12,0xFFFFFFFF);
             g.text(mc.font,label,12,27,0xFFFFDD88);
             g.text(mc.font,"服务端实际攻击 / SA 命中 · "+shownTick+" ticks",12,42,0xFFDDDDDD);
@@ -118,7 +130,12 @@ public final class CombatShowcaseClientProbe {
     private static void add(String title,ComboState combo,int ticks) { stages.add(new Stage(title,combo,ticks,"")); }
     public static void start() {
         var mc=Minecraft.getInstance();
-        folder=mc.gameDirectory.toPath().resolve(FIRST_PERSON ? "screenshots/full-combat-first" : "screenshots/full-combat");
+        // Renderer probes equip the local test model without touching the server inventory.
+        // Clear that temporary client-only armor before recording the actual fight.
+        for(var slot:EquipmentSlot.values()) if(slot!=EquipmentSlot.MAINHAND) mc.player.setItemSlot(slot,ItemStack.EMPTY);
+        folder=mc.gameDirectory.toPath().resolve(SHOWCASE
+                ? (FIRST_PERSON ? "screenshots/showcase-first" : "screenshots/showcase-third")
+                : (FIRST_PERSON ? "screenshots/full-combat-first" : "screenshots/full-combat"));
         try { Files.createDirectories(folder); } catch(Exception e) { throw new IllegalStateException(e); }
         org.lwjgl.stb.STBImageWrite.stbi_write_png_compression_level.put(0,1);
         writer=Executors.newFixedThreadPool(2); BladeMotionState.clear();
@@ -147,18 +164,26 @@ public final class CombatShowcaseClientProbe {
         add("演示结束",null,30);
         mc.getSingleplayerServer().execute(()-> {
             actor=mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
-            origin=actor.position(); actor.setYRot(0); actor.setXRot(FIRST_PERSON?20:0);
+            origin=actor.position(); actor.setYRot(0); actor.setXRot(FIRST_PERSON?(SHOWCASE?8:20):0);
             for(var slot:EquipmentSlot.values()) if(slot!=EquipmentSlot.MAINHAND) actor.setItemSlot(slot,ItemStack.EMPTY);
             var sword=new ItemStack(SBItems.slashblade); var s=state(sword);
             s.setDefaultBewitched(true); s.setKillCount(1000); s.setBaseAttackModifier(6); s.setColorCode(0x66CCFF);
             sword.enchant(actor.level().registryAccess().getOrThrow(Enchantments.SHARPNESS),1);
             actor.setItemInHand(InteractionHand.MAIN_HAND,sword);
-            target=EntityType.COW.create(actor.level(),EntitySpawnReason.COMMAND);
+            if(SHOWCASE) {
+                actor.level().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.SPAWN_MOBS,false,actor.level().getServer());
+                actor.level().getServer().setDifficulty(net.minecraft.world.Difficulty.NORMAL,true);
+                for(var mob:actor.level().getEntitiesOfClass(Mob.class,actor.getBoundingBox().inflate(64))) mob.discard();
+            }
+            target=(SHOWCASE?EntityType.HUSK:EntityType.COW).create(actor.level(),EntitySpawnReason.COMMAND);
             target.setNoAi(true); target.setNoGravity(true);
             // The normal targeting policy includes glowing passive entities as training targets.
-            target.setGlowingTag(true);
-            target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000); target.setHealth(1000);
+            target.setGlowingTag(!SHOWCASE);
+            float health=SHOWCASE?SHOWCASE_HEALTH:1000;
+            target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(health); target.setHealth(health);
+            previousHealth=health;
             target.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
+            target.setYRot(180); target.yHeadRot=target.yHeadRotO=target.yBodyRot=target.yBodyRotO=180;
             target.setPos(origin.add(0,0,2.5)); actor.level().addFreshEntity(target); s.setTargetEntityId(target);
             actor.inventoryMenu.broadcastChanges();
             began=System.nanoTime(); running=true;
@@ -167,12 +192,18 @@ public final class CombatShowcaseClientProbe {
     private static ISlashBladeState state(ItemStack stack) { return SBData.get(stack,ItemSlashBlade.BLADESTATE).orElseThrow(IllegalStateException::new); }
     private static void serverTick() {
         shownTick=totalTick++;
-        actor.setYRot(0); actor.setXRot(FIRST_PERSON?20:0); actor.setOnGround(true);
+        actor.setYRot(0); actor.setXRot(FIRST_PERSON?(SHOWCASE?8:20):0); actor.setOnGround(true);
         target.setPos(origin.add(0,0,2.5)); target.setDeltaMovement(Vec3.ZERO);
-        damage+=Math.max(0,1000-target.getHealth()); target.setHealth(1000);
+        float hit=Math.max(0,(SHOWCASE?previousHealth:1000)-target.getHealth());
+        damage+=hit;
+        if(hit>0) hitEvents.add(Map.of("tick",shownTick,"stage",label,"damage",hit,"health",target.getHealth()));
+        previousHealth=target.getHealth();
+        if(!SHOWCASE) target.setHealth(1000);
+        shownHealth=target.getHealth(); shownDamage=damage;
         if(target.getExistingDataOrNull(SBData.SUPER_FREEZE)!=null) frozenSamples++;
         if(stage>=stages.size()) { done=true; return; }
         Stage current=stages.get(stage); label=current.name;
+        displayLabel=englishTitle(current);
         var stack=actor.getMainHandItem(); var s=state(stack);
         if(stageTick==0) {
             events.add(Map.of("tick",shownTick,"stage",current.name,"action",current.action,"combo",current.combo==null?"":current.combo.getName()));
@@ -203,6 +234,20 @@ public final class CombatShowcaseClientProbe {
         if(down) input.getCommands().add(InputCommand.STYLE); else input.getCommands().remove(InputCommand.STYLE);
         InputCommandEvent.onInputChange(actor,input,old,input.getCommands().clone());
     }
+    private static String englishTitle(Stage current) {
+        return switch(current.action) {
+            case "charge" -> stage+1<stages.size() && stages.get(stage+1).action.equals("just")
+                    ? "JUST SA  /  Precision charge" : "STANDARD SA  /  Charge";
+            case "sa" -> "STANDARD SA  /  Judgment Cut - recover - sheathe";
+            case "just" -> "JUST SA  /  Precision cut - recover - sheathe";
+            case "super-charge" -> "SUPER SA  /  Charge";
+            case "super" -> "SUPER SA  /  Stun - delayed cuts - sheathe";
+            default -> current.combo==null ? (stage==0?"Ready / Full sequence, real-time":"Complete / Blade sheathed")
+                    : (current.name.startsWith("强化")?"EXTENDED COMBO  /  ":"NORMAL ATTACKS  /  ")
+                    +current.combo.getName().replace("ex_combo_","").toUpperCase(Locale.ROOT)
+                    +(current.ticks>=80?" - recover - sheathe":"");
+        };
+    }
     private static void finish() {
         running=false; writer.shutdown();
         boolean passed=cuts.getOrDefault("sa",Set.of()).size()>0 && cuts.getOrDefault("just",Set.of()).size()>0
@@ -210,6 +255,22 @@ public final class CombatShowcaseClientProbe {
         var report=new LinkedHashMap<String,Object>(); report.put("status",passed?"passed":"failed");
         report.put("frames",frame); report.put("ticks",shownTick); report.put("damage",damage); report.put("frozenSamples",frozenSamples);
         report.put("cutEntityIds",cuts); report.put("stages",events);
+        report.put("hitEvents",hitEvents);
+        if(SHOWCASE) {
+            report.put("target","minecraft:husk"); report.put("initialHealth",SHOWCASE_HEALTH);
+            report.put("finalHealth",shownHealth); report.put("targetHealthResetDuringRecording",false);
+            var categoryDamage=new LinkedHashMap<String,Float>();
+            for(var hit:hitEvents) {
+                String title=(String)hit.get("stage");
+                String category=title.startsWith("Super SA")?"super":title.startsWith("Just SA")?"just":title.startsWith("SA")?"sa":"normal";
+                categoryDamage.merge(category,((Number)hit.get("damage")).floatValue(),Float::sum);
+            }
+            report.put("damageByCategory",categoryDamage);
+            for(String category:List.of("normal","sa","just","super"))
+                if(categoryDamage.getOrDefault(category,0F)<=0) passed=false;
+            if(Math.abs(SHOWCASE_HEALTH-shownHealth-damage)>.01F) passed=false;
+            report.put("status",passed?"passed":"failed");
+        }
         if(FIRST_PERSON) {
             report.put("cameraRanges",cameraRanges);
             for(String prefix:List.of("A 连段","B 连段","C 分支","SA · 次元","Just SA · 精准","Super SA · 定身")) {
