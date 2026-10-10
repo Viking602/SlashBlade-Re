@@ -42,16 +42,18 @@ public final class BladeIconClientProbe {
                     require(!state.isEmpty(), "item definition missing");
                     require(!state.usesBlockLight(), "GUI lighting differs from the flat item setting");
                     var reported = state.getModelBoundingBox();
-                    require(reported.minX >= -.494 && reported.maxX <= .494 && reported.minY >= -.494 && reported.maxY <= .494,
-                            "model reports inflated GUI extents");
                     var capture = new Capture();
                     state.submit(new PoseStack(), capture, 15728880, OverlayTexture.NO_OVERLAY, 0);
                     require(capture.all.vertices > 0 && capture.first.vertices > 0, "special renderer did not submit geometry");
                     double edge = Math.min(Math.min(capture.all.minX + .5, .5 - capture.all.maxX),
                             Math.min(capture.all.minY + .5, .5 - capture.all.maxY)) * 16;
-                    require(edge >= .099, "icon is clipped: " + model + "/" + variant + "/" + damage);
+                    var reference=referenceBounds(model,variant);
+                    require(Math.abs(reference.minX-capture.first.minX)<.00001 && Math.abs(reference.maxX-capture.first.maxX)<.00001
+                            && Math.abs(reference.minY-capture.first.minY)<.00001 && Math.abs(reference.maxY-capture.first.maxY)<.00001,
+                            "icon differs from Resharped's authored GUI transform: "+model+"/"+variant);
+                    require(reported.minX<=capture.all.minX+.00001 && reported.maxX>=capture.all.maxX-.00001
+                            && reported.minY<=capture.all.minY+.00001 && reported.maxY>=capture.all.maxY-.00001,"model bounds omit rendered geometry");
                     double size = Math.max(capture.first.maxX - capture.first.minX, capture.first.maxY - capture.first.minY) * 16;
-                    require(size >= (variant == 2 ? 14.5 : 15.79), "blade silhouette is undersized: " + model + " size=" + size);
                     margin = Math.min(margin, edge);
                     cases++;
                     if (!glint && damage == 0) {
@@ -65,7 +67,7 @@ public final class BladeIconClientProbe {
         }
         var report = new LinkedHashMap<String, Object>();
         report.put("status", "passed"); report.put("cases", cases); report.put("minimumEdgeMarginPixels", margin);
-        report.put("scope", "real ItemModelResolver + SpecialModelRenderer + deferred geometry, 5 models, 3 variants, 6 damage states, glint on/off; no GPU pixel assertion");
+        report.put("scope", "real ItemModelResolver and deferred geometry vs independent Resharped GUI matrix and OBJ vertices; 5 models, 3 variants, 6 damage states, glint on/off");
         report.put("models", results);
         SlashBlade.LOGGER.info("Blade icon verification PASSED: cases={} minimumEdgeMarginPixels={}", cases, margin);
         return report;
@@ -73,6 +75,21 @@ public final class BladeIconClientProbe {
 
     private static void require(boolean condition, String message) {
         if (!condition) throw new IllegalStateException("Blade icon verification failed: " + message);
+    }
+
+    private static Bounds referenceBounds(String name,int variant) {
+        // Resharped slashblade.json: translation [2,3,0]/16, XYZ rotation
+        // [15,-25,-5], scale .65; TEISR then centers the OBJ and scales by .008.
+        // ItemTransform's -.5 and TEISR's +.5 cancel each other.
+        var matrix=new org.joml.Matrix4f().translation(2/16F,3/16F,0)
+                .rotateXYZ((float)Math.toRadians(15),(float)Math.toRadians(-25),(float)Math.toRadians(-5)).scale(.65F*.008F);
+        var model=mods.flammpfeil.slashblade.client.renderer.model.BladeModelManager.getInstance().getModel(SlashBlade.id("model/"+name+".obj"));
+        String group=variant==2?"item_damaged":variant==1?"item_bladens":"item_blade";
+        var bounds=new Bounds();
+        for(var part:model.groupObjects)if(part.name.equals(group))for(var face:part.faces)for(var v:face.vertices) {
+            var p=matrix.transformPosition(new org.joml.Vector3f(v.x,v.y,v.z));bounds.addVertex(p.x,p.y,p.z);
+        }
+        require(bounds.vertices>0,"missing reference OBJ group "+group);return bounds;
     }
 
     private static final class Capture extends SubmitNodeStorage {

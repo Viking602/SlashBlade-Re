@@ -297,9 +297,10 @@ public final class CombatShowcaseClientProbe {
         if(FIRST_PERSON) {
             report.put("cameraRanges",cameraRanges);
             for(String prefix:List.of("A 连段","B 连段","C 分支","SA · 次元","Just SA · 精准","Super SA · 定身")) {
-                boolean moving=cameraRanges.entrySet().stream().filter(e->e.getKey().startsWith(prefix))
-                        .anyMatch(e->{var v=e.getValue();return Math.max(v[1]-v[0],Math.max(v[3]-v[2],v[5]-v[4]))>.5F;});
-                if(!moving) {passed=false;report.put("missingCameraMotion",prefix);}
+                boolean changed=cameraRanges.entrySet().stream().filter(e->e.getKey().startsWith(prefix))
+                        .anyMatch(e->{var v=e.getValue();return Math.max(Math.max(Math.abs(v[0]),Math.abs(v[1])),Math.max(Math.max(Math.abs(v[2]),Math.abs(v[3])),Math.max(Math.abs(v[4]),Math.abs(v[5]))))>.001F;});
+                if(changed) {passed=false;report.put("unexpectedCameraMotion",prefix);}
+
             }
             report.put("status",passed?"passed":"failed");
         }

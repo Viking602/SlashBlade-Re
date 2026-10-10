@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import mods.flammpfeil.slashblade.client.renderer.util.GeometryBuffer;
-import mods.flammpfeil.slashblade.client.renderer.model.BladeIconLayout;
 import mods.flammpfeil.slashblade.SlashBlade;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -21,18 +20,12 @@ import java.util.function.Consumer;
 public final class BladeSpecialRenderer implements SpecialModelRenderer<BladeSpecialRenderer.Argument> {
     private final ItemDisplayContext context;
     private final SlashBladeTEISR renderer;
-    private final BladeIconLayout iconLayout;
-    BladeSpecialRenderer(String context, BladeIconLayout iconLayout) {
+    BladeSpecialRenderer(String context) {
         this.context = ItemDisplayContext.valueOf(context.toUpperCase(java.util.Locale.ROOT));
-        this.iconLayout = iconLayout;
-        renderer = new SlashBladeTEISR(iconLayout);
+        renderer = new SlashBladeTEISR();
     }
     @Override public Argument extractArgument(ItemStack stack) { return new Argument(stack); }
     @Override public void getExtents(Consumer<Vector3fc> output) {
-        if (context == ItemDisplayContext.GUI && iconLayout != null) {
-            iconLayout.getExtents(output);
-            return;
-        }
         // TEISR places the scaled OBJ around (0.5, 0.5, 0.5), before the
         // item's display transform. Supply all corners so rotations retain
         // the full bounds of the blade, scabbard and durability ring.
@@ -76,13 +69,7 @@ public final class BladeSpecialRenderer implements SpecialModelRenderer<BladeSpe
     public record Unbaked(String context) implements SpecialModelRenderer.Unbaked<Argument> {
         public static final MapCodec<Unbaked> CODEC = Codec.STRING.optionalFieldOf("context", "gui").xmap(Unbaked::new, Unbaked::context);
         @Override public SpecialModelRenderer<Argument> bake(BakingContext context) {
-            BladeIconLayout layout = null;
-            if (this.context.equalsIgnoreCase("gui") && context instanceof ItemModel.BakingContext itemContext) {
-                var gui = itemContext.blockModelBaker().getModel(SlashBlade.id("item/slashblade"))
-                        .getTopTransforms().getTransform(ItemDisplayContext.GUI);
-                layout = new BladeIconLayout(gui);
-            }
-            return new BladeSpecialRenderer(this.context, layout);
+            return new BladeSpecialRenderer(this.context);
         }
         @Override public MapCodec<Unbaked> type() { return CODEC; }
     }

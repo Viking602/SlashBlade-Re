@@ -86,7 +86,15 @@ public class ItemSlashBlade extends Item {
         return enchantment.is(net.minecraft.world.item.enchantment.Enchantments.SOUL_SPEED) || enchantment.is(net.minecraft.world.item.enchantment.Enchantments.POWER) || enchantment.is(net.minecraft.world.item.enchantment.Enchantments.FEATHER_FALLING) || enchantment.is(net.minecraft.world.item.enchantment.Enchantments.FIRE_PROTECTION) || enchantment.is(net.minecraft.world.item.enchantment.Enchantments.THORNS);
     }
     public Rarity getRarity(ItemStack stack) {
-        return SBData.get(stack, BLADESTATE).map(ISlashBladeState::getRarity).orElse(Rarity.COMMON);
+        if(isDetunedBlade())return Rarity.COMMON;
+        var types=SwordType.from(stack);
+        return types.contains(SwordType.Bewitched)?Rarity.EPIC:types.contains(SwordType.Enchanted)?Rarity.RARE:Rarity.COMMON;
+    }
+
+    /** These four items use ItemSlashBladeDetune's presentation in Resharped. */
+    private boolean isDetunedBlade() {
+        return this==SBItems.slashblade_wood || this==SBItems.slashblade_bamboo
+                || this==SBItems.slashblade_silverbamboo || this==SBItems.slashblade_white;
     }
 
 
@@ -378,7 +386,7 @@ public class ItemSlashBlade extends Item {
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) { return repair.is(ItemTags.STONE_TOOL_MATERIALS) || repair.is(ItemTags.create(Identifier.fromNamespaceAndPath("slashblade", "proudsouls"))); }
 
     RangeMap refineColor = ImmutableRangeMap.builder()
-            .put(Range.lessThan(10), ChatFormatting.WHITE)
+            .put(Range.lessThan(10), ChatFormatting.GRAY)
             .put(Range.closedOpen(10,50), ChatFormatting.YELLOW)
             .put(Range.closedOpen(50,100), ChatFormatting.GREEN)
             .put(Range.closedOpen(100,150), ChatFormatting.AQUA)
@@ -389,16 +397,21 @@ public class ItemSlashBlade extends Item {
 
     @Override public void appendHoverText(ItemStack stack, Item.TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
         SBData.get(stack, BLADESTATE).ifPresent(state -> {
-            tooltip.accept(Component.translatable("slashblade.tooltip.proud_soul",state.getProudSoulCount()));
-            if (state.isBroken()) tooltip.accept(Component.translatable("slashblade.tooltip.broken"));
-            if (state.isSealed()) tooltip.accept(Component.translatable("slashblade.tooltip.sealed"));
-            tooltip.accept(Component.translatable("slashblade.tooltip.slash_art",Component.translatable("slash_art.slashblade."+state.getSlashArts().getName())).withStyle(ChatFormatting.AQUA));
-            for(var id:state.getSpecialEffects()) {
-                var effect=mods.flammpfeil.slashblade.registry.SpecialEffectsRegistry.REGISTRY.get().getValue(id);
-                if(effect!=null)tooltip.accept(Component.translatable(effect.getDescriptionId()).withStyle(ChatFormatting.LIGHT_PURPLE));
+            var types= SwordType.from(stack);
+            if(!isDetunedBlade() && !types.contains(SwordType.Sealed)) {
+                if(types.contains(SwordType.Bewitched)) tooltip.accept(Component.translatable("slashblade.sword_type.bewitched")
+                        .withStyle(types.contains(SwordType.SoulEeater) && types.contains(SwordType.FiercerEdge)?ChatFormatting.GOLD:ChatFormatting.DARK_PURPLE));
+                else if(types.contains(SwordType.Enchanted)) tooltip.accept(Component.translatable("slashblade.sword_type.enchanted").withStyle(ChatFormatting.DARK_AQUA));
+                else tooltip.accept(Component.translatable("slashblade.sword_type.noname").withStyle(ChatFormatting.DARK_GRAY));
             }
-            if (state.getKillCount() > 0) tooltip.accept(Component.translatable("slashblade.tooltip.killcount", state.getKillCount()));
-            if (state.getRefine() > 0) tooltip.accept(Component.translatable("slashblade.tooltip.refine", state.getRefine()).withStyle((ChatFormatting)refineColor.get(state.getRefine())));
+            if(state.getProudSoulCount()>0) tooltip.accept(Component.translatable("slashblade.tooltip.proud_soul",state.getProudSoulCount())
+                    .withStyle(state.getProudSoulCount()>10000?ChatFormatting.DARK_PURPLE:ChatFormatting.GRAY));
+            if(state.getKillCount()>0) tooltip.accept(Component.translatable("slashblade.tooltip.killcount",state.getKillCount())
+                    .withStyle(state.getKillCount()>1000?ChatFormatting.DARK_PURPLE:ChatFormatting.GRAY));
+            if(!isDetunedBlade() && types.contains(SwordType.Bewitched) && !types.contains(SwordType.Sealed))
+                tooltip.accept(Component.translatable("slashblade.tooltip.slash_art",state.getSlashArts().getDescription()).withStyle(ChatFormatting.GRAY));
+            if(state.getRefine()>0) tooltip.accept(Component.translatable("slashblade.tooltip.refine",state.getRefine()).withStyle((ChatFormatting)refineColor.get(state.getRefine())));
+            for(var id:state.getSpecialEffects()) mods.flammpfeil.slashblade.item.ResharpedTooltip.effect(id,context,tooltip,false);
         });
         super.appendHoverText(stack, context, display, tooltip, flag);
     }

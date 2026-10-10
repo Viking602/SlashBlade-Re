@@ -33,7 +33,6 @@ public final class SlashBladeClient {
         });
         NeoForge.EVENT_BUS.addListener(MoveInputHandler::onPlayerPostTick);
         NeoForge.EVENT_BUS.addListener(BladeFirstPersonRender.getInstance()::onRenderHand);
-        NeoForge.EVENT_BUS.addListener(mods.flammpfeil.slashblade.client.animation.BladeCameraAnimation::onCameraAngles);
         mods.flammpfeil.slashblade.verification.CombatClientProbe.register();
         mods.flammpfeil.slashblade.verification.PlayerAnimationClientProbe.register();
         if (net.neoforged.fml.ModList.get().isLoaded("jei")) mods.flammpfeil.slashblade.verification.BladeRecipeClientProbe.register();

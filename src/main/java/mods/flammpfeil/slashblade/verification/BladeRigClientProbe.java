@@ -35,7 +35,8 @@ public final class BladeRigClientProbe {
         Vector3f pelvis = torso.transformPosition(new Vector3f(0, 12F / 16, 0));
         Vector3f hips = new Vector3f(model.leftLeg.x + model.rightLeg.x, model.leftLeg.y + model.rightLeg.y,
                 model.leftLeg.z + model.rightLeg.z).div(32);
-        if (pose.weight() >= 1) require(pelvis.distance(hips) < .00001, "torso detached from pelvis");
+        if (pose.weight() >= 1) require(pelvis.distance(hips) < .00001, "torso detached from pelvis: distance="+pelvis.distance(hips)
+                +" pelvis="+pelvis+" hips="+hips+" model="+model.getClass().getName()+" crouching="+state.isCrouching+" score="+pose.score());
         for (var arm : HumanoidArm.values()) {
             var part = arm == HumanoidArm.RIGHT ? model.rightArm : model.leftArm;
             var expected = torso.transformPosition(new Vector3f(arm == HumanoidArm.RIGHT ? -5F / 16 : 5F / 16, 2F / 16, 0));

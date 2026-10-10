@@ -19,7 +19,7 @@ import net.neoforged.neoforge.common.NeoForge;
 
 /** Opt-in verification of actual JEI lookups/layouts and GPU-rendered item icons. */
 public final class BladeRecipeClientProbe {
-    private static final String[] shots={"catalog-icons","recipe-white","recipe-ruby","recipe-fox-black","recipe-doutanuki","recipe-anvil"};
+    private static final String[] shots={"catalog-icons","recipe-white","recipe-ruby","recipe-fox-black","recipe-doutanuki","recipe-anvil","tooltip-tukumo"};
     private static boolean active,pending;
     private static int stage,frames;
     public static void register() {
@@ -75,6 +75,7 @@ public final class BladeRecipeClientProbe {
     private static void show() {
         var mc=Minecraft.getInstance();var runtime=SlashBladeJeiPlugin.runtime();
         if(stage==0) { mc.setScreen(new IconScreen()); return; }
+        if(stage==6) { mc.setScreen(new TooltipScreen()); return; }
         var manager=runtime.getRecipeManager();
         if(stage==5) {
             var recipes=manager.createRecipeLookup(RecipeTypes.ANVIL).get().filter(r -> r.getUid()!=null && r.getUid().getNamespace().equals("slashblade") && r.getUid().getPath().startsWith("refine/0/")).toList();
@@ -83,6 +84,19 @@ public final class BladeRecipeClientProbe {
             String id=switch(stage) { case 1 -> "slashblade_white";case 2 -> "ruby";case 3 -> "fox_black";default -> "doutanuki"; };
             var recipes=manager.createRecipeLookup(RecipeTypes.CRAFTING).get().filter(r -> r.id().identifier().equals(SlashBlade.id("upgrades/"+id))).toList();
             runtime.getRecipesGui().showRecipes(manager.getRecipeCategory(RecipeTypes.CRAFTING),recipes,List.of());
+        }
+    }
+    private static final class TooltipScreen extends Screen {
+        private final net.minecraft.world.item.ItemStack blade=BladeCatalog.blade("yuzukitukumo");
+        TooltipScreen() {
+            super(Component.literal("Resharped tooltip"));
+            SBData.get(blade,ItemSlashBlade.BLADESTATE).ifPresent(s -> {s.setProudSoulCount(162);s.setKillCount(200);});
+        }
+        @Override public boolean isPauseScreen(){return false;}
+        @Override public void extractRenderState(GuiGraphicsExtractor g,int mx,int my,float delta) {
+            g.fill(0,0,width,height,0xff18222e);
+            g.text(font,"SlashBlade:Re / Resharped tooltip and item icon",25,25,0xffe8edf2,false);
+            g.fakeItem(blade,75,70);g.setTooltipForNextFrame(font,blade,100,90);
         }
     }
     private static final class IconScreen extends Screen {

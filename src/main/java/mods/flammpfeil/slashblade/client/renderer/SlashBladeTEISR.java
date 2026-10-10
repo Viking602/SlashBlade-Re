@@ -6,7 +6,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import mods.flammpfeil.slashblade.client.renderer.model.BladeFirstPersonRender;
 import mods.flammpfeil.slashblade.client.renderer.model.BladeModel;
 import mods.flammpfeil.slashblade.client.renderer.model.BladeModelManager;
-import mods.flammpfeil.slashblade.client.renderer.model.BladeIconLayout;
 import mods.flammpfeil.slashblade.client.renderer.model.obj.WavefrontObject;
 import mods.flammpfeil.slashblade.client.renderer.util.MSAutoCloser;
 import mods.flammpfeil.slashblade.client.renderer.util.BladeRenderState;
@@ -34,9 +33,7 @@ import java.util.EnumSet;
 
 public class SlashBladeTEISR {
 
-    private final BladeIconLayout iconLayout;
-    public SlashBladeTEISR() { this(null); }
-    public SlashBladeTEISR(BladeIconLayout iconLayout) { this.iconLayout = iconLayout; }
+    public SlashBladeTEISR() {}
 
     public void renderByItem(ItemStack itemStackIn, ItemDisplayContext type, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
     //public void render(ItemStack itemStackIn, MatrixStack matrixStack, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
@@ -157,7 +154,6 @@ public class SlashBladeTEISR {
         }
 
         try (MSAutoCloser bladePose = MSAutoCloser.pushMatrix(matrixStack)) {
-            if (renderDurability && iconLayout != null) iconLayout.applyBlade(matrixStack, model, renderTarget);
             if (renderDurability) {
                 BladeRenderState.renderOverridedIcon(stack, model, renderTarget, textureLocation, matrixStack, bufferIn, lightIn);
             } else {
@@ -169,9 +165,8 @@ public class SlashBladeTEISR {
         if(renderDurability){
 
             WavefrontObject durabilityModel = BladeModelManager.getInstance().getModel(BladeModelManager.resourceDurabilityModel);
-            if (iconLayout != null) iconLayout.applyGauge(matrixStack, durabilityModel);
 
-            float durability = SBData.get(stack, ItemSlashBlade.BLADESTATE).map(s->s.getDurabilityForDisplay()).orElse(0.0f);
+            float durability = (float)stack.getDamageValue() / Math.max(1,stack.getMaxDamage());
             matrixStack.translate(0.0F, 0.0F, 0.1f);
 
             // SpecialModelRenderer snapshots ItemStacks, so reference equality with
@@ -179,9 +174,9 @@ public class SlashBladeTEISR {
             // including the main hand, uses the original model's damage gauge.
             Color aCol = new Color(0.25f,0.25f,0.25f,1.0f);
             Color bCol = new Color(0xA52C63);
-            int r = 0xFF & (int)Mth.lerp(durability, aCol.getRed(), bCol.getRed());
-            int g = 0xFF & (int)Mth.lerp(durability, aCol.getGreen(), bCol.getGreen());
-            int b = 0xFF & (int)Mth.lerp(durability, aCol.getBlue(), bCol.getBlue());
+            int r = 0xFF & (int)Mth.lerp(aCol.getRed(), bCol.getRed(), durability);
+            int g = 0xFF & (int)Mth.lerp(aCol.getGreen(), bCol.getGreen(), durability);
+            int b = 0xFF & (int)Mth.lerp(aCol.getBlue(), bCol.getBlue(), durability);
 
             BladeRenderState.setCol(new Color(r,g,b));
             BladeRenderState.renderOverridedIcon(stack, durabilityModel, "base", BladeModelManager.resourceDurabilityTexture, matrixStack, bufferIn, lightIn);

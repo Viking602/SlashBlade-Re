@@ -10,10 +10,10 @@ Chain your cuts. Time your Slash Arts. Feel the motion carry through your hands,
 
 **[Get started ↓](#get-started)** · [Controls](#make-your-first-cut) · [Build from source](#build-from-source) · [Report an issue](https://github.com/Viking602/SlashBlade-Re/issues)
 
-> **Development preview · `0.1.2-26.1.2-port.26`**<br>
+> **Development preview · `0.1.2-26.1.2-port.27`**<br>
 > This repository provides source code. Build the preview below; a packaged release is not published here yet.
 
-**[port.26: all eight Slash Arts in first person](media/resharped-first-person.mp4)** — normal combos, each SA, Just SA and Super SA against one training Husk, with real damage and no healing.
+**[port.27: all eight Slash Arts in first person](media/resharped-first-person.mp4)** — normal combos, each SA, Just SA and Super SA against one training Husk, with real damage and no healing.
 
 ![Continuous combat against a training Husk: normal combos, Slash Arts and Super SA](media/combat-preview.gif)
 
@@ -32,7 +32,11 @@ Hips lead. Shoulders turn. Elbows and wrists bend. Hands, hilt, and sheath share
 **Original cuts. A clearer first-person view.**<br>
 First person restores SlashBlade's original VMD blade and saya tracks. Quick cuts keep their authored timing; a brief, shared transition settles the weapon pair when a combo is interrupted. No hands, arms, or sleeves obstruct the view, and the resting hilt stays visible.
 
-Both views share the action clock and katana size. Third person uses the articulated character rig; first person uses the original weapon tracks, so their paths differ. The camera follows the animated head with limited rotation, while your gameplay aim stays under your control.
+Both views share the action clock and katana size. Third person uses the articulated character rig; first person uses the original weapon tracks, so their paths differ. Like Resharped, attacks animate the weapon without adding head-follow rotation to the world camera.
+
+Item tooltips follow Resharped's field order, colors and visibility rules. Inventory icons use its authored rotation, scale and durability ring. If RarityCore is installed, its extra rarity labels and name recoloring are skipped for SlashBlade items.
+
+[View the tooltip](media/resharped-tooltip.png) · [View all blade icons](media/resharped-icons.png)
 
 **SlashBlade, carried forward.**<br>
 Ground and air combos, Slash Arts, Just SA, and Super SA join the familiar blades, crafting progression, soul materials, and summoned swords. English and Simplified Chinese are built in.
@@ -157,11 +161,11 @@ The animation system runs inside this mod. **Epic Fight and PlayerAnimator are n
 | Just SA | Release in the precision window — normally ticks 9–11 |
 | Super SA | Hold **V** for at least one second, then release |
 
-Super SA requires an eligible enchanted blade with at least **1,000 kills**, full durability, and no broken or sealed state. It consumes **50% durability**. Check the blade tooltip for readiness; **V** can be rebound in Controls.
+Super SA requires an eligible enchanted blade with at least **1,000 kills**, full durability, and no broken or sealed state. It consumes **50% durability**. **V** can be rebound in Controls.
 
 ## Built. Played. Compared.
 
-`port.26` passes **132 required GameTests**: progression, inheritance, soul economy, acquisition, blade-stand transactions, special effects, configuration, registries, and actual damage from all eight Slash Arts. Client checks run in an isolated instance with **73 installed mods**.
+`port.27` passes **132 required GameTests**: progression, inheritance, soul economy, acquisition, blade-stand transactions, special effects, configuration, registries, and actual damage from all eight Slash Arts. Client checks run in an isolated instance with **205 installed mods**, including RarityCore. Tooltip checks cover display conditions and compatibility; icon checks compare actual rendered bounds with Resharped's OBJ geometry and GUI transform.
 
 The renderer checks compare first-person geometry with the original VMD tracks, including Piercing; test interruption and sheathing transitions; and sample both hands, head turns and look angles. Third-person tests exercise the character rig and actual entity renderer. First person submits no arm geometry.
 
@@ -188,7 +192,7 @@ cd SlashBlade-Re
 sh ./gradlew build
 ```
 
-Output: `build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.26.jar`.
+Output: `build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.27.jar`.
 
 To run the server-side regression suite, use the same wrapper with `runGameTestServer` in a disposable checkout. The task writes to a sibling `test-gametest` directory.
 

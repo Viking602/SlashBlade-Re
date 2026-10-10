@@ -72,8 +72,8 @@ public final class FirstPersonBladeMotion {
         float rad=(float)Math.PI/180;
         var nativeView=new Quaternionf().rotationYXZ((float)Math.PI-player.getViewYRot(partialTick)*rad,
                 -player.getViewXRot(partialTick)*rad,0);
-        // Retain the animated head's rotation relative to the user's look, without
-        // making the weapon orbit when the user looks up or down.
+        // Resharped leaves camera rotation to Minecraft. Respect that view and
+        // external camera effects without driving it from the weapon/body rig.
         var view=new Matrix4f().rotation(new Quaternionf(mc.gameRenderer.getMainCamera().rotation()).conjugate()).rotate(nativeView);
         // Original BladeFirstPersonRender / LayerMainBlade coordinate chain.
         // Uniformly resize the complete authored space to the shared katana size.

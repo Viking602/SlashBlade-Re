@@ -1,8 +1,15 @@
 {
   "package": "mods.flammpfeil.slashblade.mixin",
-  "client": ["MixinHumanoidModel", "MixinModelPart", "AvatarRendererAccess"],
+  "client": [
+    "MixinHumanoidModel",
+    "MixinModelPart",
+    "AvatarRendererAccess",
+    "RarityCoreTooltipMixin",
+    "ResharpedItemNameMixin"
+  ],
   "mixins": [
-    "MixinBlockBehaviour"
+    "MixinBlockBehaviour",
+    "BladeRarityMixin"
   ],
   "required": true,
   "minVersion": "0.8",

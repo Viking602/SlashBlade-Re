@@ -34,12 +34,6 @@ public class BladeComponentTooltips {
         List<Component> tooltip = event.getToolTip();
 
         ItemStack stack = event.getItemStack();
-        if(stack.getItem() instanceof ItemSlashBlade) {
-            tooltip.add(Component.translatable("slashblade.super_sa.hint",
-                    mods.flammpfeil.slashblade.client.SlashBladeKeys.SUPER_SA.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_AQUA));
-            tooltip.add(Component.translatable("slashblade.super_sa.requirements").withStyle(
-                    mods.flammpfeil.slashblade.ability.SuperSlashArts.eligible(stack)?ChatFormatting.GREEN:ChatFormatting.GRAY));
-        }
 
         AnvilCraftingRecipe recipe = AnvilCraftingRecipe.getRecipe(stack);
 

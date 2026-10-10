@@ -26,20 +26,15 @@ public final class SBItems {
         @Override public boolean isFoil(ItemStack stack) { return true; }
         @Override public void appendHoverText(ItemStack stack,Item.TooltipContext context,net.minecraft.world.item.component.TooltipDisplay display,java.util.function.Consumer<net.minecraft.network.chat.Component> tooltip,TooltipFlag flag) {
             var data=mods.flammpfeil.slashblade.compat.SBItemData.tag(stack);
-            var art=net.minecraft.resources.Identifier.tryParse(data.getStringOr("SpecialAttackType",""));
-            if(art!=null && !art.getPath().isEmpty()){
-                var definition=mods.flammpfeil.slashblade.registry.SlashArtsRegistry.VALUES.getValue(art);
-                if(definition!=null)tooltip.accept(definition.getDescription());
-                tooltip.accept(net.minecraft.network.chat.Component.translatable("slashblade.tooltip.apply_art"));
+            if(this==proudsoul_sphere) {
+                var id=net.minecraft.resources.Identifier.tryParse(data.getStringOr("SpecialAttackType",""));
+                var art=id==null?null:mods.flammpfeil.slashblade.registry.SlashArtsRegistry.VALUES.getValue(id);
+                if(art!=null && art!=mods.flammpfeil.slashblade.specialattack.SlashArts.NONE)
+                    tooltip.accept(net.minecraft.network.chat.Component.translatable("slashblade.tooltip.slash_art",art.getDescription()).withStyle(net.minecraft.ChatFormatting.GRAY));
+            } else if(this==proudsoul_crystal) {
+                var id=net.minecraft.resources.Identifier.tryParse(data.getStringOr("SpecialEffectType",""));
+                if(id!=null) mods.flammpfeil.slashblade.item.ResharpedTooltip.effect(id,context,tooltip,true);
             }
-            var effect=net.minecraft.resources.Identifier.tryParse(data.getStringOr("SpecialEffectType",""));
-            if(effect!=null && !effect.getPath().isEmpty()){
-                var definition=mods.flammpfeil.slashblade.registry.SpecialEffectsRegistry.VALUES.getValue(effect);
-                if(definition!=null)tooltip.accept(net.minecraft.network.chat.Component.translatable("slashblade.tooltip.effect_level",definition.getDescription(),definition.getRequestLevel()));
-                tooltip.accept(net.minecraft.network.chat.Component.translatable("slashblade.tooltip.apply_effect"));
-            }
-            int value=stack.get(net.minecraft.core.component.DataComponents.ENCHANTABLE).value();
-            tooltip.accept(net.minecraft.network.chat.Component.translatable("slashblade.tooltip.soul_material",(this==proudsoul_trapezohedron?mods.flammpfeil.slashblade.SlashBladeConfig.TRAPEZOHEDRON_MAX_REFINE.get():Math.max(10,value)),(int)Math.min(5000L,(long)value*10)));
             super.appendHoverText(stack,context,display,tooltip,flag);
         }
         @Override public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {

@@ -135,7 +135,8 @@ public final class PlayerRenderClientProbe {
             report.put("notoGeometry", NotoGeometryClientProbe.verify());
             report.put("cameraAndSwordTransforms", BladeMotionClientProbe.verifyFirstPerson());
             report.put("firstPersonFraming", FirstPersonFramingClientProbe.verify());
-            report.put("cameraBodyFollow", BladeCameraClientProbe.verify());
+            report.put("resharpedCamera", BladeCameraClientProbe.verify());
+            report.put("resharpedTooltips", ResharpedTooltipClientProbe.verify());
             report.put("sheathBodyFollow", SheathFollowClientProbe.verify());
             report.put("perspectiveParity", PerspectiveParityClientProbe.verify(true));
             report.put("worldRigParity", PerspectiveParityClientProbe.verifyRegisteredRig());

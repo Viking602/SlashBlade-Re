@@ -135,7 +135,7 @@ public final class PlayerAnimationClientProbe {
             if ("zh_cn".equals(mc.options.languageCode)) {
                 for (var entry : chinese.entrySet()) require(language.getOrDefault(entry.getKey()).equals(entry.getValue()),
                         "Chinese locale did not load " + entry.getKey());
-                require(net.minecraft.network.chat.Component.translatable("slashblade.tooltip.killcount", 123).getString().equals("斩杀数：123"),
+                require(net.minecraft.network.chat.Component.translatable("slashblade.tooltip.killcount", 123).getString().equals("杀敌数：123"),
                         "Chinese tooltip placeholder does not format");
             }
             Map<String, Object> report = new LinkedHashMap<>();
