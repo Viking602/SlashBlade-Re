@@ -113,6 +113,8 @@ public class SlashBladeTEISR {
                 matrixStack.translate(0, 0.15f, 0);
                 renderIcon(stack, matrixStack, bufferIn, combinedLightIn,0.005f);
             } else if (transformType == ItemDisplayContext.GUI) {
+                // Resharped's BladeModel inherits Forge's NO_TRANSFORMS. Its OBJ
+                // already lays out the icon; the GUI base must keep an identity transform.
                 renderIcon(stack, matrixStack, bufferIn, combinedLightIn,0.008f, true);
             } else if (transformType == ItemDisplayContext.FIXED) {
                 matrixStack.mulPose(Axis.YP.rotationDegrees(180.0f));
