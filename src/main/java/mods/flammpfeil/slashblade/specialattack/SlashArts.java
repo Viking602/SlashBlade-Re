@@ -65,10 +65,11 @@ public class SlashArts extends RegistryBase<SlashArts> {
     private Function<LivingEntity,ComboState> comboState;
     private Function<LivingEntity,ComboState> comboStateJust;
     private Function<LivingEntity,ComboState> comboStateBroken;
+    private Function<LivingEntity,ComboState> comboStateSuper = e -> mods.flammpfeil.slashblade.slasharts.ResharpedCombos.JUDGEMENT_CUT_END;
 
     public ComboState doArts(ArtsType type, LivingEntity user) {
         switch (type){
-            case Super: return mods.flammpfeil.slashblade.slasharts.ResharpedCombos.JUDGEMENT_CUT_END;
+            case Super: return getComboStateSuper().apply(user);
             case Jackpot:
                 return getComboStateJust(user);
             case Success:
@@ -108,6 +109,9 @@ public class SlashArts extends RegistryBase<SlashArts> {
         this.comboStateJust = state;
         return this;
     }
+
+    public Function<LivingEntity,ComboState> getComboStateSuper() { return comboStateSuper; }
+    public SlashArts setComboStateSuper(Function<LivingEntity,ComboState> state) { comboStateSuper = state; return this; }
 
     public ComboState getComboStateBroken(LivingEntity user) {
         return this.comboStateBroken.apply(user);

@@ -21,19 +21,29 @@ import mods.flammpfeil.slashblade.compat.LazyOptional;
 import java.util.Optional;
 
 public class JudgementCut {
-    public static void doJudgementCutSuper(LivingEntity owner){
-        if(owner.level().isClientSide())return;
-        for(var target:owner.level().getEntitiesOfClass(LivingEntity.class,owner.getBoundingBox().inflate(48),e->e!=owner && mods.flammpfeil.slashblade.util.TargetSelector.canAttack(owner,e) && e.distanceToSqr(owner)<=1600)){
-            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOWNESS,40,10));
-            var cut=new EntityJudgementCut(SlashBlade.RegistryEvents.JudgementCut,owner.level());cut.setOwner(owner);cut.setPos(target.position());
-            SBData.get(owner.getMainHandItem(),ItemSlashBlade.BLADESTATE).ifPresent(s->cut.setColor(s.getColorCode()));owner.level().addFreshEntity(cut);
+    public static void doJudgementCutSuper(LivingEntity owner) {
+        doJudgementCutSuper(owner, null);
+    }
+    public static void doJudgementCutSuper(LivingEntity owner, java.util.List<Entity> exclude) {
+        if (owner.level().isClientSide()) return;
+        var targets = mods.flammpfeil.slashblade.util.TargetSelector.getTargettableEntitiesWithinAABB(
+                owner.level(), owner, owner.getBoundingBox().inflate(48),
+                mods.flammpfeil.slashblade.util.TargetSelector.getResolvedReach(owner) + 32);
+        if (exclude != null) targets.removeAll(exclude);
+        for (var target : targets) if (target instanceof LivingEntity living) {
+            living.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOWNESS, 40, 10));
+            var cut = new EntityJudgementCut(SlashBlade.RegistryEvents.JudgementCut, owner.level());
+            cut.setOwner(owner); cut.setPos(target.position());
+            SBData.get(owner.getMainHandItem(), ItemSlashBlade.BLADESTATE).ifPresent(state -> cut.setColor(state.getColorCode()));
+            SBData.get(owner, ConcentrationRankCapabilityProvider.RANK_POINT).ifPresent(rank -> cut.setRank(rank.getRankLevel(owner.level().getGameTime())));
+            owner.level().addFreshEntity(cut);
         }
+        owner.level().playSound(null, owner.blockPosition(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1, 1);
     }
 
     static public EntityJudgementCut doJudgementCutJust(LivingEntity user){
         EntityJudgementCut sa = doJudgementCut(user);
         if (sa == null) return null;
-        sa.setDamage(sa.getDamage() + 1);
         sa.setIsCritical(true);
         return sa;
     }

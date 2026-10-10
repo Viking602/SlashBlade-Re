@@ -130,6 +130,9 @@ public class AttackManager {
         return areaAttack(owner, beforeHit, reach, forceHit, resetHit, null);
     }
     static public <E extends Entity & IShootable> List<Entity> areaAttack(E owner, Consumer<LivingEntity> beforeHit, double reach, boolean forceHit, boolean resetHit, List<Entity> exclude) {
+        return areaAttack(owner, beforeHit, reach, forceHit, resetHit, 1, exclude);
+    }
+    static public <E extends Entity & IShootable> List<Entity> areaAttack(E owner, Consumer<LivingEntity> beforeHit, double reach, boolean forceHit, boolean resetHit, float comboRatio, List<Entity> exclude) {
         List<Entity> founds = Lists.newArrayList();
 
         AABB bb = owner.getBoundingBox();
@@ -152,9 +155,12 @@ public class AttackManager {
                 if(owner.getShooter() instanceof LivingEntity living && !TargetSelector.canAttack(living,entity))continue;
                 float baseAmount = (float) owner.getDamage();
                 if(owner.getShooter() instanceof LivingEntity living) {
+                    if (!(owner instanceof EntitySlashEffect))
+                        baseAmount += mods.flammpfeil.slashblade.compat.SBEnchantments.level(
+                                net.minecraft.world.item.enchantment.Enchantments.POWER, living.getMainHandItem()) * .1;
                     baseAmount *= (float)living.getAttributeValue(Attributes.ATTACK_DAMAGE);
                     baseAmount += AttackHelper.getRankBonus(living);
-                    baseAmount *= getSlashBladeDamageScale(living)*mods.flammpfeil.slashblade.SlashBladeConfig.SLASHBLADE_DAMAGE_MULTIPLIER.get();
+                    baseAmount *= comboRatio*getSlashBladeDamageScale(living)*mods.flammpfeil.slashblade.SlashBladeConfig.SLASHBLADE_DAMAGE_MULTIPLIER.get();
                 }
                 doAttackWith(owner.damageSources().indirectMagic(owner, owner.getShooter()), baseAmount,entity, forceHit, resetHit);
             }

@@ -89,8 +89,6 @@ public class MoveInputHandler {
         if(Minecraft.getInstance().options.keyPickItem.isDown())
             commands.add(InputCommand.M_DOWN);
 
-        if (mods.flammpfeil.slashblade.client.SlashBladeKeys.SUPER_SA.isDown())
-            commands.add(InputCommand.STYLE);
 
 
         if(Minecraft.getInstance().options.keySaveHotbarActivator.isDown())

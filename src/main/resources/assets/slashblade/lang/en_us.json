@@ -142,7 +142,6 @@
   "adv.slashblade.exeffect.soul_speed.desc": "The input time limit for just actions will be extended by 1 tick for each soul speed level.",
   "adv.slashblade.exeffect.feather_falling": "Slow Fall",
   "adv.slashblade.exeffect.feather_falling.desc": "Falling speed during aerial actions will be reduced depending on Feather Falling level.",
-  "key.slashblade.super_sa": "Super SA",
   "item.slashblade.ex.sabigatana": "Rusted Blade",
   "item.slashblade.ex.doutanuki": "Doutanuki",
   "slashblade.jei.forge": "Forge this blade on an anvil with the shown material box. Cost: %s levels.",

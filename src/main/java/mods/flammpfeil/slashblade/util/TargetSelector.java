@@ -166,6 +166,21 @@ public class TargetSelector {
         return list1;
     }
 
+    public static List<Entity> getTargettableEntitiesWithinAABB(Level world, LivingEntity attacker, AABB area, double reach) {
+        List<Entity> targets = Lists.newArrayList();
+        var predicate = getAreaAttackPredicate(reach);
+        targets.addAll(getReflectableEntitiesWithinAABB(attacker));
+        targets.addAll(getExtinguishableEntitiesWithinAABB(attacker));
+        for (var target : world.getEntitiesOfClass(LivingEntity.class, area)) {
+            if (target.getParts() != null && target.getParts().length > 0) {
+                for (var part : target.getParts())
+                    if (predicate.test((ServerLevel) world, attacker, target) && part.distanceToSqr(attacker) < reach * reach)
+                        targets.add(part);
+            } else if (predicate.test((ServerLevel) world, attacker, target) && canAttack(attacker, target)) targets.add(target);
+        }
+        return targets;
+    }
+
     static public <E extends Entity & IShootable> List<Entity> getTargettableEntitiesWithinAABB(Level world, double reach, E owner) {
         AABB aabb = owner.getBoundingBox().inflate(reach);
 

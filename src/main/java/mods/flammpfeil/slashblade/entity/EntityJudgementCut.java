@@ -229,7 +229,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
             //cyclehit
             if (this.tickCount % 2 == 0) {
                 KnockBacks knockBackType = getIsCritical() ? KnockBacks.toss : KnockBacks.cancel;
-                AttackManager.areaAttack(this, knockBackType.action,4.0, this.doCycleHit(),false);
+                AttackManager.areaAttack(this, knockBackType.action, 4.0, true, false, .16f, null);
             }
 
             final int count = 3;
@@ -245,7 +245,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
                 jc.setMute(false);
                 jc.setIsCritical(true);
 
-                jc.setDamage(1.0);
+                jc.setDamage(0.1F);
 
                 jc.setColor(this.getColor());
                 jc.setBaseSize(0.5f);

@@ -57,7 +57,7 @@ public final class CombatShowcaseClientProbe {
     private static final List<Map<String,Object>> events=new ArrayList<>();
     private static final Map<String,Set<Integer>> cuts=new LinkedHashMap<>();
     private static float damage;
-    private static int frozenSamples;
+    private static int slowedSamples;
     public static void register() {
         if(!BladeVisualClientProbe.ENABLED) return;
         NeoForge.EVENT_BUS.addListener((PlayerTickEvent.Pre e)-> {
@@ -164,7 +164,7 @@ public final class CombatShowcaseClientProbe {
             stages.add(new Stage("SA · "+art+" / release / sheathe",null,100,"art:"+art));
         }
         stages.add(new Stage("Super SA · 满耐久 / 千杀 / 蓄力",null,24,"super-charge"));
-        stages.add(new Stage("Super SA · 定身 / 延迟斩击 / 收刀",null,110,"super"));
+        stages.add(new Stage("Super SA · 减速 / 范围次元斩 / 收刀",null,110,"super"));
         add("演示结束",null,30);
         mc.getSingleplayerServer().execute(()-> {
             actor=mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
@@ -205,7 +205,7 @@ public final class CombatShowcaseClientProbe {
         previousHealth=target.getHealth();
         if(!SHOWCASE) target.setHealth(1000);
         shownHealth=target.getHealth(); shownDamage=damage;
-        if(target.getExistingDataOrNull(SBData.SUPER_FREEZE)!=null) frozenSamples++;
+        if(target.hasEffect(net.minecraft.world.effect.MobEffects.SLOWNESS) && target.getEffect(net.minecraft.world.effect.MobEffects.SLOWNESS).getAmplifier()==10) slowedSamples++;
         if(stage>=stages.size()) { done=true; return; }
         Stage current=stages.get(stage); label=current.name;
         displayLabel=englishTitle(current);
@@ -230,7 +230,7 @@ public final class CombatShowcaseClientProbe {
                     actor.stopUsingItem();
                     SlashBlade.LOGGER.info("Combat showcase release: held={} combo={}",held,s.getComboSeq().getName());
                 }
-                case "super-charge" -> { actor.teleportTo(origin.x,origin.y,origin.z);actor.setDeltaMovement(Vec3.ZERO);s.setSlashArtsKey("slashblade:judgement_cut");s.setDamage(0); s.setKillCount(1000); style(true); }
+                case "super-charge" -> { actor.teleportTo(origin.x,origin.y,origin.z);actor.setDeltaMovement(Vec3.ZERO);s.setSlashArtsKey("slashblade:judgement_cut");s.setDamage(0); s.setKillCount(1000); s.updateComboSeq(actor,ComboState.NONE); style(true); }
                 case "super" -> {
                     style(false);
                     SlashBlade.LOGGER.info("Combat showcase Super SA release: combo={} damage={} kills={}",s.getComboSeq().getName(),s.getDamage(),s.getKillCount());
@@ -239,12 +239,12 @@ public final class CombatShowcaseClientProbe {
             s.sendChanges(actor);
         }
         for(var cut:actor.level().getEntitiesOfClass(EntityJudgementCut.class,actor.getBoundingBox().inflate(40),c->c.getOwner()==actor))
-            cuts.computeIfAbsent(current.action.isEmpty()?"other":current.action,k->new HashSet<>()).add(cut.getId());
+            cuts.computeIfAbsent(current.action.startsWith("super")?"super":current.action.isEmpty()?"other":current.action,k->new HashSet<>()).add(cut.getId());
         if(++stageTick>=current.ticks) { stage++; stageTick=0; }
     }
     private static void style(boolean down) {
         var input=actor.getData(SBData.INPUT); var old=input.getCommands().clone();
-        if(down) input.getCommands().add(InputCommand.STYLE); else input.getCommands().remove(InputCommand.STYLE);
+        if(down) { input.getCommands().add(InputCommand.SPRINT); if(!old.contains(InputCommand.SPRINT)) input.getLastPressTimes().put(InputCommand.SPRINT,actor.level().getGameTime()); } else input.getCommands().remove(InputCommand.SPRINT);
         InputCommandEvent.onInputChange(actor,input,old,input.getCommands().clone());
     }
     private static String englishTitle(Stage current) {
@@ -257,7 +257,7 @@ public final class CombatShowcaseClientProbe {
             case "sa" -> "STANDARD SA  /  Judgment Cut - recover - sheathe";
             case "just" -> "JUST SA  /  Precision cut - recover - sheathe";
             case "super-charge" -> "SUPER SA  /  Charge";
-            case "super" -> "SUPER SA  /  Stun - delayed cuts - sheathe";
+            case "super" -> "SUPER SA  /  Auto-cast - area cuts - sheathe";
             default -> current.combo==null ? (stage==0?"Ready / Full sequence, real-time":"Complete / Blade sheathed")
                     : (current.name.startsWith("强化")?"EXTENDED COMBO  /  ":"NORMAL ATTACKS  /  ")
                     +current.combo.getName().replace("ex_combo_","").toUpperCase(Locale.ROOT)
@@ -267,9 +267,9 @@ public final class CombatShowcaseClientProbe {
     private static void finish() {
         running=false; writer.shutdown();
         boolean passed=cuts.getOrDefault("sa",Set.of()).size()>0 && cuts.getOrDefault("just",Set.of()).size()>0
-                && cuts.getOrDefault("super",Set.of()).size()>0 && damage>0 && frozenSamples>0;
+                && cuts.getOrDefault("super",Set.of()).size()>0 && damage>0 && slowedSamples>0;
         var report=new LinkedHashMap<String,Object>(); report.put("status",passed?"passed":"failed");
-        report.put("frames",frame); report.put("ticks",shownTick); report.put("damage",damage); report.put("frozenSamples",frozenSamples);
+        report.put("frames",frame); report.put("ticks",shownTick); report.put("damage",damage); report.put("slowedSamples",slowedSamples);
         report.put("cutEntityIds",cuts); report.put("stages",events);
         report.put("hitEvents",hitEvents);
         if(SHOWCASE) {
@@ -296,7 +296,7 @@ public final class CombatShowcaseClientProbe {
         }
         if(FIRST_PERSON) {
             report.put("cameraRanges",cameraRanges);
-            for(String prefix:List.of("A 连段","B 连段","C 分支","SA · 次元","Just SA · 精准","Super SA · 定身")) {
+            for(String prefix:List.of("A 连段","B 连段","C 分支","SA · 次元","Just SA · 精准","Super SA · 减速")) {
                 boolean changed=cameraRanges.entrySet().stream().filter(e->e.getKey().startsWith(prefix))
                         .anyMatch(e->{var v=e.getValue();return Math.max(Math.max(Math.abs(v[0]),Math.abs(v[1])),Math.max(Math.max(Math.abs(v[2]),Math.abs(v[3])),Math.max(Math.abs(v[4]),Math.abs(v[5]))))>.001F;});
                 if(changed) {passed=false;report.put("unexpectedCameraMotion",prefix);}

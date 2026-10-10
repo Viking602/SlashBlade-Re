@@ -16,7 +16,6 @@ import net.neoforged.neoforge.common.NeoForge;
 public final class SlashBladeClient {
     public static void register(IEventBus bus) {
         bus.addListener(ClientNetwork::register);
-        bus.addListener(SlashBladeKeys::register);
         bus.addListener(SlashBladeClient::renderers);
         bus.addListener(SlashBladeClient::setup);
         bus.addListener(mods.flammpfeil.slashblade.client.renderer.util.BladeRenderState::registerPipelines);

@@ -3,7 +3,6 @@ package mods.flammpfeil.slashblade.verification;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import java.util.*;
 import mods.flammpfeil.slashblade.SlashBlade;
-import mods.flammpfeil.slashblade.client.SlashBladeKeys;
 import mods.flammpfeil.slashblade.entity.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
@@ -37,7 +36,7 @@ public final class CombatClientProbe {
         mc.setScreen(null); mode=art; elapsed=0; holdTicks=ticks; monitorTicks=80; received.clear();
         if(art.equals("sa")) {
             mc.options.keyUse.setDown(true); mc.gameMode.useItem(mc.player,InteractionHand.MAIN_HAND);
-        } else SlashBladeKeys.SUPER_SA.setDown(true);
+        } else mc.options.keySprint.setDown(true);
         SlashBlade.LOGGER.info("Combat client probe began: {} held {} ticks",art,ticks); return 1;
     }
     private static void tick(ClientTickEvent.Post event) {
@@ -72,7 +71,7 @@ public final class CombatClientProbe {
         if(mode==null)return;
         if(elapsed++==holdTicks) {
             if(mode.equals("sa")) { mc.options.keyUse.setDown(false); mc.gameMode.releaseUsingItem(mc.player); }
-            else SlashBladeKeys.SUPER_SA.setDown(false);
+            else mc.options.keySprint.setDown(false);
             SlashBlade.LOGGER.info("Combat client probe released: {} at tick {}",mode,elapsed-1);
         }
         if(elapsed>holdTicks && --monitorTicks<=0) {
@@ -98,6 +97,6 @@ public final class CombatClientProbe {
             SlashBlade.LOGGER.info("Combat client renderer submitted: {}",description);
         }
     }
-    private static void reset(Minecraft mc) { mc.options.keyUse.setDown(false); SlashBladeKeys.SUPER_SA.setDown(false); mode=null; }
+    private static void reset(Minecraft mc) { mc.options.keyUse.setDown(false); mc.options.keySprint.setDown(false); mode=null; }
     private CombatClientProbe() {}
 }

@@ -145,118 +145,7 @@ public final class CombatGameTests {
             SBItems.slashblade.releaseUsing(actor.getMainHandItem(),h.getLevel(),actor,72000-charge);
             h.assertValueEqual(state(actor.getMainHandItem()).getComboSeq(),charge==13?Extra.EX_JUDGEMENT_CUT_SLASH_JUST:Extra.EX_JUDGEMENT_CUT,"Soul Speed extends capped Just window");h.succeed();
         });
-        for(int gate=0;gate<7;gate++) {
-            final int mode=gate;
-            tests.put("super_sa_requirement_"+mode,h -> {
-                var actor=player(h); var stack=actor.getMainHandItem(); var s=state(stack); s.setKillCount(1000);
-                switch(mode) {
-                    case 0 -> s.setKillCount(999);
-                    case 1 -> s.setDamage(.01f);
-                    case 2 -> s.setBroken(true);
-                    case 3 -> s.setSealed(true);
-                    case 4 -> stack.remove(net.minecraft.core.component.DataComponents.ENCHANTMENTS);
-                    case 5 -> s.setDefaultBewitched(false);
-                    default -> { }
-                }
-                style(actor,true);
-                h.runAfterDelay(mode==6?19:20,() -> {
-                    style(actor,false);
-                    h.assertValueEqual(s.getDamage(),mode==1?.01f:0f,"failed Super SA has no cost");
-                    h.assertFalse(s.getComboSeq()==Extra.EX_SUPER_SA,"failed Super SA has no attack"); h.succeed();
-                });
-            });
-        }
-        tests.put("super_sa_swap_cancels_charge",h -> {
-            var actor=player(h); var first=actor.getMainHandItem(); state(first).setKillCount(1000);
-            style(actor,true);
-            h.runAfterDelay(20,() -> {
-                var second=blade(h); state(second).setKillCount(1000); actor.setItemInHand(InteractionHand.MAIN_HAND,second);
-                style(actor,false);
-                h.assertValueEqual(state(first).getDamage(),0f,"old blade not charged by another blade");
-                h.assertValueEqual(state(second).getDamage(),0f,"new blade cannot inherit charge"); h.succeed();
-            });
-        });
-        tests.put("super_sa_release_stun_wide_damage",h -> {
-            var actor=player(h); var stack=actor.getMainHandItem(); var s=state(stack); s.setKillCount(1000);
-            stack.set(net.minecraft.core.component.DataComponents.UNBREAKABLE,net.minecraft.util.Unit.INSTANCE);
-            var target=h.spawn(EntityType.HUSK,3,2,7); target.setNoAi(true); target.setGlowingTag(true); target.setNoGravity(true);
-            target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(200); target.setHealth(200);
-            target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR).setBaseValue(20);
-            target.setPos(actor.position().add(20,0,0));
-            style(actor,true);
-            h.onEachTick(() -> SuperSlashArts.getInstance().onTick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(actor)));
-            h.runAfterDelay(20,() -> {
-                style(actor,false);
-                h.assertValueEqual(s.getDamage(),.5f,"Super SA always costs half durability");
-                h.assertValueEqual(s.getComboSeq(),Extra.EX_SUPER_SA,"Super SA animation entered");
-                h.assertTrue(target.getData(SBData.EFFECT).isStun(h.getLevel().getGameTime()+39),"40-tick wide-area stun");
-                h.assertFalse(target.getData(SBData.EFFECT).isStun(h.getLevel().getGameTime()+41),"stun expires");
-                h.assertValueEqual(target.getData(SBData.SUPER_FREEZE).until(),h.getLevel().getGameTime()+40,"40-tick synchronized freeze deadline");
-                style(actor,false); h.assertValueEqual(s.getDamage(),.5f,"duplicate release cannot charge twice");
-            });
-            h.runAfterDelay(44,() -> h.assertValueEqual(target.getHealth(),200f,"attack waits for its animation"));
-            h.runAfterDelay(47,() -> {
-                var cuts=h.getLevel().getEntitiesOfClass(EntityJudgementCut.class,target.getBoundingBox().inflate(3),e->e.getOwner()==actor);
-                h.assertValueEqual(cuts.size(),1,"one cut batches Super SA hits per target");
-                float before=target.getHealth(); h.assertTrue(before<200,"wide melee strike dealt damage");
-                var cut=cuts.getFirst(); for(int i=0;i<10 && !cut.isRemoved();i++){cut.tickCount++;cut.tick();}
-                h.assertTrue(before-target.getHealth()>=3.9f,"remaining Super SA magic pulses bypass 20 armor"); h.succeed();
-            });
-        });
-        tests.put("super_sa_freeze_pauses_and_resumes",h -> {
-            var target=h.spawn(EntityType.HUSK,3,2,7);target.setNoAi(true);target.setNoGravity(true);
-            target.tickCount=37;
-            int initialTicks=target.tickCount;var position=target.position();
-            SuperSlashArts.freezeUntil(target,h.getLevel().getGameTime()+5);
-            target.setDeltaMovement(1,0,0);
-            h.runAfterDelay(3,()-> {
-                h.assertValueEqual(target.tickCount,initialTicks,"frozen entity age does not advance");
-                h.assertValueEqual(target.position(),position,"frozen target does not move");
-            });
-            h.runAfterDelay(7,()-> {
-                h.assertFalse(target.hasData(SBData.SUPER_FREEZE),"expired freeze attachment is removed");
-                h.assertTrue(target.tickCount>initialTicks,"entity resumes ticking after freeze");h.succeed();
-            });
-        });
-        tests.put("super_sa_freeze_tick_order",h -> {
-            var target=h.spawn(EntityType.HUSK,3,2,7); target.tickCount=41;
-            SuperSlashArts.freezeUntil(target,h.getLevel().getGameTime()+5);
-            target.tickCount++;
-            var afterIncrement=new net.neoforged.neoforge.event.tick.EntityTickEvent.Pre(target);
-            SuperSlashArts.getInstance().freeze(afterIncrement);
-            h.assertTrue(afterIncrement.isCanceled(),"NeoForge tick work is cancelled");
-            h.assertValueEqual(target.tickCount,41,"age is held when tickCount advances before the event");
-            var beforeIncrement=new net.neoforged.neoforge.event.tick.EntityTickEvent.Pre(target);
-            SuperSlashArts.getInstance().freeze(beforeIncrement);
-            h.assertTrue(beforeIncrement.isCanceled(),"ServerCore tick work is cancelled");
-            h.assertValueEqual(target.tickCount,41,"age is held when tickCount advances inside the cancelled work");
-            h.succeed();
-        });
-        tests.put("super_sa_freeze_save_compatibility",h -> {
-            var ops=com.mojang.serialization.JsonOps.INSTANCE;
-            var legacy=new com.google.gson.JsonObject(); legacy.addProperty("until",123L);
-            var restored=FreezeState.CODEC.codec().parse(ops,legacy).getOrThrow();
-            h.assertValueEqual(restored,new FreezeState(123L,0),"previous until-only saves remain readable");
-            var current=new FreezeState(321L,57);
-            var saved=FreezeState.CODEC.codec().encodeStart(ops,current).getOrThrow();
-            h.assertValueEqual(FreezeState.CODEC.codec().parse(ops,saved).getOrThrow(),current,"freeze deadline and age survive saving");
-            h.succeed();
-        });
-        tests.put("super_sa_freeze_sync_local_clock",h -> {
-            var target=h.spawn(EntityType.HUSK,3,2,7); target.tickCount=27;
-            var buf=new net.minecraft.network.RegistryFriendlyByteBuf(io.netty.buffer.Unpooled.buffer(),h.getLevel().registryAccess());
-            try {
-                var server=new FreezeState(321L,903);
-                FreezeState.SYNC.write(buf,server,true);
-                var client=FreezeState.SYNC.read(target,buf,null);
-                h.assertValueEqual(client,new FreezeState(321L,27),"sync preserves the client's own animation phase");
-                h.assertValueEqual(buf.readableBytes(),0,"existing deadline-only wire format is fully consumed");
-                target.tickCount=28;
-                FreezeState.SYNC.write(buf,server,false);
-                h.assertValueEqual(FreezeState.SYNC.read(target,buf,client),client,"repeat sync cannot advance a frozen clock");
-            } finally { buf.release(); }
-            h.succeed();
-        });
+        SuperSlashArtsGameTests.add(tests);
         ResharpedCombatGameTests.add(tests);
         tests.forEach((name,test) -> event.registerTest(SlashBlade.id("combat_"+name),new GameTestInstance(new TestData<>(environment,SlashBlade.id("port_test"),180,0,true)) {
             @Override public void run(GameTestHelper h) { test.accept(h); }
@@ -280,10 +169,5 @@ public final class CombatGameTests {
         });
     }
     private static ISlashBladeState state(ItemStack stack) { return SBData.get(stack,ItemSlashBlade.BLADESTATE).orElseThrow(()->new IllegalStateException("No blade state")); }
-    private static void style(ServerPlayer player,boolean down) {
-        var input=player.getData(SBData.INPUT); var old=input.getCommands().clone();
-        if(down)input.getCommands().add(InputCommand.STYLE);else input.getCommands().remove(InputCommand.STYLE);
-        InputCommandEvent.onInputChange(player,input,old,input.getCommands().clone());
-    }
     private CombatGameTests() {}
 }

@@ -134,7 +134,7 @@ By default, each anvil refine costs **1 material and 1 experience level**, resto
 | Blade Soul Crystal | 200 | 2,000 |
 | Blade Soul Trapezohedron | 2,147,483,647 | 5,000 |
 
-With default server settings, kills grant ProudSoul from dropped experience and style rank, capped at 100 per award. A summoned sword costs 2; a formation costs 20. Standard SA spends 20 when available, otherwise one durability point. Super SA retains this build’s rules below.
+With default server settings, kills grant ProudSoul from dropped experience and style rank, capped at 100 per award. A summoned sword costs 2; a formation costs 20. Standard SA spends 20 when available, otherwise one durability point. Super SA follows the Resharped rules below.
 
 ## Get started
 
@@ -159,9 +159,9 @@ The animation system runs inside this mod. **Epic Fight and PlayerAnimator are n
 | Draw attack | Tap right click |
 | Slash Arts (SA) | Hold right click to charge, then release |
 | Just SA | Release in the precision window — normally ticks 9–11 |
-| Super SA | Hold **V** for at least one second, then release |
+| Super SA | On the ground, hold the **Sprint** key for one second; it casts automatically |
 
-Super SA requires an eligible enchanted blade with at least **1,000 kills**, full durability, and no broken or sealed state. It consumes **50% durability**. **V** can be rebound in Controls.
+Super SA follows Resharped: an eligible enchanted, bewitched blade needs at least **1,000 kills**, full durability, and no broken or sealed state. Hold Sprint on the ground for **20 ticks**; releasing early cancels. Moving while sneaking prevents the cast. The base cost is half the maximum durability, rounded down; Unbreaking, creative mode and Unbreakable apply. Each blade dispatches its Super art. The default art applies two seconds of Slowness and creates area Judgement Cuts.
 
 ## Built. Played. Compared.
 
