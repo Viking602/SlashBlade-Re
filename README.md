@@ -10,16 +10,12 @@ Chain your cuts. Time your Slash Arts. Feel the motion carry through your hands,
 
 **[Get started ↓](#get-started)** · [Controls](#make-your-first-cut) · [Build from source](#build-from-source) · [Report an issue](https://github.com/Viking602/SlashBlade-Re/issues)
 
-> **Development preview · `0.1.2-26.1.2-port.27`**<br>
+> **Development preview · `0.1.2-26.1.2-port.30`**<br>
 > This repository provides source code. Build the preview below; a packaged release is not published here yet.
 
-**[port.27: all eight Slash Arts in first person](media/resharped-first-person.mp4)** — normal combos, each SA, Just SA and Super SA against one training Husk, with real damage and no healing.
+![port.30 continuous combat: normal combos, all eight Slash Arts, Just SA and Super SA](media/combat-preview.gif?v=port30)
 
-![Continuous combat against a training Husk: normal combos, Slash Arts and Super SA](media/combat-preview.gif)
-
-**[Watch the full combat showcase](media/combat-showcase.mp4)** · [First-person recording](https://cdn.jsdelivr.net/gh/Viking602/SlashBlade-Re@7bf343ad5039dfab8b6275542618887e4e8f2b81/media/first-person-combat.mp4) · [Original-motion comparison](media/first-person-original.mp4)
-
-*Fresh, continuous gameplay: normal and extended combos, standard SA, Just SA, and Super SA, including recovery and sheathing. The stationary training Husk has extra health; the display shows actual damage, with no healing during the recording. Videos run at original speed and have no audio.*
+*port.30 · 91 seconds of continuous third-person combat: normal and extended combos, all eight Slash Arts, Just SA, and the updated Super SA that casts after holding Sprint for one second. One stationary, high-health training Husk takes actual damage with no healing. Every attack and recovery is retained at original speed.*
 
 ## Every cut, connected.
 
@@ -165,7 +161,7 @@ Super SA follows Resharped: an eligible enchanted, bewitched blade needs at leas
 
 ## Built. Played. Compared.
 
-`port.27` passes **132 required GameTests**: progression, inheritance, soul economy, acquisition, blade-stand transactions, special effects, configuration, registries, and actual damage from all eight Slash Arts. Client checks run in an isolated instance with **205 installed mods**, including RarityCore. Tooltip checks cover display conditions and compatibility; icon checks compare actual rendered bounds with Resharped's OBJ geometry and GUI transform.
+`port.30` passes **139 required GameTests**: progression, inheritance, soul economy, acquisition, blade-stand transactions, special effects, configuration, registries, actual damage from all eight Slash Arts, and Resharped's Super SA charge and durability rules. Client checks run in an isolated instance with **206 installed mods**, including RarityCore. Tooltip checks cover display conditions and compatibility; icon checks compare actual rendered bounds with Resharped's OBJ geometry and effective GUI transform.
 
 The renderer checks compare first-person geometry with the original VMD tracks, including Piercing; test interruption and sheathing transitions; and sample both hands, head turns and look angles. Third-person tests exercise the character rig and actual entity renderer. First person submits no arm geometry.
 
@@ -192,7 +188,7 @@ cd SlashBlade-Re
 sh ./gradlew build
 ```
 
-Output: `build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.27.jar`.
+Output: `build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.30.jar`.
 
 To run the server-side regression suite, use the same wrapper with `runGameTestServer` in a disposable checkout. The task writes to a sibling `test-gametest` directory.
 

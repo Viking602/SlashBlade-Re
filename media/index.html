@@ -3,52 +3,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark">
-<title>SlashBlade:Re — First-person combat</title>
+<title>SlashBlade:Re — port.30 combat</title>
 <style>
-  *{box-sizing:border-box}body{margin:0;background:#111416;color:#edf0ec;font:16px/1.55 system-ui,sans-serif}
-  main{max-width:1160px;margin:0 auto;padding:40px 24px}a{color:#bde692}header{display:flex;justify-content:space-between;gap:16px;align-items:center}
-  .brand{color:inherit;text-decoration:none;font-weight:650}h1{font-size:clamp(28px,5vw,48px);line-height:1.1;letter-spacing:-.035em;margin:40px 0 12px}
-  p{color:#afb8af;margin:12px 0 24px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0 14px}
-  button{font:inherit;color:inherit;background:#242b26;border:1px solid #485344;padding:10px 18px;border-radius:9px;cursor:pointer}
-  button[aria-pressed=true]{background:#d1eca5;color:#172211;border-color:#d1eca5}button:focus-visible,a:focus-visible{outline:3px solid #e7ffcf;outline-offset:4px}
-  video{display:block;width:100%;aspect-ratio:8/5;background:#000;border-radius:12px;box-shadow:0 16px 60px #0005}
-  .details{display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap;font-size:14px;margin-top:16px}.details p{margin:0}
-  .chapters{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}.chapters button{font-size:14px;padding:8px 14px;background:transparent}
-  footer{margin-top:36px;border-top:1px solid #30392e;padding-top:18px;color:#afb8af;font-size:14px}
+*{box-sizing:border-box}body{margin:0;background:#111416;color:#edf0ec;font:16px/1.6 system-ui,sans-serif}
+main{max-width:1000px;margin:auto;padding:36px 24px}a{color:#bde692}header{display:flex;justify-content:space-between;gap:16px}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.15;margin:36px 0 16px}p{color:#afb8af}img{display:block;width:100%;height:auto;border-radius:12px;margin:24px 0}
 </style>
 <main>
-  <header><a class="brand" href="https://github.com/Viking602/SlashBlade-Re">SlashBlade:Re</a><span>port.23</span></header>
-  <h1 data-en="Every cut, in first person." data-zh="每一刀，都看得清。">Every cut, in first person.</h1>
-  <p data-en="Original SlashBlade weapon tracks, refined framing and brief combo transitions. No arms in view." data-zh="原版拔刀剑刀路，调整取景与短过渡。第一人称不显示手臂。">Original SlashBlade weapon tracks, refined framing and brief combo transitions. No arms in view.</p>
-  <div class="tabs" role="group" aria-label="Recording version">
-    <button id="refined" aria-pressed="true" data-en="Refined" data-zh="优化版">Refined</button>
-    <button id="original" aria-pressed="false" data-en="Original tracks" data-zh="原版刀路对照">Original tracks</button>
-  </div>
-  <video id="video" controls playsinline preload="metadata" aria-label="First-person combat recording" src="first-person-combat.mp4"></video>
-  <div class="details"><p data-en="50 seconds · Original speed · Silent · Actual hits on a training Husk" data-zh="约 50 秒 · 原速 · 无音轨 · 对尸壳练习靶实际命中">50 seconds · Original speed · Silent · Actual hits on a training Husk</p><a id="download" href="first-person-combat.mp4" download data-en="Download video" data-zh="下载视频">Download video</a></div>
-  <div class="chapters" role="group" aria-label="Jump to action">
-    <button data-time="0.9" data-en="Combo A" data-zh="A 连招">Combo A</button>
-    <button data-time="6.7" data-en="Extended combo" data-zh="强化连招">Extended combo</button>
-    <button data-time="15.7" data-en="Combo B" data-zh="B 连招">Combo B</button>
-    <button data-time="25.7" data-en="Combo C" data-zh="C 连招">Combo C</button>
-    <button data-time="30.9">SA</button><button data-time="36.9">Just SA</button><button data-time="41.7">Super SA</button>
-  </div>
-  <footer data-en="Both recordings retain the full attack and recovery sequence. The stationary target has extra health and is never healed during recording. Third-person choreography shares the action clock but uses a different rig." data-zh="两段实录均保留完整攻击与收刀过程。静止练习靶增加了生命值，录制中不回血。第三人称共用动作时钟，使用独立的人物骨骼编排。">Both recordings retain the full attack and recovery sequence. The stationary target has extra health and is never healed during recording. Third-person choreography shares the action clock but uses a different rig.</footer>
+<header><a href="https://github.com/Viking602/SlashBlade-Re">SlashBlade:Re</a><span>port.30</span></header>
+<h1 data-zh="每一刀，完整展现。">Every cut, from draw to sheathe.</h1>
+<p data-zh="91 秒连续第三人称战斗：普通与强化连招、全部八类 SA、精准 SA 和新版超级 SA。原速循环播放。">91 seconds of continuous third-person combat: normal and extended combos, all eight Slash Arts, Just SA and the updated Super SA. Original speed, looping GIF.</p>
+<img src="combat-preview.gif?v=port30" width="640" height="400" alt="SlashBlade port.30 full combat GIF">
+<p data-zh="持续攻击同一只静止高血量尸壳，显示实际伤害，全程不回血。超级 SA 按住疾跑键一秒自动释放。">One stationary, high-health training Husk takes actual damage, with no healing. Super SA casts automatically after holding Sprint for one second.</p>
 </main>
 <script>
-  const zh=navigator.language.toLowerCase().startsWith('zh');
-  if(zh){document.documentElement.lang='zh-CN';for(const el of document.querySelectorAll('[data-zh]'))el.textContent=el.dataset.zh;}
-  const video=document.getElementById('video'),download=document.getElementById('download');
-  let request=0;
-  for(const id of ['refined','original']) document.getElementById(id).addEventListener('click',()=>{
-    const button=document.getElementById(id);if(button.getAttribute('aria-pressed')==='true')return;
-    const time=video.currentTime,playing=!video.paused,version=++request;
-    const file=id==='refined'?'first-person-combat.mp4':'first-person-original.mp4';
-    for(const other of ['refined','original'])document.getElementById(other).setAttribute('aria-pressed',String(other===id));
-    video.src=file;download.href=file;
-    video.addEventListener('loadedmetadata',()=>{if(request!==version)return;video.currentTime=Math.min(time,video.duration);if(playing)video.play().catch(()=>{});},{once:true});
-    video.load();
-  });
-  for(const button of document.querySelectorAll('[data-time]'))button.addEventListener('click',()=>{video.currentTime=Number(button.dataset.time);video.play().catch(()=>{});});
+if(navigator.language.toLowerCase().startsWith('zh')){document.documentElement.lang='zh-CN';for(const el of document.querySelectorAll('[data-zh]'))el.textContent=el.dataset.zh;}
 </script>
 </html>

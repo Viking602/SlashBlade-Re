@@ -10,16 +10,12 @@
 
 **[开始游玩 ↓](#开始游玩)** · [基础操作](#挥出第一刀) · [从源码构建](#从源码构建) · [反馈问题](https://github.com/Viking602/SlashBlade-Re/issues)
 
-> **开发预览版 · `0.1.2-26.1.2-port.27`**<br>
+> **开发预览版 · `0.1.2-26.1.2-port.30`**<br>
 > 当前仓库提供源码，可按下方步骤构建；暂未在此发布打包下载版。
 
-**[port.27：八类 SA 第一人称完整实录](media/resharped-first-person.mp4)** — 普通连招、各类 SA、精准 SA 与 Super SA 连续攻击同一只尸壳，显示真实伤害，全程不回血。
+![port.30 连续战斗：普通连招、全部八类 SA、精准 SA 与超级 SA](media/combat-preview.gif?v=port30)
 
-![对尸壳练习靶连续施展普通连招、标准 SA 与超级 SA](media/combat-preview.gif)
-
-**[观看完整战斗演示](media/combat-showcase.mp4)** · [第一人称实录](https://cdn.jsdelivr.net/gh/Viking602/SlashBlade-Re@7bf343ad5039dfab8b6275542618887e4e8f2b81/media/first-person-combat.mp4) · [原版刀路对照](media/first-person-original.mp4)
-
-*全新连续实录：普通与强化连招、标准 SA、精准 SA、超级 SA，保留完整收势与收刀。静止尸壳练习靶增加了生命值；画面显示实际伤害，全程不回血。原速播放，无音轨。*
+*port.30 · 91 秒连续第三人称战斗：普通与强化连招、全部八类 SA、精准 SA，以及按住疾跑键一秒自动释放的新版超级 SA。持续攻击同一只静止高血量尸壳，显示真实伤害，全程不回血。保留每次攻击与收刀，原速循环播放。*
 
 ## 每一刀，都连贯。
 
@@ -165,7 +161,7 @@ Super SA 与重锋一致：使用满足妖刀条件的附魔刀，击杀数至�
 
 ## 构建之外，也经实机检验。
 
-`port.27` 已通过 **132 项必需 GameTests**，覆盖成长路线、数据继承、耀魂经济、获取方式、刀架交易、SE、配置、注册表，以及八类 SA 的实际伤害。客户端在含 RarityCore 的 **205 个模组**隔离实例中验证。提示检查覆盖显示条件和兼容性；图标检查将实际渲染边界与重锋的 OBJ 几何体及 GUI 变换对照。
+`port.30` 已通过 **139 项必需 GameTests**，覆盖成长路线、数据继承、耀魂经济、获取方式、刀架交易、SE、配置、注册表、八类 SA 的实际伤害，以及重锋超级 SA 的蓄力和耐久规则。客户端在含 RarityCore 的 **206 个模组**隔离实例中验证。提示检查覆盖显示条件和兼容性；图标检查将实际渲染边界与重锋的 OBJ 几何体及实际生效的 GUI 变换对照。
 
 渲染检查对照第一人称几何体与原版 VMD 轨迹，包括突刺；检查打断、收刀衔接，以及左右持刀、转头和不同俯仰角。第三人称检查覆盖人物骨骼与实际实体渲染器，第一人称不提交手臂几何体。
 
@@ -192,7 +188,7 @@ cd SlashBlade-Re
 sh ./gradlew build
 ```
 
-产物：`build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.27.jar`。
+产物：`build/libs/SlashBlade-26.1.2-0.1.2-26.1.2-port.30.jar`。
 
 在临时检出目录中，使用相同 wrapper 执行 `runGameTestServer` 可运行服务端回归测试。该任务会写入同级的 `test-gametest` 目录。
 

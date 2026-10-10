@@ -33,3 +33,6 @@ __pycache__/
 /tool/
 /docs/
 *.ps1
+
+# Publish GIF previews only; full recordings remain local.
+/media/*.mp4
